@@ -3,6 +3,8 @@ project (GOTHiC CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+#-D_GLIBCXX_PARALLEL")
  
 find_package (SeqAn3 3.0.0 REQUIRED HINTS "${CMAKE_SOURCE_DIR}/../seqan3/build_system")
 find_package(Boost 1.36.0 COMPONENTS iostreams)

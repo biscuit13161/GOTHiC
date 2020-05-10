@@ -72,6 +72,8 @@ public:
 	inline std::string getInt1() const {return mInt1;}
 	inline std::string getInt2() const {return mInt2;}
 
+	inline void setLocus1(int L) {mLocus1 = L; mInt1 = mChr1 + "_" + std::to_string(mLocus1);}
+	inline void setLocus2(int L) {mLocus2 = L; mInt2 = mChr2 + "_" + std::to_string(mLocus2);}
 	void print();
 
 };

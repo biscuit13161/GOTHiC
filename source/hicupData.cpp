@@ -8,8 +8,11 @@
 #include "hicupData.h"
 #include <set>
 #include <iostream>
+#include <stdio.h>
+#include <omp.h>
 #include <istream>
 #include <fstream>
+#include <cmath>
 #include <regex>
 #include <zlib.h>
 #include <algorithm>
@@ -214,6 +217,8 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string re
 	findOverlaps(sources, fragments); //Parallelise?
 	findOverlaps(targets, fragments); //Parallelise?
 
+	cout << interactions.size() << endl;
+	//throw std::invalid_argument("test finish");
 
 	//sort positions into order
 	// to Parallelise?
@@ -250,33 +255,40 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string re
 void binInteractions(vector<Interaction> & interactions, int res)
 {
 	//
+
+	vector<Interaction> interactions2;
+
+	for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
+	{
+		cout << T.getLocus1() << "\t" << flush;
+
+		// if resolution is given, bins will be calculated from interactions using the resolution
+		T.setLocus1(floor(T.getLocus1() / res) * res );
+		T.setLocus2(floor(T.getLocus2() / res) * res );
+		cout << T.getLocus1() << endl;;
+	});
+
+	//#pragma omp parallel for
+/*	for (auto it = interactions.begin(); it != interactions.end(); it++)
+	{
+		Interaction T = *it;
+		cout << T.getLocus1() << "\t" << flush;
+
+		// if resolution is given, bins will be calculated from interactions using the resolution
+		T.setLocus1(floor(T.getLocus1() / res) * res );
+		T.setLocus2(floor(T.getLocus2() / res) * res );
+		cout << T.getLocus1() << endl;;
+	}*/
+
 	/*
 	 * #####bin interactions into desired bin size e.g. 1Mb########
 .binInteractions <- function(interactions, resolution, frequencyCol = "frequencies", considerExistingFrequencies = frequencyCol %in% names(interactions))
 {
-	if(!identical(colnames(interactions)[1:4], c("chr1", "locus1", "chr2", "locus2")))
-		stop("expecting columns chr1, locus1, chr2, locus2")
-	if(considerExistingFrequencies && sum(names(interactions) == "frequencies") == 0)
-		stop(paste("expecting column", frequencyCol))
 
 
-#if resolution is given, bins will be calculated from interactions using the resolution
-	interactions$locus1 <- (interactions$locus1 %/% resolution) * resolution
-	interactions$locus2 <- (interactions$locus2 %/% resolution) * resolution
-
-#put smaller locus first to make sure a-b and b-a interactions look the same
-	firstSmaller <- subset(interactions, (as.character(chr1) < as.character(chr2)) | (as.character(chr1) == (as.character(chr2)) & locus1 <= locus2))
-	secondSmaller <- subset(interactions, !((as.character(chr1) < as.character(chr2)) | (as.character(chr1) == (as.character(chr2)) & locus1 <= locus2)))
-#flip first and second if second is smaller
-	cnames <- colnames(interactions)
-	cnames[1:4] <- c("chr2", "locus2", "chr1", "locus1")
-	setnames(secondSmaller,colnames(secondSmaller),cnames)
-#stich them back together
-	interactions <- rbind(firstSmaller, secondSmaller)
 
 # --------- count the number of interactions between bins -------
-	interactions <- interactions[order(interactions$chr1, interactions$locus1, interactions$chr2, interactions$locus2), ]
-#bin it
+
 	interactions <- .countDuplicates(interactions, frequencyCol, considerExistingFrequencies)
 
 	return(interactions)
@@ -385,13 +397,13 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string re
 			}
 		}
 	}
-/*
-#all read pairs used in binomial
-		numberOfReadPairs <- sum(binned_df_filtered$frequencies)
-#calculate coverage
-		all_bins <- unique(c(unique(binned_df_filtered$int1), unique(binned_df_filtered$int2)))
-		all_bins <- sort(all_bins)
-		if(nrow(binned_df_filtered)>1e8)
+
+	// all read pairs used in binomial
+	int numberOfReadPairs = interactions.size(); // before binning!!
+
+	// calculate coverage
+		/*
+		if( interations.size() > 1e8)
 			{
 				t <- ceiling(nrow(binned_df_filtered)/1e8)
 				dfList <- list()
@@ -605,14 +617,20 @@ return(binned_df_filtered)
 
 void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
 {
-	for (int i = 0; i < query.size(); i++)
+	//omp_set_dynamic(0);
+	//omp_set_num_threads(8);
+	int i;
+
+	#pragma omp parallel for
+	for (i = 0; i < query.size(); i++)
 	{
 		for (int j = 0; j < fragments.size(); j++)
 		{
 			if (query[i].getChr() == fragments[j].getChr())
 			{
+				if ((query[i].getLocus() - fragments[j].getStart()) * (fragments[j].getEnd() - query[i].getLocus()) >= 0)
 				//if ((query[i].getLocus() >= fragments[j].getStart()) && (query[i].getLocus() <= fragments[j].getEnd()))
-				if (fragments[j].getStart() <<= query[i].getLocus() <= fragments[j].getEnd())
+				if ((query[i].getLocus() - fragments[j].getStart()) * (fragments[j].getEnd() - query[i].getLocus()) >= 0)
 				{
 					query[i] = halfInteraction(fragments[j].getChr(), fragments[j].getStart());
 					break;
@@ -622,6 +640,26 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool
 		}
 	}
 }//*/
+
+/*void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
+{
+	for(auto & Q : query)
+	{
+		for(auto& F : fragments)
+		{
+			if (Q.getChr() == F.getChr())
+			{
+				if ((Q.getLocus() - F.getStart()) * (F.getEnd() - Q.getLocus()) >= 0)
+				{
+					Q = halfInteraction(F.getChr(), F.getStart());
+					break;
+				}
+			}
+		}
+	}
+}//*/
+
+//#pragma omp parallel
 
 /*void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
 {
@@ -644,4 +682,16 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool
 }//*/
 
 
+/*
+int binomialCoefficients(int n, int k) {
+   int C[k+1];
+   memset(C, 0, sizeof(C));
+   C[0] = 1;
+   for (int i = 1; i <= n; i++) {
+      for (int j = min(i, k); j > 0; j--)
+         C[j] = C[j] + C[j-1];
+   }
+   return C[k];
+}
+//*/
 

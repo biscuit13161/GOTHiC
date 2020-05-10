@@ -1,6 +1,8 @@
 #include "gothic.h"
 #include "BinomData.h"
 #include <iostream>
+#include <stdio.h>
+#include <omp.h>
 #include <string>
 #include <seqan3/core/debug_stream.hpp>   // for debug_stream
 #include <seqan3/std/filesystem>          // for tmp_dir
