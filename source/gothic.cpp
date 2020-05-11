@@ -1,10 +1,13 @@
 #include "gothic.h"
 #include "BinomData.h"
+#include "Utils.h"
 #include <iostream>
+#include <stdio.h>
+#include <omp.h>
 #include <string>
-#include <seqan3/core/debug_stream.hpp>   // for debug_stream
-#include <seqan3/std/filesystem>          // for tmp_dir
-#include <seqan3/argument_parser/all.hpp> // for argument_parser
+//#include <seqan3/core/debug_stream.hpp>   // for debug_stream
+//#include <seqan3/std/filesystem>          // for tmp_dir
+//#include <seqan3/argument_parser/all.hpp> // for argument_parser
 
 using namespace std;
 
@@ -18,6 +21,8 @@ int main()
 	CisTrans cistrans = ct_all;
 	bool parallel = false;
 	int cores = 1;
+
+	omp_set_num_threads(4);
 
 	vector<BinomData> binom;
 
@@ -105,7 +110,6 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 	// Get Hicup data
     vector<Interaction> interactions;
 
-
     importHicup(fileName, interactions);
 
 /*	for (auto it = interactions.begin(); it != interactions.end(); it++)
@@ -116,7 +120,7 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 
     mapHicupToRestrictionFragment(interactions, restrictionFile);
 
-	//binInteractions(interactions, res);
+	binInteractions(interactions, res);
 
 	// Prepare Binominal data from Hicup Data
     vector<BinomData> binom;

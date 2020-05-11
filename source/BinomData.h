@@ -61,8 +61,10 @@ private:
 public:
 	Interaction();
 	Interaction(std::string chr1, std::string chr2, int locus1,	int locus2);
+	Interaction(std::string chr1, std::string chr2, int locus1,	int locus2, int freq);
 	Interaction(const Interaction & other);
 	Interaction(const halfInteraction & first, const halfInteraction & second);
+	Interaction(std::string int1, std::string int2, int freq);
 	friend std::string fixChromosomeNames(std::string chr);
 
 	inline std::string getChr1() const {return mChr1;}
@@ -72,8 +74,8 @@ public:
 	inline std::string getInt1() const {return mInt1;}
 	inline std::string getInt2() const {return mInt2;}
 
-	inline void setLocus1(int L) {mLocus1 = L; mInt1 = mChr1 + "_" + std::to_string(mLocus1);}
-	inline void setLocus2(int L) {mLocus2 = L; mInt2 = mChr2 + "_" + std::to_string(mLocus2);}
+	inline void setLocus1(int L) {mLocus1 = L; mInt1 = mChr1 + ":" + std::to_string(mLocus1);}
+	inline void setLocus2(int L) {mLocus2 = L; mInt2 = mChr2 + ":" + std::to_string(mLocus2);}
 	void print();
 
 };

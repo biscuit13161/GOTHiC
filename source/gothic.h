@@ -20,5 +20,4 @@
 std::vector<BinomData> gothicHicup(std::string fileName, std::string sampleName, int res, std::string restrictionFile, CisTrans cistrans = ct_all, bool parallel = false, int cores = 0);
 
 
-
 #endif /* SOURCE_GOTHIC_H_ */

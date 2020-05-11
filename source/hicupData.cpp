@@ -6,16 +6,19 @@
  */
 
 #include "hicupData.h"
+#include "Utils.h"
 #include <set>
 #include <iostream>
 #include <stdio.h>
 #include <omp.h>
 #include <istream>
 #include <fstream>
+#include <map>
 #include <cmath>
 #include <regex>
 #include <zlib.h>
 #include <algorithm>
+#include <boost/algorithm/string.hpp>
 //#include <execution>
 //#include <seqan3/io/alignment_file/all.hpp>
 //#include "gzstream.h"
@@ -48,6 +51,7 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 
 	//seqan3::alignment_file_input fin_from_filename{filename};
 
+	cerr << "importing HiCUP file: " << fileName << endl;
 
 	//the output of hicup is a sam file, that looks like uniques_ORIGINALFILE_trunc.sam
 	//this has to be converted using the hicupToTable tool
@@ -67,7 +71,7 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 	{
 		importHicupTxt(fileName, interactions, checkConsistency);
 	}
-
+	completed();
 }
 
 void importHicupGz(string fileName, vector<Interaction> & interactions, bool checkConsistency)
@@ -198,31 +202,33 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 
 void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string restrictionFile)
 {
-	cout << interactions.size() << endl;
+	int iSize = interactions.size();
+	cerr << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
 	vector<halfInteraction> sources;
 	vector<halfInteraction> targets;
 
-	for (int i = 0; i < interactions.size(); i++)
+	for (int i = 0; i < iSize; i++)
 	{
 		sources.push_back(halfInteraction(interactions[i].getChr1(), interactions[i].getLocus1() ));
 		targets.push_back(halfInteraction(interactions[i].getChr2(), interactions[i].getLocus2() ));
 	}
 
 	interactions.clear();
+	interactions.resize(iSize);
 
 	std::vector<Site> fragments;
 	getHindIIIsitesFromHicup(fragments, restrictionFile);
+	cerr << "Loaded " << fragments.size() << " enzyme fragments" << endl;;
 
-	findOverlaps(sources, fragments); //Parallelise?
-	findOverlaps(targets, fragments); //Parallelise?
+	findOverlaps(sources, fragments, "Sources");
+	findOverlaps(targets, fragments, "Targets");
 
-	cout << interactions.size() << endl;
-	//throw std::invalid_argument("test finish");
+	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;;
 
 	//sort positions into order
-	// to Parallelise?
-	for (int i = 0; i < sources.size(); i++)
+	#pragma omp parallel for
+	for (int i = 0; i < iSize; i++)
 	{
 		halfInteraction first = sources[i];
 		halfInteraction second = targets[i];
@@ -247,59 +253,48 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string re
 		{
 			out = Interaction(second, first);
 		}
-		interactions.push_back(out);
+		interactions[i] = out;
 	}
-	cout << interactions.size() << endl;
+	completed();
 }
 
 void binInteractions(vector<Interaction> & interactions, int res)
 {
-	//
+	cerr << "Calculating Interaction Bins ("  <<interactions.size() << ")" << endl;
 
 	vector<Interaction> interactions2;
 
-	for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
+	#pragma omp parallel for
+	for (int i = 0; i < interactions.size(); i++)
 	{
-		cout << T.getLocus1() << "\t" << flush;
+		int T1 = interactions[i].getLocus1();
 
 		// if resolution is given, bins will be calculated from interactions using the resolution
-		T.setLocus1(floor(T.getLocus1() / res) * res );
-		T.setLocus2(floor(T.getLocus2() / res) * res );
-		cout << T.getLocus1() << endl;;
-	});
+		int V = floor(interactions[i].getLocus1() / res) * res;
+		if (V == 0)
+		{
+			V = 1;
+		}
+		interactions[i].setLocus1(V);
+		V = floor(interactions[i].getLocus2() / res) * res;
+		if (V == 0)
+		{
+			V = 1;
+		}
+		interactions[i].setLocus2(V);
+	}
 
-	//#pragma omp parallel for
-/*	for (auto it = interactions.begin(); it != interactions.end(); it++)
-	{
-		Interaction T = *it;
-		cout << T.getLocus1() << "\t" << flush;
+	// --------- count the number of interactions between bins -------
 
-		// if resolution is given, bins will be calculated from interactions using the resolution
-		T.setLocus1(floor(T.getLocus1() / res) * res );
-		T.setLocus2(floor(T.getLocus2() / res) * res );
-		cout << T.getLocus1() << endl;;
-	}*/
+	countDuplicates(interactions);
 
-	/*
-	 * #####bin interactions into desired bin size e.g. 1Mb########
-.binInteractions <- function(interactions, resolution, frequencyCol = "frequencies", considerExistingFrequencies = frequencyCol %in% names(interactions))
-{
-
-
-
-# --------- count the number of interactions between bins -------
-
-	interactions <- .countDuplicates(interactions, frequencyCol, considerExistingFrequencies)
-
-	return(interactions)
-}
-	 *
-	 */
+	completed();
 }
 
 void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 {
 	// load sites for HindIII restriction enzyme from HiCUP_digester
+	cerr << "Loading Enzyme Restriction Sites" << endl;
 
 	ifstream inFile;
 	inFile.open(fileName);
@@ -341,8 +336,8 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 
 	inFile.close();
 
-
 	//return 0;
+	cerr << "\t... Completed!" << endl;
 }
 
 vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string restrictionFile, string sampleName, CisTrans cistrans, bool parallel, int cores, bool removeDiagonal)
@@ -363,39 +358,38 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string re
 	//diagonal removal
 	if(removeDiagonal)
 	{
-		for (auto it = interactions.begin(); it != interactions.end(); it++)
+		//for (auto it = interactions.begin(); it != interactions.end(); it++)
+		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
 		{
-			Interaction T = *it;
+			//Interaction T = *it;
 			if (T.getInt1() == T.getInt2())
 			{
 				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$int1!=binned_df_filtered$int2,]
 				all_bins.insert(T.getInt1());
 			}
-		}
+		});
 	}
 	if(cistrans == ct_cis){
-		for (auto it = interactions.begin(); it != interactions.end(); it++)
+		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
 		{
-			Interaction T = *it;
 			if (T.getChr1() == T.getChr2())
 			{
 				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$chr1==binned_df_filtered$chr2,]
 				all_bins.insert(T.getInt1());
 				all_bins.insert(T.getInt2());
 			}
-		}
+		});
 	}
 	else if(cistrans == ct_trans){
-		for (auto it = interactions.begin(); it != interactions.end(); it++)
+		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
 		{
-			Interaction T = *it;
 			if (T.getChr1() != T.getChr2())
 			{
 				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$chr1!=binned_df_filtered$chr2,]
 				all_bins.insert(T.getInt1());
 				all_bins.insert(T.getInt2());
 			}
-		}
+		});
 	}
 
 	// all read pairs used in binomial
@@ -615,8 +609,9 @@ return(binned_df_filtered)
 }
 
 
-void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
+void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, string name, bool drop)
 {
+	cerr << "Finding Overlaps in " << name << endl;
 	//omp_set_dynamic(0);
 	//omp_set_num_threads(8);
 	int i;
@@ -629,8 +624,6 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool
 			if (query[i].getChr() == fragments[j].getChr())
 			{
 				if ((query[i].getLocus() - fragments[j].getStart()) * (fragments[j].getEnd() - query[i].getLocus()) >= 0)
-				//if ((query[i].getLocus() >= fragments[j].getStart()) && (query[i].getLocus() <= fragments[j].getEnd()))
-				if ((query[i].getLocus() - fragments[j].getStart()) * (fragments[j].getEnd() - query[i].getLocus()) >= 0)
 				{
 					query[i] = halfInteraction(fragments[j].getChr(), fragments[j].getStart());
 					break;
@@ -639,46 +632,7 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool
 			}
 		}
 	}
-}//*/
-
-/*void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
-{
-	for(auto & Q : query)
-	{
-		for(auto& F : fragments)
-		{
-			if (Q.getChr() == F.getChr())
-			{
-				if ((Q.getLocus() - F.getStart()) * (F.getEnd() - Q.getLocus()) >= 0)
-				{
-					Q = halfInteraction(F.getChr(), F.getStart());
-					break;
-				}
-			}
-		}
-	}
-}//*/
-
-//#pragma omp parallel
-
-/*void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, bool drop)
-{
-	for_each(execution::par, query.begin(), query.end(),[&](halfInteraction Q)
-	{
-		for (int j = 0; j < fragments.size(); j++)
-		{
-			if (Q.getChr() == fragments[j].getChr())
-			{
-				if ((Q.getLocus() >= fragments[j].getStart()) && (Q.getLocus() <= fragments[j].getEnd()))
-				{
-					Q = halfInteraction(fragments[j].getChr(), fragments[j].getStart());
-					break;
-				}
-
-			}
-		}
-	}
-	);
+	completed();
 }//*/
 
 
@@ -694,4 +648,78 @@ int binomialCoefficients(int n, int k) {
    return C[k];
 }
 //*/
+
+//countDuplicates <- function(df, frequencyCol = c("frequencies", "frequency"), considerExistingFrequencies = any(frequencyCol %in% names(df)), ordered=FALSE)
+void countDuplicates(vector<Interaction> & interactions)
+{
+	showTime();
+	cerr << "Counting Duplicates" << endl;
+	/*
+	if(considerExistingFrequencies)
+	{
+		frequencyCol <- frequencyCol[frequencyCol %in% names(df)][1]
+		if(is.null(df[[frequencyCol]]))
+			stop("frequencies column missing")
+	} else if(!considerExistingFrequencies)
+	{
+		frequencyCol <- frequencyCol[1]
+		df[, frequencyCol] <- 1 #one for all
+	}//*/
+
+
+	set<string> int1s;
+	set<string> int2s;
+	map<string , map<string, int>> list;
+
+	for (int i = 0; i <= interactions.size(); i++)
+	{
+		string int1 = interactions[i].getInt1();
+		string int2 = interactions[i].getInt2();
+		list[int1][int2]++;
+		int1s.insert(int1);
+		int2s.insert(int2);
+		//cout << int1 << "\t" << int2 << "\t" << list[int1][int2] << endl;
+	}
+	interactions.clear();
+	cerr << "Counting Duplicates2" << endl;
+
+	for (auto it = list.begin(); it != list.end(); it++)
+	{
+		string int1 = it->first;
+		cout << "test1 " << int1 << endl;
+		size_t pos = int1.find(":");
+		string chr1 = int1.substr(0,pos);
+		int locus1 = atoi(int1.substr(pos+1).c_str());
+ 		//cout << "\t" << chr1 << ":" << locus1 << endl;
+		map<string, int> l2 = it->second;
+		for (auto ti = l2.begin(); ti != l2.end(); ti++)
+		{
+			int f = ti->second;
+
+			string int2 = ti->first;
+
+			size_t pos = int2.find(":");
+			string chr2 = int2.substr(0,pos);
+			int locus2 = atoi(int2.substr(pos+1).c_str());
+
+			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
+			I.print();
+			cout << "  test3" << endl;
+
+
+			//cout << "  test4" << endl;
+			//interactions.push_back(I);
+			//string mInt2 = ti->first;
+			//int freq = ti->second;
+		}//*/
+
+	}
+
+	showTime();
+	cout << "Duplicates: " << interactions.size() << endl;
+
+	completed();
+}
+
+
 

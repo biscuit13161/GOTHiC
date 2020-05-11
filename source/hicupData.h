@@ -53,6 +53,9 @@ std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions,
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
 
-void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, bool drop = false);
+void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name, bool drop = false);
+void countDuplicates(std::vector<Interaction> & interactions);
+
+void completed();
 
 #endif /* SOURCE_HICUPDATA_H_ */
