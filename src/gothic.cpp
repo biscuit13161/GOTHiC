@@ -13,16 +13,28 @@
 
 using namespace std;
 
-int main()
+int main(int argc, char *argv[])
 {
+	if ( argc != 2 ) // argc should be 2 for correct execution
+	{
+		// We print argv[0] assuming it is the program name
+		cout<<"usage: "<< argv[0] <<" <filename>\n";
+		printUsage();
+		return 0;
+	}
+
+	Setup setupValues = loadConfig(argv[1]);
+
+
+
 	//string fileName = "damage.txt";
-	string fileName = "test_dataset1_2.hicup.bam.txt";
+	string fileName = setupValues.getInput();
 	string sampleName = "";
-	int res = 10000;
-	string restrictionFile = "Digest_test.txt";
+	int res = setupValues.getRes();
+	string restrictionFile = setupValues.getEnzyme();
 	CisTrans cistrans = ct_all;
 	bool parallel = false;
-	int cores = 1;
+	int cores = setupValues.getThreads();
 
 	omp_set_num_threads(4);
 
