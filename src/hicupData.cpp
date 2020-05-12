@@ -157,49 +157,51 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 	inFile.open(fileName);
 
 	//if(fileType=="table")
-	if (inFile.is_open())
+	if (!inFile.is_open())
 	{
-		while(inFile)
-		{
-			string id1;
-			getline(inFile,id1,'\t');
-			if (id1.length() == 0)
-			{
-				break;
-			}
-			string flag1;
-			getline(inFile,flag1,'\t');
-			string chr1;
-			getline(inFile,chr1,'\t');
-			string start1;
-			getline(inFile,start1,'\n');
-			int locus1 = stoi(start1,nullptr,10);
-
-			string id2;
-			getline(inFile,id2,'\t');
-			if (checkConsistency && (id2.length() == 0 | id1 != id2))
-			{
-				throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
-			}
-			string flag2;
-			getline(inFile,flag1,'\t');
-			string chr2;
-			getline(inFile,chr2,'\t');
-			string start2;
-			getline(inFile,start2,'\n');
-			int locus2 = stoi(start2,nullptr,10);
-
-			Interaction a = Interaction(chr1, chr2, locus1, locus2);
-
-			interactions.push_back(a);
-
-			if (!inFile) // corrects for last blank line
-			{
-				break;
-			}
-		}
-		inFile.close();
+		throw std::invalid_argument("importHicup: unable to open input file!");
 	}
+
+	while(inFile)
+	{
+		string id1;
+		getline(inFile,id1,'\t');
+		if (id1.length() == 0)
+		{
+			break;
+		}
+		string flag1;
+		getline(inFile,flag1,'\t');
+		string chr1;
+		getline(inFile,chr1,'\t');
+		string start1;
+		getline(inFile,start1,'\n');
+		int locus1 = stoi(start1,nullptr,10);
+
+		string id2;
+		getline(inFile,id2,'\t');
+		if (checkConsistency && (id2.length() == 0 | id1 != id2))
+		{
+			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
+		}
+		string flag2;
+		getline(inFile,flag1,'\t');
+		string chr2;
+		getline(inFile,chr2,'\t');
+		string start2;
+		getline(inFile,start2,'\n');
+		int locus2 = stoi(start2,nullptr,10);
+
+		Interaction a = Interaction(chr1, chr2, locus1, locus2);
+
+		interactions.push_back(a);
+
+		if (!inFile) // corrects for last blank line
+		{
+			break;
+		}
+	}
+	inFile.close();
 }
 
 void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string restrictionFile)
@@ -289,6 +291,11 @@ void binInteractions(vector<Interaction> & interactions, int res)
 	// --------- count the number of interactions between bins -------
 
 	countDuplicates(interactions);
+
+	for (auto it = interactions.begin(); it != interactions.end(); it++)
+	{
+		(*it).print();
+	}
 
 	completed();
 }
@@ -614,8 +621,6 @@ return(binned_df_filtered)
 void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, string name, bool drop)
 {
 	cerr << "Finding Overlaps in " << name << endl;
-	//omp_set_dynamic(0);
-	//omp_set_num_threads(8);
 	int i;
 
 	#pragma omp parallel for
@@ -680,15 +685,14 @@ void countDuplicates(vector<Interaction> & interactions)
 		list[int1][int2]++;
 		int1s.insert(int1);
 		int2s.insert(int2);
-		//cout << int1 << "\t" << int2 << "\t" << list[int1][int2] << endl;
+		//cout << "list " << int1 << "\t" << int2 << "\t" << list[int1][int2] << endl;
 	}
 	interactions.clear();
-	cerr << "Counting Duplicates2" << endl;
 
 	for (auto it = list.begin(); it != list.end(); it++)
 	{
 		string int1 = it->first;
-		cout << "test1 " << int1 << endl;
+		//cout << "test1 " << int1 << endl;
 		size_t pos = int1.find(":");
 		string chr1 = int1.substr(0,pos);
 		int locus1 = atoi(int1.substr(pos+1).c_str());
@@ -705,14 +709,10 @@ void countDuplicates(vector<Interaction> & interactions)
 			int locus2 = atoi(int2.substr(pos+1).c_str());
 
 			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
-			I.print();
-			cout << "  test3" << endl;
+			//I.print();
 
-
-			//cout << "  test4" << endl;
-			//interactions.push_back(I);
-			//string mInt2 = ti->first;
-			//int freq = ti->second;
+			//cout << "  test3" << endl;
+			interactions.push_back(I);
 		}//*/
 
 	}

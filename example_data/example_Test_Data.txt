@@ -1,0 +1,4 @@
+Alpha	67	chr17_gl000204_random	51677
+Alpha	131	chr2	155678032
+Delta	115	chr3	101663949
+Delta	179	chr2	230303040

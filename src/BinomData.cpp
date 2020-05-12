@@ -36,11 +36,11 @@ BinomData::BinomData(BinomData & other){
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
 }
 
-Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(""), mInt2(""), mFrequency(0) {
+Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(""), mInt2(""), mFrequency(1) {
 
 }
 
-Interaction::Interaction(string chr1, string chr2, int locus1, int locus2): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(0) {
+Interaction::Interaction(string chr1, string chr2, int locus1, int locus2): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(1) {
 		mInt1 = mChr1 + ":" + to_string(mLocus1);
 		mInt2 = mChr2 + ":" + to_string(mLocus2);
 }
@@ -50,7 +50,7 @@ Interaction::Interaction(string chr1, string chr2, int locus1, int locus2, int f
 		mInt2 = mChr2 + ":" + to_string(mLocus2);
 }
 
-Interaction::Interaction(string int1, string int2, int freq): mInt1(int1), mInt2(int2), mFrequency(freq) {
+/*Interaction::Interaction(string int1, string int2, int freq): mInt1(int1), mInt2(int2), mFrequency(freq) {
 	vector<string> results;
 	boost::split(results, mInt1, [](char c){return c == '_';});
 	mChr1 = results[0];
@@ -58,7 +58,7 @@ Interaction::Interaction(string int1, string int2, int freq): mInt1(int1), mInt2
 	boost::split(results, mInt2, [](char c){return c == '_';});
 	mChr2 = results[0];
 	mLocus2 = stoi(results[1]);
-}
+}//*/
 
 Interaction::Interaction(const Interaction & other): mFrequency(0){
 	mChr1 = other.mChr1;
@@ -77,6 +77,15 @@ Interaction::Interaction(const halfInteraction & first, const halfInteraction & 
 	mInt1 = first.getInt();
 	mInt2 = second.getInt();
 	mFrequency = 1;
+}
+
+bool Interaction::operator==(const Interaction & other)
+{
+	return (mChr1 == other.getChr1()) &&
+			(mChr2 == other.getChr2()) &&
+			(mInt1 == other.getInt1()) &&
+			(mInt2 == other.getInt2()) &&
+			(mFrequency == other.getFreq());
 }
 
 void Interaction::print(){
