@@ -1,12 +1,14 @@
-#include "../src/gothic.h"
-
+#include "gothic.h"
+#include "Setup.h"
+#include "Utils.h"
+#include "BinomData.h"
 #include <iostream>
 #include <stdio.h>
 #include <omp.h>
 #include <string>
 
-#include "../src/BinomData.h"
-#include "../src/Utils.h"
+
+
 //#include <seqan3/core/debug_stream.hpp>   // for debug_stream
 //#include <seqan3/std/filesystem>          // for tmp_dir
 //#include <seqan3/argument_parser/all.hpp> // for argument_parser
@@ -23,7 +25,8 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	Setup setupValues = loadConfig(argv[1]);
+	vector<string> allArgs(argv, argv + argc);
+	Setup setupValues = loadConfig(allArgs[1]);
 
 
 
@@ -36,7 +39,9 @@ int main(int argc, char *argv[])
 	bool parallel = false;
 	int cores = setupValues.getThreads();
 
-	omp_set_num_threads(4);
+	setupValues.print();
+
+	omp_set_num_threads(setupValues.getThreads());
 
 	vector<BinomData> binom;
 

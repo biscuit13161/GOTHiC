@@ -2,7 +2,7 @@
 find_package(Boost 1.36.0 COMPONENTS iostreams)
 #find_package (gzstream 1.5 REQUIRED "${CMAKE_SOURCE_DIR}/../gzstream")
 
-set(LIBS hicupData BinomData Utils)
+set(LIBS Setup Utils hicupData BinomData)
 
 foreach(lib ${LIBS})
   add_library(${lib} ${lib}.cpp)

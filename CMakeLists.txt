@@ -8,7 +8,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_subdirectory (src) 
-add_subdirectory (test)
+#add_subdirectory (test)
 
-enable_testing ()
-add_test (NAME MyTest COMMAND test)
+#enable_testing ()
+#add_test (NAME MyTest COMMAND test)
