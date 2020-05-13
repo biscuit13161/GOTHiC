@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 
 	//string fileName = "damage.txt";
 	string fileName = setupValues.getInput();
-	string sampleName = "";
+	string sampleName = setupValues.getSname();
 	int res = setupValues.getRes();
 	string restrictionFile = setupValues.getEnzyme();
 	CisTrans cistrans = ct_all;
@@ -130,12 +130,6 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
     vector<Interaction> interactions;
 
     importHicup(fileName, interactions);
-
-/*	for (auto it = interactions.begin(); it != interactions.end(); it++)
-	{
-		Interaction site = *it;
-		site.print();
-	}*/
 
     mapHicupToRestrictionFragment(interactions, restrictionFile);
 

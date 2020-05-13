@@ -30,8 +30,8 @@ void showTime()
 void completed()
 {
 
-	cerr << "\t... Completed: " << flush;
-	showTime();
+	cerr << "\t... Completed! " << flush;
+	//showTime();
 	cerr << endl;
 }
 

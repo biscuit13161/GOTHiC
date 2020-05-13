@@ -60,13 +60,14 @@ Interaction::Interaction(string chr1, string chr2, int locus1, int locus2, int f
 	mLocus2 = stoi(results[1]);
 }//*/
 
-Interaction::Interaction(const Interaction & other): mFrequency(0){
+Interaction::Interaction(const Interaction & other){
 	mChr1 = other.mChr1;
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
 	mLocus2 = other.mLocus2;
 	mInt1 = other.mInt1;
 	mInt2 = other.mInt2;
+	mFrequency = other.mFrequency;
 }
 
 Interaction::Interaction(const halfInteraction & first, const halfInteraction & second){
@@ -89,7 +90,8 @@ bool Interaction::operator==(const Interaction & other)
 }
 
 void Interaction::print(){
-	cout << mChr1 << "\t" << mChr2<< "\t" << mLocus1<< "\t" << mLocus2 << "\t" << mInt1<< "\t" << mInt2 << "\t" << mFrequency<< endl;;
+	string L = mChr1 + "\t" + mChr2 +"\t" + to_string(mLocus1)+"\t" + to_string(mLocus2) + "\t" + mInt1 + "\t" + mInt2 + "\t" + to_string(mFrequency) + "\n";
+	cout << L;
 }
 
 halfInteraction::halfInteraction():mChr(""), mLocus(0), mInt("") {

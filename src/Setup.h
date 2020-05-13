@@ -17,6 +17,7 @@ private:
 	std::string mOutDir;
 	std::string mEnzyme;
 	std::string mInput;
+	std::string mSname;
 	int mThreads;
 	int mRes;
 public:
@@ -30,10 +31,12 @@ public:
 	inline std::string getEnzyme() const {return mEnzyme;}
 	inline std::string getOutDir() const {return mOutDir;}
 	inline std::string getInput() const {return mInput;}
+	inline std::string getSname() const {return mSname;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
 	inline void setEnzyme(std::string enzyme) {mEnzyme = enzyme;}
+	inline void setSname(std::string name) {mSname = name;}
 	inline void setOutDir(std::string outDir) {mOutDir = outDir;}
 	inline void setInput(std::string input) {mInput = input;}
 };
@@ -42,6 +45,7 @@ Setup loadConfig(std::string & fileName);
 
 enum Options {
 	Input = 0,
+	Sname,
 	Digest,
 	Threads,
 	Res,

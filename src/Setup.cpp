@@ -25,11 +25,15 @@ Setup::Setup(string outDir, string enzyme, string input, int threads): mOutDir(o
 
 void Setup::print()
 {
-	cerr << "Output Directory: " <<  mOutDir << endl;
-	cerr << "Restriction File: " << mEnzyme << endl;
-	cerr << "Input Data File:  " << mInput << endl;
-	cerr << "Threads:          " << mThreads << endl;
-	cerr << "Resolution:       " << mRes << endl;
+	cerr << endl;
+	cerr << "#" << endl;
+	cerr << "# Output Directory: " <<  mOutDir << endl;
+	cerr << "# Restriction File: " << mEnzyme << endl;
+	cerr << "# Sample Name:      " << mSname << endl;
+	cerr << "# Input Data File:  " << mInput << endl;
+	cerr << "# Threads:          " << mThreads << endl;
+	cerr << "# Resolution:       " << mRes << endl;
+	cerr << "#" << endl << endl;
 }
 
 Setup loadConfig(string & fileName)
@@ -61,6 +65,7 @@ Setup loadConfig(string & fileName)
 			//cout << id << "_" << value << endl;
 			std::map<std::string, Options> optionValues;
 			optionValues["Input"] = Input;
+			optionValues["SampleName"] = Sname;
 			optionValues["Digest"] = Digest;
 			optionValues["Threads"] = Threads;
 			optionValues["Res"] = Res;
@@ -70,6 +75,9 @@ Setup loadConfig(string & fileName)
 			{
 			case Input:
 				setupValues.setInput(value);
+				break;
+			case Sname:
+				setupValues.setSname(value);
 				break;
 			case Digest:
 				setupValues.setEnzyme(value);
