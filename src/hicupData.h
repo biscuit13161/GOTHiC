@@ -12,8 +12,7 @@
 #include <string>
 #include <math.h>
 #include <streambuf>
-
-#include "../src/BinomData.h"
+#include "BinomData.h"
 
 class Site{
 private:
@@ -47,17 +46,17 @@ public:
 void importHicup(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupTxt(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupGz(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency);
-void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::string restrictionFile);
+void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
 void binInteractions(std::vector<Interaction> & interactions, int res);
-std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::string restrictionFile, std::string sampleName, CisTrans cistrans = ct_all, bool parallel = false, int cores = 1, bool removeDiagonal = true);
+std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::vector<Site> & fragments, std::string sampleName, CisTrans cistrans, bool parallel = false, bool removeDiagonal = true);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
 
 void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name, bool drop = false);
 void countDuplicates(std::vector<Interaction> & interactions);
-
+void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 void completed();
 
 #endif /* SRC_HICUPDATA_H_ */

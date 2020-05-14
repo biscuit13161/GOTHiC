@@ -6,6 +6,7 @@
  */
 
 #include "Setup.h"
+#include "version.h"
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -25,14 +26,15 @@ Setup::Setup(string outDir, string enzyme, string input, int threads): mOutDir(o
 
 void Setup::print()
 {
-	cerr << endl;
+	cerr << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
 	cerr << "#" << endl;
-	cerr << "# Output Directory: " <<  mOutDir << endl;
+	cerr << "# Output Directory: " << mOutDir << endl;
 	cerr << "# Restriction File: " << mEnzyme << endl;
 	cerr << "# Sample Name:      " << mSname << endl;
 	cerr << "# Input Data File:  " << mInput << endl;
 	cerr << "# Threads:          " << mThreads << endl;
 	cerr << "# Resolution:       " << mRes << endl;
+	cerr << "# Config File:      " << mCliName << endl;
 	cerr << "#" << endl << endl;
 }
 
@@ -47,6 +49,7 @@ Setup loadConfig(string & fileName)
 	}
 
 	Setup setupValues;
+	setupValues.setCliName(fileName);
 
 	while (inFile)
 	{
@@ -70,6 +73,12 @@ Setup loadConfig(string & fileName)
 			optionValues["Threads"] = Threads;
 			optionValues["Res"] = Res;
 			optionValues["Output"] = Output;
+			optionValues["CisTrans"] = Cistrans;
+			
+			std::map<std::string,CisTrans> CToptionValues;
+			CToptionValues["all"] = ct_all;
+			CToptionValues["cis"] = ct_cis;
+			CToptionValues["trans"] = ct_trans;
 
 			switch(optionValues[id])
 			{
@@ -98,6 +107,9 @@ Setup loadConfig(string & fileName)
 				{
 					setupValues.setOutDir(value);
 				}
+				break;
+			case Cistrans:
+				setupValues.setCisTrans(CToptionValues[value]);
 				break;
 			}//*/
 		}

@@ -8,16 +8,11 @@
 #ifndef SRC_BINOMDATA_H_
 #define SRC_BINOMDATA_H_
 
+#include "Utils.h"
 #include <string>
 #include <math.h>
 #include <gtest/gtest.h>
 
-enum CisTrans
-{
-	ct_all=0,
-	ct_cis,
-	ct_trans,
-};
 
 class halfInteraction
 {

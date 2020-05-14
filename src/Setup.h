@@ -8,8 +8,10 @@
 #ifndef SRC_SETUP_H_
 #define SRC_SETUP_H_
 
+#include "Utils.h"
 #include <string>
 #include <map>
+
 
 class Setup
 {
@@ -18,6 +20,8 @@ private:
 	std::string mEnzyme;
 	std::string mInput;
 	std::string mSname;
+	std::string mCliName;
+	CisTrans mCisTrans;
 	int mThreads;
 	int mRes;
 public:
@@ -32,13 +36,17 @@ public:
 	inline std::string getOutDir() const {return mOutDir;}
 	inline std::string getInput() const {return mInput;}
 	inline std::string getSname() const {return mSname;}
+	inline std::string getCliName() const {return mCliName;}
+	inline CisTrans getCisTrans() const {return mCisTrans;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
 	inline void setEnzyme(std::string enzyme) {mEnzyme = enzyme;}
 	inline void setSname(std::string name) {mSname = name;}
+	inline void setCliName(std::string name) {mCliName = name;}
 	inline void setOutDir(std::string outDir) {mOutDir = outDir;}
 	inline void setInput(std::string input) {mInput = input;}
+	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
 };
 
 Setup loadConfig(std::string & fileName);
@@ -50,6 +58,7 @@ enum Options {
 	Threads,
 	Res,
 	Output,
+	Cistrans,
 };
 
 

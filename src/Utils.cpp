@@ -6,6 +6,7 @@
  */
 
 #include "Utils.h"
+#include "version.h"
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -39,5 +40,6 @@ void printUsage()
 {
 	cerr << "GOTHiC++ usage:" << endl << endl;
 	cerr << "    gothic <path/to/config/file>"  << endl << endl;
+	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl;
 
 }

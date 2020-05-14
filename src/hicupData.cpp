@@ -204,7 +204,7 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 	inFile.close();
 }
 
-void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string restrictionFile)
+void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Site> & fragments)
 {
 	int iSize = interactions.size();
 	cerr << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
@@ -221,10 +221,7 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, string re
 	interactions.clear();
 	interactions.resize(iSize);
 
-	std::vector<Site> fragments;
-	getHindIIIsitesFromHicup(fragments, restrictionFile);
 
-	cerr << "Loaded " << fragments.size() << " enzyme fragments" << endl;;
 
 	findOverlaps(sources, fragments, "Sources");
 	findOverlaps(targets, fragments, "Targets");
@@ -347,62 +344,73 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 	inFile.close();
 
 	completed();
+	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
 }
 
-vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string restrictionFile, string sampleName, CisTrans cistrans, bool parallel, int cores, bool removeDiagonal)
+vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Site> & fragments, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
 {
-	vector<Site> hindGR;
-	getHindIIIsitesFromHicup(hindGR, restrictionFile);
-	/*	if(parallel)
-			{
-				requireNamespace("parallel")
-				print("running garbage collector before parallel fork")
-				gc()
-			}//*/
+	//vector<Site> hindGR;
+	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
 
-	//vector<Interaction> binned_df_filtered;
-	//binned_df_filtered = interactions;
+	vector<Interaction> binned_df_filtered;
+	//binned_df_filtered.resize(interactions.size());
 	set<string> all_bins;
 
+	cout << "bin size " << binned_df_filtered.size() << endl;
 	//diagonal removal
 	if(removeDiagonal)
 	{
-		//for (auto it = interactions.begin(); it != interactions.end(); it++)
-		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
-		{
-			//Interaction T = *it;
-			if (T.getInt1() == T.getInt2())
-			{
-				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$int1!=binned_df_filtered$int2,]
-				all_bins.insert(T.getInt1());
-			}
-		});
+		cerr << "Removing Diagonals!";
+		removeDuplicates(interactions, binned_df_filtered);
+		completed();
 	}
+	else
+	{
+		binned_df_filtered.swap(interactions);
+	}
+	cout << "size " << binned_df_filtered.size() << endl;
+	interactions.clear();
+
 	if(cistrans == ct_cis){
-		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
+		cerr << "Finding Cis interactions!";
+		int pos = 0;
+		for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
 		{
+			Interaction T = *it;
 			if (T.getChr1() == T.getChr2())
 			{
-				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$chr1==binned_df_filtered$chr2,]
-				all_bins.insert(T.getInt1());
-				all_bins.insert(T.getInt2());
+				interactions.push_back(T);
+				pos++;
 			}
-		});
+		}
+		//interactions.resize(pos);
+		completed();
 	}
 	else if(cistrans == ct_trans){
-		for_each (interactions.begin(), interactions.end(), [&](Interaction & T)
+		cerr << "Finding Trans interactions!";
+		int pos = 0;
+		for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
 		{
+			Interaction T = *it;
 			if (T.getChr1() != T.getChr2())
 			{
-				//binned_df_filtered <- binned_df_filtered[binned_df_filtered$chr1!=binned_df_filtered$chr2,]
-				all_bins.insert(T.getInt1());
-				all_bins.insert(T.getInt2());
+				interactions.push_back(T);
+				pos++;
 			}
-		});
+		}
+		//interactions.resize(pos);
+		completed();
 	}
+	else
+	{
+		interactions.swap(binned_df_filtered);
+	}
+
 
 	// all read pairs used in binomial
 	int numberOfReadPairs = interactions.size(); // before binning!!
+	cout << "size " << interactions.size() << endl;
+
 
 	// calculate coverage
 		/*
@@ -707,4 +715,17 @@ void countDuplicates(vector<Interaction> & interactions)
 }
 
 
+void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+		int pos = 0;
+		for (auto it = interactions.begin(); it != interactions.end(); it++)
+		{
+			Interaction T = *it;
+			if (T.getInt1() != T.getInt2())
+			{
+				binned_df_filtered.push_back(T);
+				pos++;
+			}
+		}
+}
 

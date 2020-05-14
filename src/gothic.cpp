@@ -29,13 +29,12 @@ int main(int argc, char *argv[])
 	Setup setupValues = loadConfig(allArgs[1]);
 
 
-
 	//string fileName = "damage.txt";
 	string fileName = setupValues.getInput();
 	string sampleName = setupValues.getSname();
 	int res = setupValues.getRes();
 	string restrictionFile = setupValues.getEnzyme();
-	CisTrans cistrans = ct_all;
+	CisTrans cistrans = setupValues.getCisTrans();
 	bool parallel = false;
 	int cores = setupValues.getThreads();
 
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
-		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel, cores);
+		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
 	}
 	catch(const std::invalid_argument& e){
 		cout<< "Error: " << e.what() << endl;
@@ -96,7 +95,7 @@ gothic(string fileName1, string fileName2, string sampleName, res, string genome
 
 // GOTHiC main tool based on hicup alignment
 
-vector<BinomData> gothicHicup(string fileName, string sampleName, int res, string restrictionFile, CisTrans cistrans, bool parallel, int cores)
+vector<BinomData> gothicHicup(string fileName, string sampleName, int res, string restrictionFile, CisTrans cistrans, bool parallel)
 {
 	/*
 	 * fileName
@@ -131,13 +130,15 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 
     importHicup(fileName, interactions);
 
-    mapHicupToRestrictionFragment(interactions, restrictionFile);
+	std::vector<Site> fragments;
+	getHindIIIsitesFromHicup(fragments, restrictionFile);
+    mapHicupToRestrictionFragment(interactions, fragments);
 
 	binInteractions(interactions, res);
 
 	// Prepare Binominal data from Hicup Data
     vector<BinomData> binom;
-	//binom = binomialHiChicup(interactions, restrictionFile, sampleName, cistrans, parallel, cores);
+	binom = binomialHiChicup(interactions, fragments, sampleName, cistrans, parallel);
 
     return(binom);
 }

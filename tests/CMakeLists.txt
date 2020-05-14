@@ -11,15 +11,21 @@ include_directories (${TEST_SOURCE_DIR}../src)
 
 #ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
-set(LIBS tests sysTests overlapTests importHicupTests binInterTests)
+set(LIBS hicupTests sysTests overlapTests importHicupTests binInterTests sortPositionsTest countDupsTests removeDupsTest)
 
-add_executable (hicupTests hicupTests.cpp)
-add_executable (systests sysTests.cpp) 
-add_executable (overlaptests overlapTests.cpp)
-add_executable (importHicupTests importHicupTests.cpp)
-add_executable (binInterTests binInterTests.cpp)
-add_executable (sortPositionsTest sortPositionsTest.cpp)
-add_executable (countDupsTests countDupsTests.cpp)
+#add_executable (hicupTests hicupTests.cpp)
+#add_executable (systests sysTests.cpp) 
+#add_executable (overlaptests overlapTests.cpp)
+#add_executable (importHicupTests importHicupTests.cpp)
+#add_executable (binInterTests binInterTests.cpp)
+#add_executable (sortPositionsTest sortPositionsTest.cpp)
+#add_executable (countDupsTests countDupsTests.cpp)
+
+
+foreach(lib ${LIBS})
+  add_executable(${lib} ${lib}.cpp)
+  target_link_libraries (${lib} hicupData BinomData Utils gtest gtest_main)
+endforeach(lib)
 
 #target_link_libraries(test
 #                      ${Boost_FILESYSTEM_LIBRARY}
@@ -27,13 +33,13 @@ add_executable (countDupsTests countDupsTests.cpp)
 #                      ${Boost_UNIT_TEST_FRAMEWORK_LIBRARY}
 #                      )
 
-target_link_libraries(hicupTests hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(overlaptests hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(importHicupTests hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(binInterTests hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(sortPositionsTest hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(countDupsTests hicupData BinomData Utils gtest gtest_main)
-target_link_libraries(systests gtest gtest_main)
+#target_link_libraries(hicupTests hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(overlaptests hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(importHicupTests hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(binInterTests hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(sortPositionsTest hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(countDupsTests hicupData BinomData Utils gtest gtest_main)
+#target_link_libraries(systests gtest gtest_main)
 
 
 add_test(Sys_Tests systests)
@@ -43,4 +49,5 @@ add_test(importHiCUP_Tests importHicupTests)
 add_test(binInteractions_Tests binInterTests)
 add_test(sortPositions_Tests sortPositionsTest)
 add_test(countDuplicates_Tests countDupsTests)
+add_test(removeDuplicates_Tests removeDupsTest)
 

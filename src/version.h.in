@@ -1,0 +1,33 @@
+/*
+ * version.h
+ *
+ *  Created on: 14 May 2020
+ *      Author: rich
+ */
+
+#ifndef SRC_VERSION_H_
+#define SRC_VERSION_H_
+
+#cmakedefine GOTH_MAJOR_VERSION @GOTH_PATCH_VERSION@
+#cmakedefine GOTH_MINOR_VERSION @GOTH_MINOR_VERSION@
+#cmakedefine GOTH_PATCH_VERSION @GOTH_PATCH_VERSION@
+
+#ifndef GOTH_MAJOR_VERSION
+#define GOTH_MAJOR_VERSION 0
+#endif
+#ifndef GOTH_MINOR_VERSION
+#define GOTH_MINOR_VERSION 0
+#endif
+#ifndef GOTH_PATCH_VERSION
+#define GOTH_PATCH_VERSION 0
+#endif
+
+#define GOTH_STR_HELPER(x) #x
+#define GOTH_STR(x) GOTH_STR_HELPER(x)
+
+#define GOTH_VERSION_STRING                                            \
+  (GOTH_STR(GOTH_MAJOR_VERSION) "." GOTH_STR(GOTH_MINOR_VERSION) "." GOTH_STR( GOTH_PATCH_VERSION) )
+
+
+
+#endif /* SRC_VERSION_H_ */
