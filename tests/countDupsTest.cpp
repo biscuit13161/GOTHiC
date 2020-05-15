@@ -5,9 +5,9 @@
  *      Author: rich
  */
 
-#include "../src/hicupData.h"
-#include "../src/BinomData.h"
-#include "../src/Utils.h"
+#include "hicupData.h"
+#include "BinomData.h"
+#include "Utils.h"
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
@@ -34,24 +34,11 @@ TEST(countDupsTests, testCountDuplicates)
 
 	countDuplicates(interactions);
 
-	/*
-	int max = 1;
-
-	for (auto it = interactions.begin(); it!= interactions.end(); it++)
-	{
-		Interaction I = *it;
-		max = (I.getFreq() > max) ? I.getFreq() : max;
-	}//*/
-
-
 	ASSERT_FALSE(interactions[0] == inter[0]);
 	EXPECT_TRUE(interactions[1].getFreq() == 3);
 	EXPECT_TRUE(interactions[0].getFreq() == 1);
 	EXPECT_FALSE(interactions.size() == inter.size());
 	EXPECT_TRUE(interactions.size() == 3);
-	// this should be three
-	//EXPECT_FALSE(max == 1);
-	//EXPECT_TRUE(max == 3);
 }//*/
 
 

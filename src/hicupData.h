@@ -57,6 +57,8 @@ void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
 void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name, bool drop = false);
 void countDuplicates(std::vector<Interaction> & interactions);
 void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
-void completed();
+void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+//void completed();
 
 #endif /* SRC_HICUPDATA_H_ */

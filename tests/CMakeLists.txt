@@ -11,20 +11,16 @@ include_directories (${TEST_SOURCE_DIR}../src)
 
 #ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
-set(LIBS hicupTests sysTests overlapTests importHicupTests binInterTests sortPositionsTest countDupsTests removeDupsTest)
-
-#add_executable (hicupTests hicupTests.cpp)
-#add_executable (systests sysTests.cpp) 
-#add_executable (overlaptests overlapTests.cpp)
-#add_executable (importHicupTests importHicupTests.cpp)
-#add_executable (binInterTests binInterTests.cpp)
-#add_executable (sortPositionsTest sortPositionsTest.cpp)
-#add_executable (countDupsTests countDupsTests.cpp)
-
+set(LIBS hicupTest sysTests overlapTest importHicupTest binInterTest)
+set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest)
+set(LIBS ${LIBS} findTransTest fixChromoTest halfInteractionTest hicupCompFreqTest hicupCompInterTest)
 
 foreach(lib ${LIBS})
   add_executable(${lib} ${lib}.cpp)
   target_link_libraries (${lib} hicupData BinomData Utils gtest gtest_main)
+  string(REPLACE "Test" "_Test" name ${lib})
+  message(STATUS ${name})
+  add_test(${name} ${lib})
 endforeach(lib)
 
 #target_link_libraries(test
@@ -42,12 +38,15 @@ endforeach(lib)
 #target_link_libraries(systests gtest gtest_main)
 
 
-add_test(Sys_Tests systests)
-add_test(HiCUP_Tests hicupTests)
-add_test(Overlap_Tests overlaptests)
-add_test(importHiCUP_Tests importHicupTests)
-add_test(binInteractions_Tests binInterTests)
-add_test(sortPositions_Tests sortPositionsTest)
-add_test(countDuplicates_Tests countDupsTests)
-add_test(removeDuplicates_Tests removeDupsTest)
+#add_test(Sys_Tests systests)
+#add_test(HiCUP_Tests hicupTests)
+#add_test(Overlap_Tests overlaptests)
+#add_test(importHiCUP_Tests importHicupTests)
+#add_test(binInteractions_Tests binInterTests)
+#add_test(sortPositions_Tests sortPositionsTest)
+#add_test(countDuplicates_Tests countDupsTests)
+#add_test(removeDuplicates_Tests removeDupsTest)
+#add_test(findCis_Test findCisTest)
+#add_test(findTrans_Test findTransTest)
+
 

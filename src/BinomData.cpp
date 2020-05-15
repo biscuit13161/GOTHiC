@@ -50,16 +50,6 @@ Interaction::Interaction(string chr1, string chr2, int locus1, int locus2, int f
 		mInt2 = mChr2 + ":" + to_string(mLocus2);
 }
 
-/*Interaction::Interaction(string int1, string int2, int freq): mInt1(int1), mInt2(int2), mFrequency(freq) {
-	vector<string> results;
-	boost::split(results, mInt1, [](char c){return c == '_';});
-	mChr1 = results[0];
-	mLocus1 = stoi(results[1]);
-	boost::split(results, mInt2, [](char c){return c == '_';});
-	mChr2 = results[0];
-	mLocus2 = stoi(results[1]);
-}//*/
-
 Interaction::Interaction(const Interaction & other){
 	mChr1 = other.mChr1;
 	mChr2 = other.mChr2;
@@ -89,9 +79,31 @@ bool Interaction::operator==(const Interaction & other)
 			(mFrequency == other.getFreq());
 }
 
+
 void Interaction::print(){
-	string L = mChr1 + "\t" + mChr2 +"\t" + to_string(mLocus1)+"\t" + to_string(mLocus2) + "\t" + mInt1 + "\t" + mInt2 + "\t" + to_string(mFrequency) + "\n";
+	string L = mChr1 + "\t" + mChr2 +"\t" + to_string(mLocus1)+"\t" \
+			+ to_string(mLocus2) + "\t" + mInt1 + "\t" + mInt2 + "\t" \
+			+ to_string(mFrequency) + "\n";
 	cout << L;
+}
+
+ostream & operator<<(ostream & out, const Interaction & in)
+{
+	out << in.mChr1 << "\t" << in.mLocus1 << "\t" << in.mInt1 \
+			<< "\t" << in.mChr2 << "\t" << in.mLocus2 << "\t" \
+			<< in.mInt2 << "\t" << in.mFrequency;
+	return out;
+}
+
+ostream & operator<<(ostream & out, const BinomData & in)
+{
+	out << in.mChr1 << "\t" << in.mChr2 << "\t" << in.mLocus1 \
+			<< "\t" << in.mLocus2 << "\t" << in.mRelCoverage1 \
+			<< "\t" << in.mRelCoverage2 << "\t" << in.mProbability \
+			<< "\t" << in.mExpected << "\t" << in.mReadCount << "\t" \
+			<< in.mPvalue << "\t" << in.mQvalue << "\t" \
+			<< in.mLogObservedOverExpected;
+	return out;
 }
 
 halfInteraction::halfInteraction():mChr(""), mLocus(0), mInt("") {

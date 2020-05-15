@@ -27,6 +27,15 @@
 
 using namespace std;
 
+struct RetrieveKey
+{
+    template <typename T>
+    typename T::first_type operator()(T keyValuePair) const
+    {
+        return keyValuePair.first;
+    }
+};
+
 Site::Site(): mChr(""), mLocus(0), mStart(0), mEnd(0)
 {
 }
@@ -356,48 +365,30 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 	//binned_df_filtered.resize(interactions.size());
 	set<string> all_bins;
 
-	cout << "bin size " << binned_df_filtered.size() << endl;
+
 	//diagonal removal
 	if(removeDiagonal)
 	{
 		cerr << "Removing Diagonals!";
 		removeDuplicates(interactions, binned_df_filtered);
 		completed();
+		interactions.clear();
 	}
 	else
 	{
 		binned_df_filtered.swap(interactions);
 	}
-	cout << "size " << binned_df_filtered.size() << endl;
-	interactions.clear();
+	//cout << "size " << binned_df_filtered.size() << endl;
 
 	if(cistrans == ct_cis){
 		cerr << "Finding Cis interactions!";
-		int pos = 0;
-		for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		{
-			Interaction T = *it;
-			if (T.getChr1() == T.getChr2())
-			{
-				interactions.push_back(T);
-				pos++;
-			}
-		}
+		findCis(interactions, binned_df_filtered);
 		//interactions.resize(pos);
 		completed();
 	}
 	else if(cistrans == ct_trans){
 		cerr << "Finding Trans interactions!";
-		int pos = 0;
-		for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		{
-			Interaction T = *it;
-			if (T.getChr1() != T.getChr2())
-			{
-				interactions.push_back(T);
-				pos++;
-			}
-		}
+		findTrans(interactions, binned_df_filtered);
 		//interactions.resize(pos);
 		completed();
 	}
@@ -409,12 +400,15 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 
 	// all read pairs used in binomial
 	int numberOfReadPairs = interactions.size(); // before binning!!
-	cout << "size " << interactions.size() << endl;
+	cout << "Read Pairs " << numberOfReadPairs << endl;
 
+    ofstream outFile("my_file.txt");
+    // the important part
+    for (const auto &e : interactions) outFile << e << "\n";
 
 	// calculate coverage
-		/*
-		if( interations.size() > 1e8)
+
+		/*if( interations.size() > 1e8)
 			{
 				t <- ceiling(nrow(binned_df_filtered)/1e8)
 				dfList <- list()
@@ -429,11 +423,68 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 				covBm <- do.call(rbind, covBs)
 				covA <- covAm[,sum(V1),by=int1]
 				covB <- covBm[,sum(V1),by=int2]
-			}else{
-				binned_dt=data.table(binned_df_filtered)
-				covA <- binned_dt[,sum(frequencies),by=int1]
-				covB <- binned_dt[,sum(frequencies),by=int2]
-			}
+			}else{//*/
+    set<string> ints;
+    for (auto it = interactions.begin(); it != interactions.end(); it++)
+    {
+    	ints.insert((*it).getInt1());
+    	ints.insert((*it).getInt2());
+    }//*/
+    map<string,vector<int>> cov;
+    for (auto it : ints)
+    {
+    	cout << "ints " << it << endl;
+    	cov[it] = vector(0,0);
+    }//*/
+    for (auto it : interactions)
+    {
+    	if (cov.find(it.getInt1()) == cov.end())
+    	{
+    		cov[it.getInt1()] = vector(0,0);
+    	}
+    	vector<int> T = cov[it.getInt1()];
+    	/*if (T[0] == 0)
+    	{
+    		T[0] = it.getFreq();
+    	}
+    	else
+    	{
+    		T[0] = T[0] + it.getFreq();
+    	}
+    	cov[it.getInt1()] = T;//*/
+
+
+    	if (cov.find(it.getInt2()) == cov.end())
+    	{
+    		cov[it.getInt2()] = vector(0,0);
+    	}
+    	vector<int> F = cov[it.getInt2()];
+    	/*if (F[1] == 0)
+    	{
+    		F[1] = it.getFreq();
+    	}
+    	else
+    	{
+    		F[1] = F[1] + it.getFreq();
+    	}
+    	cov[it.getInt2()] = F;//*/
+
+    	cout << it.getInt1() << " : " << T[0] << endl;
+       	//cov[it.getInt1()][0] + it.getFreq();
+    	//cov[it.getInt2()][1] + it.getFreq();
+    }//*/
+
+    cout << "cov.size: " << cov.size() << endl;;
+
+    /*for (auto I = cov.begin(); I != cov.end(); I++)
+    {
+    	vector<int> L = cov[I->first];
+    	cout << I->first << endl; //"\t" << ints[0] << "\t" << ints[1]<< endl;
+    }//*/
+
+    //for ()
+			//}
+/*
 		covA <- setkey(covA,key='int1')
 		setnames(covB, 1,'int1')
 		covB <- setkey(covB,key='int1')
@@ -575,7 +626,7 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 			return(tryCatch(
 				{
 				pdf(file=paste(sampleName,"pvalue_distribution.pdf",sep="_"))
-				print(pval.plot + geom_density())
+				print(pval.plot + geom_density())fi
 				dev.off()
 				},
 				error=function(cond2) {
@@ -729,3 +780,30 @@ void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & 
 		}
 }
 
+void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+	{
+		Interaction T = *it;
+		if (T.getChr1() == T.getChr2())
+		{
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}
+
+void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+	{
+		Interaction T = *it;
+		if (T.getChr1() != T.getChr2())
+		{
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}

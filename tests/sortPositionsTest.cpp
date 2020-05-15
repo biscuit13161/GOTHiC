@@ -10,14 +10,10 @@
 #include "hicupData.h"
 #include <gtest/gtest.h>
 #include <vector>
-#include <stdio.h>
-#include <omp.h>
 
 
 TEST(sortPositionsTest, first)
 {
-	omp_set_num_threads(2);
-
 	std::vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));
 	interactions.push_back(Interaction("chr1","chr1",17753,15273));

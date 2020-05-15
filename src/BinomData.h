@@ -12,6 +12,8 @@
 #include <string>
 #include <math.h>
 #include <gtest/gtest.h>
+#include <fstream>
+#include <iostream>
 
 
 class halfInteraction
@@ -60,7 +62,6 @@ public:
 	Interaction(std::string chr1, std::string chr2, int locus1,	int locus2, int freq);
 	Interaction(const Interaction & other);
 	Interaction(const halfInteraction & first, const halfInteraction & second);
-	//Interaction(std::string int1, std::string int2, int freq);
 	friend std::string fixChromosomeNames(std::string chr);
 
 	inline std::string getChr1() const {return mChr1;}
@@ -76,10 +77,11 @@ public:
 	void print();
 
 	bool operator==(const Interaction & other);
+	friend std::ostream & operator<<(std::ostream & out, const Interaction & in);
 
 };
 
-
+std::ostream & operator<<(std::ostream & out, const Interaction & in);
 
 class BinomData
 {
@@ -109,6 +111,21 @@ public:
 	BinomData(std::string chr1, std::string chr2, int locus1, int locus2, double relCoverage1, double relCoverage2, double probability, int expected, int readCount, double pvalue, double qvalue, double logObservedOverExpected);
 	BinomData(BinomData & other);
 
+	friend std::ostream & operator<<(std::ostream & out, const BinomData & in);
+};
+
+std::ostream & operator<<(std::ostream & out, const BinomData & in);
+
+class Coverage
+{
+private:
+	std::string mInt;
+	int mFreq1;
+	int mFreq2;
+
+public:
+	Coverage();
+	inline int getFreq() const {return mFreq2;}
 };
 
 std::string fixChromosomeNames(std::string chr);

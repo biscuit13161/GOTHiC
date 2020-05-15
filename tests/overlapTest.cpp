@@ -5,21 +5,12 @@
  *      Author: rich
  */
 
-#include "../src/hicupData.h"
-#include "../src/BinomData.h"
-#include "../src/Utils.h"
+#include "hicupData.h"
+#include "BinomData.h"
+#include "Utils.h"
 #include <gtest/gtest.h>
 #include <vector>
-//#include <string>
 
-TEST(overlapTests, constructor)
-{
-	halfInteraction I = halfInteraction("chr1", 1357908642);
-	halfInteraction T(I);
-
-	ASSERT_TRUE(I.getInt() == "chr1:1357908642");
-	ASSERT_TRUE(T.getInt() == "chr1:1357908642");
-}
 
 TEST(overlapTests, findOverlapTest)
 {
@@ -41,10 +32,4 @@ TEST(overlapTests, findOverlapTest)
 	EXPECT_TRUE(query[1].getLocus() == 50000);
 }
 
-TEST(overlapTests, fixChromosomeNamesTest)
-{
-	ASSERT_TRUE(fixChromosomeNames("1") == "chr1");
-	EXPECT_TRUE(fixChromosomeNames("X") == "chrX");
-	EXPECT_TRUE(fixChromosomeNames("chr2") == "chr2");
-	EXPECT_TRUE(fixChromosomeNames("CHR3") == "chr3");
-}
+
