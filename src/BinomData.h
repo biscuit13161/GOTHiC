@@ -94,13 +94,18 @@ private:
 	int mLocus2;
 	//start positions of the interacting regions 1 and 2 in the corresponding chromosome(s)
 
+	std::string mInt1;
+	std::string mInt2;
+	//combined strings for comparisons
+
+	int mFrequency;
 
 	double mRelCoverage1;
 	double mRelCoverage2;
 	// relative coverage corresponding to regions 1 and 2
 
-	double mProbability; // expected frequency
-	int mExpected; // expected number of reads
+	long double mProbability; // expected frequency - probabilityOfInteraction
+	long double mExpected; // expected number of reads - predicted
 	int mReadCount; // observed reads number
 	double mPvalue; // binomial p-value
 	double mQvalue; // binomial p-value corrected for multi-testing with Benjamini-Hochberg
@@ -108,8 +113,33 @@ private:
 
 public:
 	BinomData();
-	BinomData(std::string chr1, std::string chr2, int locus1, int locus2, double relCoverage1, double relCoverage2, double probability, int expected, int readCount, double pvalue, double qvalue, double logObservedOverExpected);
+	BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
+			std::string int1, std::string int2, \
+			int frequency, long double relCoverage1, long double relCoverage2, \
+			long double probability, long double expected, int readCount, \
+			double pvalue, double qvalue, double logObservedOverExpected);
 	BinomData(BinomData & other);
+	BinomData(Interaction & other);
+
+	inline std::string getChr1() const {return mChr1;}
+	inline int getLocus1() const {return mLocus1;}
+	inline int getLocus2() const {return mLocus2;}
+	inline std::string getChr2() const {return mChr2;}
+	inline std::string getInt1() const {return mInt1;}
+	inline std::string getInt2() const {return mInt2;}
+	inline int getFreq() const {return mFrequency;}
+	inline long double getRelCov1() {return mRelCoverage1;}
+	inline long double getRelCov2() {return mRelCoverage2;}
+	inline long double getProbability() {return mProbability;}
+	inline long double getExpected() {return mExpected;}
+
+	inline void setLocus1(int L) {mLocus1 = L; mInt1 = mChr1 + ":" + std::to_string(mLocus1);}
+	inline void setLocus2(int L) {mLocus2 = L; mInt2 = mChr2 + ":" + std::to_string(mLocus2);}
+	inline void setRelCov1(long double L) {mRelCoverage1 = L;}
+	inline void setRelCov2(long double L) {mRelCoverage2 = L;}
+
+	inline void setProbability(long double L) {mProbability = L;}
+	inline void setExpected(long double L) {mExpected = L;}
 
 	friend std::ostream & operator<<(std::ostream & out, const BinomData & in);
 };
@@ -132,5 +162,9 @@ std::string fixChromosomeNames(std::string chr);
 bool comp(const halfInteraction & a, const halfInteraction & b);
 
 //double relCoverage1, double relCoverage2, double probability, int mExpected, int mReadCount, double mPvalue, double mQvalue, double mLogObservedOverExpected
+
+long double binomialTest(int freq, int num, long double prob,bool alt);
+int binomialCoefficients(int n, int k);
+
 
 #endif /* SRC_BINOMDATA_H_ */

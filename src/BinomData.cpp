@@ -6,19 +6,29 @@
  */
 
 #include "../src/BinomData.h"
-
+#include "pbinom.h"
 #include <regex>
 #include <iostream>
+#include <cmath>
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
 
-BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(0), mInt2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
-BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2, double relCoverage1, double relCoverage2, double probability, int expected, int readCount, double pvalue, double qvalue, double logObservedOverExpected)
-: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), mProbability(probability), mExpected(expected), mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), mLogObservedOverExpected(logObservedOverExpected) {
+BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
+		std::string int1, std::string int2, \
+		int frequency, long double relCoverage1, long double relCoverage2, \
+		long double probability, long double expected, int readCount, \
+		double pvalue, double qvalue, double logObservedOverExpected)\
+				: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), \
+				  mInt1(int1), mInt2(int2), mFrequency(frequency), \
+				  mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), \
+				  mProbability(probability), mExpected(expected), \
+				  mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), \
+				  mLogObservedOverExpected(logObservedOverExpected) {
 }
 
 BinomData::BinomData(BinomData & other){
@@ -26,6 +36,9 @@ BinomData::BinomData(BinomData & other){
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
 	mLocus2 = other.mLocus2;
+	mInt1 = other.mInt1;
+	mInt2 = other.mInt2;
+	mFrequency = other.mFrequency;
 	mRelCoverage1 = other.mRelCoverage1;
 	mRelCoverage2 = other.mRelCoverage2;
 	mProbability = other.mProbability;
@@ -34,6 +47,16 @@ BinomData::BinomData(BinomData & other){
 	mPvalue = other.mPvalue;
 	mQvalue = other.mQvalue;
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
+}
+
+BinomData::BinomData(Interaction & other){
+	mChr1 = other.getChr1();
+	mChr2 = other.getChr2();
+	mLocus1 = other.getLocus1();
+	mLocus2 = other.getLocus2();
+	mInt1 = other.getInt1();
+	mInt2 = other.getInt2();
+	mFrequency = other.getFreq();
 }
 
 Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(""), mInt2(""), mFrequency(1) {
@@ -141,3 +164,37 @@ bool comp(const halfInteraction & a, const halfInteraction & b)
 	}
 	return a.mChr < b.mChr;
 }
+
+long double binomialTest(int freq, int num, long double prob,bool alt)
+{
+	int F = binomialCoefficients(num,freq);
+	cout << "F: " << F;
+	long double P1 = pow(prob, freq);
+	long double P2 = pow((1-prob),(num-freq));
+	long double P = F * P1 * P2;
+	cout << "P1: " << P1 << ", P2: " << P2 <<endl;
+	return P;
+}
+
+int binomialCoefficients(int n, int k) {
+   int C[k+1];
+   memset(C, 0, sizeof(C));
+   C[0] = 1;
+   for (int i = 1; i <= n; i++) {
+      for (int j = min(i, k); j > 0; j--)
+         C[j] = C[j] + C[j-1];
+   }
+   return C[k];
+}
+/*binom.test(as.numeric(x[["frequencies"]])-1,
+						numberOfReadPairs,
+						as.numeric(x[["probabilityOfInteraction"]]),
+						alternative = "greater")
+
+				/*
+				 * P(X = k) = (n : k) p^k(1-p)^(n-k)
+
+		where (n : k) = (n!) ÷ (k!)(n - k)!
+		fixed number n observations
+		probability of success p
+				 */

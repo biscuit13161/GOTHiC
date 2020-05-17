@@ -8,6 +8,8 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
+#include <cstdint>
+
 enum CisTrans
 {
 	ct_all=0,
@@ -18,5 +20,8 @@ enum CisTrans
 void showTime();
 void completed();
 void printUsage();
+
+std::uint32_t fact(std::uint32_t n);
+int fact(int n);
 
 #endif /* SRC_UTILS_H_ */

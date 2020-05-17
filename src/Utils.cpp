@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "version.h"
 #include <ctime>
+#include <stdint.h>
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
@@ -42,4 +43,21 @@ void printUsage()
 	cerr << "    gothic <path/to/config/file>"  << endl << endl;
 	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl;
 
+}
+
+uint32_t fact(uint32_t n)
+{
+   if ((n==0)||(n==1))
+      return 1;
+   else
+      return n*fact(n-1);
+}
+
+int fact(int n)
+{
+    //  Factorial
+   if ((n==0)||(n==1))
+      return 1;
+   else
+      return n*fact(n-1);
 }

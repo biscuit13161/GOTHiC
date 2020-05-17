@@ -1,5 +1,6 @@
 #include "gothic.h"
 #include "Setup.h"
+#include "binTest.h"
 #include "Utils.h"
 #include "BinomData.h"
 #include <iostream>
@@ -45,7 +46,8 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
-		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
+		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
+		binTest();
 	}
 	catch(const std::invalid_argument& e){
 		cout<< "Error: " << e.what() << endl;

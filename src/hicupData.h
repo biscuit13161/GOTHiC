@@ -8,11 +8,11 @@
 #ifndef SRC_HICUPDATA_H_
 #define SRC_HICUPDATA_H_
 
+#include "BinomData.h"
 #include <vector>
 #include <string>
 #include <math.h>
 #include <streambuf>
-#include "BinomData.h"
 
 class Site{
 private:
@@ -57,8 +57,11 @@ void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
 void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name, bool drop = false);
 void countDuplicates(std::vector<Interaction> & interactions);
 void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+
 void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+
+void calcFreq(std::vector<Interaction> & interactions, std::map<std::string,int> & cov, double & tCoverage, int & max);
 //void completed();
 
 #endif /* SRC_HICUPDATA_H_ */
