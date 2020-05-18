@@ -11,6 +11,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <omp.h>
+#include <cstdlib>
 #include <istream>
 #include <fstream>
 #include <map>
@@ -70,7 +71,21 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 
 	if (fileName.find("bam",fileName.length()-3)!=string::npos)
 	{
-		throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
+		string str = string("samtools view -h ") + fileName + " | grep -v \"^@\" | cut -f -4 > " + fileName +".txt";
+		const char *cmd = str.c_str();
+		system(cmd);
+		fileName = fileName + ".txt";
+		//throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
+		// samtools view -h CD34-2_S1_L007_R1_2_001.hicup.bam | grep -v "^@" | cut -f -4 > CD34-2_S1_L007_R1_2_001.hicup.bam.txt
+	}
+	if (fileName.find("sam",fileName.length()-3)!=string::npos)
+	{
+		string str = string("grep -v \"^@\" ") + fileName + " | cut -f -4 > " + fileName +".txt";
+		const char *cmd = str.c_str();
+		system(cmd);
+
+		fileName = fileName + ".txt";
+		//throw std::invalid_argument("importHicup: doesn't function with sam files, input can be converted to appropriate text file using hicupToTable script");
 	}
 	if (fileName.find("gz",fileName.length()-2)!=string::npos)
 	{
@@ -170,6 +185,89 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 		throw std::invalid_argument("importHicup: unable to open input file!");
 	}
 
+	vector<string> list(2);
+	vector<vector<string>> file;
+
+	//read file into temporary vector
+	while(inFile)
+	{
+		string start1;
+		getline(inFile,start1,'\n');
+		if (start1.length() == 0)
+		{
+			break;
+		}
+		list[0] = start1;
+
+		string start2;
+		getline(inFile,start2,'\n');
+		list[1] = start2;;
+
+		file.push_back(list);
+
+		if (!inFile) // corrects for last blank line
+		{
+			break;
+		}
+	}
+
+	interactions.resize(file.size());
+
+	//Parallel parse line data
+	bool foundCondition = false;
+	#pragma omp parallel for
+	for (int i = 0; i < file.size(); i++)
+	{
+		string one = file[i][0];
+		string two = file[i][1];
+		//string str = string("line ") + to_string(i) + ": " + one + "\n\t" + two +"\n";
+		//cout << str;
+		string delimiter = "\t";
+		size_t pos = one.find(delimiter);
+		string id1 = one.substr(0,pos);
+		if (id1.length() == 0)
+		{
+			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
+		}
+		one.erase(0, one.find(delimiter) + delimiter.length());
+		pos = one.find(delimiter);
+		string flag1 = one.substr(0,pos);
+		one.erase(0, one.find(delimiter) + delimiter.length());
+		pos = one.find(delimiter);
+		string chr1 = one.substr(0,pos);
+		one.erase(0, one.find(delimiter) + delimiter.length());
+		pos = one.find(delimiter);
+		string start1 = one.substr(0,pos);
+		int locus1 = stoi(start1,nullptr,10);
+
+		pos = two.find(delimiter);
+		string id2 = two.substr(0,pos);
+		if (checkConsistency && (id2.length() == 0 | id1 != id2))
+		{
+			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
+		}
+		two.erase(0, two.find(delimiter) + delimiter.length());
+		pos = two.find(delimiter);
+		string flag2 = two.substr(0,pos);
+		two.erase(0, two.find(delimiter) + delimiter.length());
+		pos = two.find(delimiter);
+		string chr2 = two.substr(0,pos);
+		two.erase(0, two.find(delimiter) + delimiter.length());
+		pos = one.find(delimiter);
+		string start2 = two.substr(0,pos);
+		int locus2 = stoi(start2,nullptr,10);
+
+		//string str = string("line ") + to_string(i) + ": " + chr1 + ":" + to_string(locus1) + " " + chr2 + ":" + to_string(locus2) +"\n";
+		//cout << str;
+
+		interactions[i] = Interaction(chr1, chr2, locus1, locus2);
+
+	}
+	//throw std::invalid_argument("finished");
+
+}
+
+/*
 	while(inFile)
 	{
 		string id1;
@@ -210,8 +308,7 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 			break;
 		}
 	}
-	inFile.close();
-}
+ */
 
 void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Site> & fragments)
 {

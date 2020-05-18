@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		//binTest();
 	}
 	catch(const std::invalid_argument& e){
-		cout<< "Error: " << e.what() << endl;
+		cout << "Error: " << e.what() << endl;
 	}
 
 	//vector<Site> sites;
