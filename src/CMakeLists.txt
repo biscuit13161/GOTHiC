@@ -16,17 +16,17 @@ foreach(lib ${CLIBS})
   target_link_libraries (${lib} ${Boost_LIBRARIES})
 endforeach(lib)
 
-set(LIBS Setup Utils hicupData BinomData binTest)
+set(LIBS Setup Utils hicupData BinomData binTest )
 
 foreach(lib ${LIBS})
   add_library(${lib} ${lib}.cpp)
-  target_link_libraries (${lib} ${Boost_LIBRARIES})
+  target_link_libraries (${lib} ${CLIBS} ${Boost_LIBRARIES})
 endforeach(lib)
 
 
 add_executable (gothic gothic.cpp)
  
-target_link_libraries (gothic ${LIBS} ${CLIBS} ${Boost_LIBRARIES})
+target_link_libraries (gothic ${CLIBS} ${LIBS} ${Boost_LIBRARIES})
 
 
 

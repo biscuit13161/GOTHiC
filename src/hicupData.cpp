@@ -6,7 +6,7 @@
  */
 
 #include "../src/hicupData.h"
-
+#include "pbinom.h"
 #include <set>
 #include <iostream>
 #include <stdio.h>
@@ -594,7 +594,7 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     int num =  28679;
     bool alt = true;
 
-    long double P = binomialTest(freq, num, prob, alt);
+    double P = pbinom(double(freq), double(num), prob, 0, 0);; //binomialTest(freq, num, prob, alt);
     cout << "P: " << P << endl;
 
 	/*	binned_df_filtered$pvalue <- apply(binned_df_filtered, 1, function(x)

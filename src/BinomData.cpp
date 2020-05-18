@@ -165,36 +165,3 @@ bool comp(const halfInteraction & a, const halfInteraction & b)
 	return a.mChr < b.mChr;
 }
 
-long double binomialTest(int freq, int num, long double prob,bool alt)
-{
-	int F = binomialCoefficients(num,freq);
-	cout << "F: " << F;
-	long double P1 = pow(prob, freq);
-	long double P2 = pow((1-prob),(num-freq));
-	long double P = F * P1 * P2;
-	cout << "P1: " << P1 << ", P2: " << P2 <<endl;
-	return P;
-}
-
-int binomialCoefficients(int n, int k) {
-   int C[k+1];
-   memset(C, 0, sizeof(C));
-   C[0] = 1;
-   for (int i = 1; i <= n; i++) {
-      for (int j = min(i, k); j > 0; j--)
-         C[j] = C[j] + C[j-1];
-   }
-   return C[k];
-}
-/*binom.test(as.numeric(x[["frequencies"]])-1,
-						numberOfReadPairs,
-						as.numeric(x[["probabilityOfInteraction"]]),
-						alternative = "greater")
-
-				/*
-				 * P(X = k) = (n : k) p^k(1-p)^(n-k)
-
-		where (n : k) = (n!) ÷ (k!)(n - k)!
-		fixed number n observations
-		probability of success p
-				 */

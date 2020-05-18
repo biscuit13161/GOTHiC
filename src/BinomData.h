@@ -163,8 +163,5 @@ bool comp(const halfInteraction & a, const halfInteraction & b);
 
 //double relCoverage1, double relCoverage2, double probability, int mExpected, int mReadCount, double mPvalue, double mQvalue, double mLogObservedOverExpected
 
-long double binomialTest(int freq, int num, long double prob,bool alt);
-int binomialCoefficients(int n, int k);
-
 
 #endif /* SRC_BINOMDATA_H_ */

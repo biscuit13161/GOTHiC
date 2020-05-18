@@ -14,7 +14,7 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 
 ###Requirements
 + Cmake 3.4
-+ C++17-compatible compiler
++ C99 and C++17-compatible compiler
 + googletest
 
 ###Building and Installing
@@ -32,6 +32,11 @@ cmake ..
 make
 ```
 
+it is possible that cmake will not use the correct compilers if you have multiple installes, or if it is not installed in a default location. The correct compiler can be passed to cmake using:
+
+```bash
+cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ ..
+```
 
 ###Testing
 

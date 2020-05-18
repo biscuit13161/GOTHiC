@@ -18,6 +18,14 @@
  */
 	/* Utilities for `dpq' handling (density/probability/quantile) */
 
+#ifndef SRC_DPQ_H_
+#define SRC_DPQ_H_
+
+#include <float.h>
+#include <limits.h>
+#include <math.h>
+
+
 /* give_log in "d";  log_p in "p" & "q" : */
 #define give_log log_p
 							/* "DEFAULT" */
@@ -27,10 +35,18 @@
 
 #define ML_NAN		(0.0 / 0.0)
 
-// #ifndef M_SQRT_PI
-#define M_SQRT_PI	1.772453850905516027298167483341
-// #ifndef M_LN_SQRT_2PI
-#define M_LN_SQRT_2PI	0.918938533204672741780329736406
+#define ML_WARN_return_NAN {return ML_NAN;}
+
+#ifndef M_SQRT_PI
+#define M_SQRT_PI       1.772453850905516027298167483341        /* sqrt(pi) */
+#endif
+#ifndef M_LN_SQRT_2PI
+#define M_LN_SQRT_2PI   0.918938533204672741780329736406        /* log(sqrt(2*pi))
+                                                                 == log(2*pi)/2 */
+#endif
+#ifndef M_LOG10_2
+#define M_LOG10_2	0.301029995663981195213738894724	/* log10(2) */
+#endif
 
 #define ISNAN(x)     (isnan(x)!=0)
 #define R_FINITE(x)    isfinite(x)
@@ -137,3 +153,7 @@
        MATHLIB_WARNING(_("non-integer x = %f"), x);	\
 	return R_D__0;					\
    }
+
+
+
+#endif /* SRC_DPQ_H_ */

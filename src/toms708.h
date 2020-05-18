@@ -11,7 +11,7 @@
 #include "dpq.h"
 #include <stdbool.h>
 
-static void bratio(double a, double b, double x, double y, double *w, double *w1, int *ierr, int log_p);
+void bratio(double a, double b, double x, double y, double *w, double *w1, int *ierr, int log_p);
 static double bfrac(double, double, double, double, double, double, int log_p);
 static void bgrat(double, double, double, double, double *, double, int *, bool log_w);
 static double grat_r(double a, double x, double r, double eps);
@@ -37,6 +37,9 @@ static double erf__(double);
 static double rexpm1(double);
 static double erfc1(int, double);
 static double gsumln(double, double);
+int Rf_i1mach(int i);
+double Rf_d1mach(int i);
+double logspace_add(double logx, double logy);
 
 
 

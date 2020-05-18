@@ -5,37 +5,49 @@
  *      Author: rich
  */
 
-#include "../src/hicupData.h"
-
-#include <set>
+//#include "hicupData.h"
+#include "pbinom.h"
+//#include <set>
 #include <iostream>
-#include <stdio.h>
-#include <omp.h>
-#include <istream>
-#include <fstream>
-#include <map>
-#include <cmath>
-#include <regex>
-#include <zlib.h>
-#include <algorithm>
-#include <boost/algorithm/string.hpp>
+//#include <stdio.h>
+//#include <omp.h>
+//#include <istream>
+//#include <fstream>
+//#include <map>
+//#include <cmath>
+//#include <regex>
+//#include <zlib.h>
+//#include <algorithm>
+//#include <boost/algorithm/string.hpp>
 
 using namespace std;
 
 void binTest()
 {
+	/*
+	 * freq = vector of quantiles
+	 * num = number of trials
+	 * prob = probability of success on each trial.
+	 * lower_tail = logical (0/1); if TRUE (default), probabilities are P[X ≤ x], otherwise, P[X > x].
+	 * log_p = return p-value as log value (0/1)
+	 */
+
 	int freq = 1;
-	long double prob = 0.30;//6.079281e-10;
+	double prob = 0.30;//6.079281e-10;
 	int num =  3; //20;
 	bool alt = true;
+	int log_p = 0; // false
+	int lower_tail = 0; //false
 
-	cout << fact(num) << endl;
-	cout << (fact(num)/(fact(freq)*fact(num-freq))) << endl;
-	cout << binomialCoefficients( num,freq) << endl;
+    prob = 6.079281e-10;
+    num =  28679;
 
-
-	long double P = binomialTest(freq, num, prob, alt);
+	// pbinom(freq, num, prob, alt);
+	double P = pbinom(double(freq), double(num), prob, lower_tail, log_p);
 	cout << "P: " << P << endl;
+	//1.519785e-10//0.216
 }
+
+
 
 

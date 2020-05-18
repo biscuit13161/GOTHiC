@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
-		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
-		binTest();
+		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
+		//binTest();
 	}
 	catch(const std::invalid_argument& e){
 		cout<< "Error: " << e.what() << endl;

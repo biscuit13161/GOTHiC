@@ -24,10 +24,10 @@
  */
 
 #include "pbinom.h"
+#include <math.h>
 //#include "nmath.h"
 #include "dpq.h"
 
-#define M_LN2		0.693147180559945309417232121458
 #define ML_NEGINF	((-1.0) / 0.0)
 
 #define R_D__0	(log_p ? ML_NEGINF : 0.)		/* 0 */
@@ -38,6 +38,17 @@
 
 double pbinom(double x, double n, double p, int lower_tail, int log_p)
 {
+	/*
+	 * x = vector of quantiles
+	 * n = number of trials
+	 * p = probability of success on each trial.
+	 * lowertail = logical (0/1); if TRUE (default), probabilities are P[X ≤ x], otherwise, P[X > x].
+	 * log_p = return p-value as log value (0/1)
+	 */
+
+	if(n < 0 || p < 0 || p > 1)
+		return ML_NAN;
+
     if (x < 0) return R_DT_0;
     x = floor(x + 1e-7);
     if (n <= x) return R_DT_1;
