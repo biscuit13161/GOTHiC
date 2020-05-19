@@ -112,9 +112,10 @@ void Interaction::print(){
 
 ostream & operator<<(ostream & out, const Interaction & in)
 {
-	out << in.mChr1 << "\t" << in.mLocus1 << "\t" << in.mInt1 \
-			<< "\t" << in.mChr2 << "\t" << in.mLocus2 << "\t" \
-			<< in.mInt2 << "\t" << in.mFrequency;
+	string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
+				+ to_string(in.mLocus2) + "\t" + in.mInt1 + "\t" + in.mInt2 + "\t" \
+				+ to_string(in.mFrequency) + "\n";
+	out << L;
 	return out;
 }
 

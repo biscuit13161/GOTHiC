@@ -9,31 +9,12 @@
 #define SRC_HICUPDATA_H_
 
 #include "BinomData.h"
+#include "Site.h"
 #include <vector>
 #include <string>
 #include <math.h>
 #include <streambuf>
 
-class Site{
-private:
-	std::string mChr;
-	int mLocus;
-	int mStart;
-	int mEnd;
-public:
-	Site();
-	Site(std::string chr, int locus, int start, int end);
-	Site(const Site & other);
-
-	friend std::string fixChromosomeNames(std::string chr);
-
-	inline std::string getChr() const {return mChr;}
-	inline int getLocus() const {return mLocus;}
-	inline int getEnd() const {return mEnd;}
-	inline int getStart() const {return mStart;}
-
-	void print();
-};
 
 template<typename CharT, typename TraitsT = std::char_traits<CharT> >
 class vectorwrapbuf : public std::basic_streambuf<CharT, TraitsT> {

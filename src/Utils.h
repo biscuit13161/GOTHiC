@@ -8,7 +8,10 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
+#include "Site.h"
 #include <cstdint>
+#include <vector>
+#include <string>
 
 enum CisTrans
 {
@@ -23,5 +26,8 @@ void printUsage();
 
 std::uint32_t fact(std::uint32_t n);
 int fact(int n);
+
+void writeBinary(std::vector<Site> & sites, std::string binOutFileName);
+void readBinary(std::vector<Site> & sites, std::string binInFileName);
 
 #endif /* SRC_UTILS_H_ */

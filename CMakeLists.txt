@@ -6,7 +6,7 @@ include(CTest) # note: this adds a BUILD_TESTING which defaults to ON
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fopenmp ")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp ")
 
 include_directories(${Boost_INCLUDE_DIRS})
 

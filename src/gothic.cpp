@@ -48,6 +48,11 @@ int main(int argc, char *argv[])
 	try {
 		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
 		//binTest();
+		/*
+		 * vector<Site> fragments;
+		 * binaryWriteTest(fragments, restrictionFile);
+		 * binaryRead(fragments);
+		 */
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;
@@ -135,6 +140,8 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 	std::vector<Site> fragments;
 	getHindIIIsitesFromHicup(fragments, restrictionFile);
     mapHicupToRestrictionFragment(interactions, fragments);
+
+
 
 	binInteractions(interactions, res);
 

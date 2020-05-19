@@ -5,8 +5,9 @@
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#include "../src/hicupData.h"
+#include "hicupData.h"
 #include "pbinom.h"
+#include "Utils.h"
 #include <set>
 #include <iostream>
 #include <stdio.h>
@@ -21,10 +22,7 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 
-#include "../src/Utils.h"
-//#include <execution>
-//#include <seqan3/io/alignment_file/all.hpp>
-//#include "gzstream.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -37,25 +35,6 @@ struct RetrieveKey
     }
 };
 
-Site::Site(): mChr(""), mLocus(0), mStart(0), mEnd(0)
-{
-}
-
-Site::Site(string chr, int locus, int start, int end): mChr(chr), mLocus(locus), mStart(start), mEnd(end)
-{
-}
-
-Site::Site(const Site & other)
-{
-	mChr = other.mChr;
-	mLocus = other.mLocus;
-	mStart = other.mStart;
-	mEnd = other.mEnd;
-}
-
-void Site::print(){
-	cout << mChr << "\t"<< mLocus << "\t"<< mStart  << "\t"<< mEnd << endl;
-}
 
 void importHicup(string fileName, vector<Interaction> & interactions, bool checkConsistency)
 {
@@ -315,6 +294,9 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	int iSize = interactions.size();
 	cerr << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
+	string binOutFileName = "Digest.bin";
+	writeBinary(fragments, binOutFileName);
+
 	vector<halfInteraction> sources;
 	vector<halfInteraction> targets;
 
@@ -332,8 +314,9 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	findOverlaps(sources, fragments, "Sources");
 	findOverlaps(targets, fragments, "Targets");
 
-	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;;
+	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
 
+	fragments.clear();
 	//sort positions into order
 
 	sortPositions(interactions, iSize, sources, targets);
@@ -455,8 +438,30 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 
 vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Site> & fragments, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
 {
-	//vector<Site> hindGR;
-	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
+	cerr << "Binomial HiC Hicup Analysis";
+//	vector<Site> hindGR;
+	string binInFileName = "Digest.bin";
+	readBinary(fragments,  binInFileName);
+//	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
+//
+//	cerr << "fragments: " << fragments.size() << endl;
+//	cerr << "hindGR: " << hindGR.size() << endl;
+//
+//	int pos = 0;
+//	for (int i= 0; i!= fragments.size(); i++)
+//	{
+//		if (hindGR[i] == fragments[i])
+//		{
+//			pos++;
+//		}
+//		else
+//		{
+//			cerr << i << " ** hindGR and fragments vectors don't match **" << endl;
+//		}
+//	}
+//
+//	cerr << pos << " Sites matched!" << endl;
+
 
 	vector<Interaction> binned_df_filtered;
 	//binned_df_filtered.resize(interactions.size());
@@ -800,18 +805,13 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 	#pragma omp parallel for
 	for (i = 0; i < query.size(); i++)
 	{
-		for (int j = 0; j < fragments.size(); j++)
+		for (auto it = fragments.begin(); it != fragments.end(); it++)
 		{
-			if (query[i].getChr() == fragments[j].getChr())
+			if (query[i].getChr() == (*it).getChr())
 			{
-				if ((query[i].getLocus() >= fragments[j].getStart()) && (fragments[j].getEnd() >= query[i].getLocus()) )
+				if ((query[i].getLocus() >= (*it).getStart()) && ((*it).getEnd() >= query[i].getLocus()) )
 				{
-					/*if (query[i].getLocus() == 197036391)
-					{
-						string L = string("overlay: ") + query[i].getChr() + ":" + to_string(query[i].getLocus()) + " -> " + fragments[j].getChr() + ":" + to_string(fragments[j].getStart()) + "-" + to_string(fragments[j].getEnd());
-						cerr << L;
-					}//*/
-					query[i] = halfInteraction(fragments[j].getChr(), fragments[j].getStart());
+					query[i] = halfInteraction((*it).getChr(), (*it).getStart());
 					break;
 				}
 
@@ -842,17 +842,21 @@ void countDuplicates(vector<Interaction> & interactions)
 	map<string , map<string, int>> list;
 
 	int count = 0;
+#pragma omp parallel for
 	for (int i = 0; i < interactions.size(); i++)
 	{
 		string int1 = interactions[i].getInt1();
 		string int2 = interactions[i].getInt2();
-
+#pragma omp critical
 		list[int1][int2]++;
 	}
 	interactions.clear();
 
-	for (auto it = list.begin(); it != list.end(); it++)
+	#pragma omp parallel for
+	for (int i = 0; i< list.size(); i++)
 	{
+		auto it = list.begin();
+		std::advance(it, i);
 		string int1 = it->first;
 		size_t pos = int1.find(":");
 		string chr1 = int1.substr(0,pos);
@@ -868,8 +872,9 @@ void countDuplicates(vector<Interaction> & interactions)
 			string chr2 = int2.substr(0,pos);
 			int locus2 = atoi(int2.substr(pos+1).c_str());
 
-			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
 
+			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
+			#pragma omp critical
 			interactions.push_back(I);
 		}//*/
 
@@ -883,26 +888,38 @@ void countDuplicates(vector<Interaction> & interactions)
 
 void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
 {
-		int pos = 0;
-		for (auto it = interactions.begin(); it != interactions.end(); it++)
+	int pos = 0;
+	//for (auto it = interactions.begin(); it != interactions.end(); it++)
+	//{
+#pragma omp parallel for
+	for (int i = 0; i< interactions.size(); i++)
+	{
+		auto it = interactions.begin();
+		std::advance(it, i);//*/
+		Interaction T = *it;
+		if (T.getInt1() != T.getInt2())
 		{
-			Interaction T = *it;
-			if (T.getInt1() != T.getInt2())
-			{
-				binned_df_filtered.push_back(T);
-				pos++;
-			}
+#pragma omp critical
+			binned_df_filtered.push_back(T);
+			pos++;
 		}
+	}
 }
 
 void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
-	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
 	{
+		auto it = binned_df_filtered.begin();
+		advance(it, i);
+		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+		//	{
 		Interaction T = *it;
 		if (T.getChr1() == T.getChr2())
 		{
+#pragma omp critical
 			interactions.push_back(T);
 			pos++;
 		}
@@ -912,11 +929,16 @@ void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df
 void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
-	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
 	{
+		auto it = binned_df_filtered.begin();
+		std::advance(it, i);
+
 		Interaction T = *it;
 		if (T.getChr1() != T.getChr2())
 		{
+#pragma omp critical
 			interactions.push_back(T);
 			pos++;
 		}
@@ -925,6 +947,7 @@ void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_
 
 void calcFreq(vector<Interaction> & interactions, map<string,int> & cov, double & tCoverage, int & max)
 {
+	// DO NOT PARALLELISE!!
     for (int i = 0; i < interactions.size(); i ++ )
     {
     	if (cov.find(interactions[i].getInt1()) == cov.end())

@@ -5,7 +5,8 @@
  *      Author: rich
  */
 
-//#include "hicupData.h"
+#include "binTest.h"
+#include "hicupData.h"
 #include "pbinom.h"
 //#include <set>
 #include <iostream>
@@ -24,6 +25,7 @@ using namespace std;
 
 void binTest()
 {
+
 	/*
 	 * freq = vector of quantiles
 	 * num = number of trials
@@ -47,6 +49,56 @@ void binTest()
 	cout << "P: " << P << endl;
 	//1.519785e-10//0.216
 }
+
+void binaryWriteTest(vector<Site> & fragments, string restrictionFile)
+{
+	cerr << "Binary Write Test" << endl;
+
+	getHindIIIsitesFromHicup(fragments, restrictionFile);
+	string binOutFileName = "Digest.bin";
+	writeBinary(fragments, binOutFileName);
+	completed();
+}
+
+void binaryRead(vector<Site> & fragments)
+{
+	cerr << "Binary Write Test" << endl;
+	vector<Site> hindGR;
+	string binInFileName = "Digest.bin";
+	readBinary(hindGR,  binInFileName);
+	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
+
+
+	cerr << "fragments: " << fragments.size() << endl;
+	cerr << "hindGR: " << hindGR.size() << endl;
+
+//	fragments[846223].print();
+//	fragments[846224].print();
+//	fragments[846225].print();
+//	fragments[846226].print();
+//	hindGR[846223].print();
+//	hindGR[846224].print();
+//	hindGR[846225].print();
+//	hindGR[846226].print();
+
+	int pos = 0;
+	for (int i= 0; i!= fragments.size(); i++)
+	{
+		if (hindGR[i] == fragments[i])
+		{
+			pos++;
+		}
+		else
+		{
+			cerr << i << " ** hindGR and fragments vectors don't match **" << endl;
+		}
+	}
+
+	cerr << pos << " Sites matched!" << endl;
+	completed();
+}
+
+
 
 
 
