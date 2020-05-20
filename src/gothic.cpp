@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
 		 * binaryWriteTest(fragments, restrictionFile);
 		 * binaryRead(fragments);
 		 */
+		//countDupsTest();
+		//binInterTest();
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;

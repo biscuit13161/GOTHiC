@@ -31,7 +31,7 @@ BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2,
 				  mLogObservedOverExpected(logObservedOverExpected) {
 }
 
-BinomData::BinomData(BinomData & other){
+BinomData::BinomData(const BinomData & other){
 	mChr1 = other.mChr1;
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
@@ -49,7 +49,7 @@ BinomData::BinomData(BinomData & other){
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
 }
 
-BinomData::BinomData(Interaction & other){
+BinomData::BinomData(const Interaction & other){
 	mChr1 = other.getChr1();
 	mChr2 = other.getChr2();
 	mLocus1 = other.getLocus1();
@@ -57,6 +57,39 @@ BinomData::BinomData(Interaction & other){
 	mInt1 = other.getInt1();
 	mInt2 = other.getInt2();
 	mFrequency = other.getFreq();
+}
+
+void BinomData::print()
+{	std::ostringstream streamObj;
+	string L = 	mInt1 + " " + mInt2;
+	streamObj << mFrequency;
+	string A = streamObj.str();
+			L = L + " " + A ; \
+//			+ " " + to_string(mRelCoverage1) \
+//			+ " " + to_string(mRelCoverage2) \
+//			+ " " + to_string(mProbability) \
+//			+ " " + to_string(mExpected) \
+//			+ " " + to_string(mReadCount) \
+//			+ " " + to_string(mPvalue) \
+//			+ "\n";
+	//double mQvalue; // binomial p-value corrected for multi-testing with Benjamini-Hochberg
+	//double mLogObservedOverExpected; ;
+	cout << L << endl;
+}
+
+ostream & operator<<(ostream & out, const BinomData & in)
+{
+	//string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
+				+ to_string(in.mLocus2) + "\t" + in.mInt1 + "\t" + in.mInt2 + "\t" \
+				+ to_string(in.mFrequency) + "\n";
+	out << in.mInt1 << "\t" << in.mInt2 \
+			<< "\t" << in.mFrequency \
+			<< "\t" << in.mRelCoverage1 \
+			<< "\t" << in.mRelCoverage2 \
+			<< "\t" << in.mProbability \
+			<< "\t" << in.mPvalue \
+			<< endl;
+	return out;
 }
 
 Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(""), mInt2(""), mFrequency(1) {
@@ -119,16 +152,7 @@ ostream & operator<<(ostream & out, const Interaction & in)
 	return out;
 }
 
-ostream & operator<<(ostream & out, const BinomData & in)
-{
-	out << in.mChr1 << "\t" << in.mChr2 << "\t" << in.mLocus1 \
-			<< "\t" << in.mLocus2 << "\t" << in.mRelCoverage1 \
-			<< "\t" << in.mRelCoverage2 << "\t" << in.mProbability \
-			<< "\t" << in.mExpected << "\t" << in.mReadCount << "\t" \
-			<< in.mPvalue << "\t" << in.mQvalue << "\t" \
-			<< in.mLogObservedOverExpected;
-	return out;
-}
+
 
 halfInteraction::halfInteraction():mChr(""), mLocus(0), mInt("") {
 

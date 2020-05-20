@@ -42,7 +42,7 @@ void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Inter
 void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 
-void calcFreq(std::vector<Interaction> & interactions, std::map<std::string,int> & cov, double & tCoverage, int & max);
+void calcFreq(const std::vector<Interaction> & interactions, std::map<std::string,int> & cov, double & tCoverage, int & max);
 //void completed();
 
 #endif /* SRC_HICUPDATA_H_ */

@@ -10,11 +10,12 @@
 #include "pbinom.h"
 //#include <set>
 #include <iostream>
+#include <string>
 //#include <stdio.h>
 //#include <omp.h>
 //#include <istream>
 //#include <fstream>
-//#include <map>
+#include <map>
 //#include <cmath>
 //#include <regex>
 //#include <zlib.h>
@@ -98,8 +99,82 @@ void binaryRead(vector<Site> & fragments)
 	completed();
 }
 
+void countDupsTest()
+{
+	std::vector<Interaction> interactions;
+	interactions.push_back(Interaction("chr1","chr2",12553,15273));
+	interactions.push_back(Interaction("chr1","chr2",12553,15273));
+	interactions.push_back(Interaction("chr1","chr2",12553,15273));
+	interactions.push_back(Interaction("chr6","chrX",125585523,1063441));
+	interactions.push_back(Interaction("chr6","chrX",125585523,1063441));
+	interactions.push_back(Interaction("chr10","chr5",1064473,1505273));
+
+	map<string,int> list;
+
+	list["chr10:1064473"] = 1;
+	list["chr6:125585523"] = 2;
+	list["chr1:12553"] = 3;
+	list["chr5:1505273"] = 1;
+	list["chrX:1063441"] = 2;
+	list["chr2:15273"] = 3;
+
+	countDuplicates(interactions);
+
+	for (auto i : interactions)
+	{
+		i.print();
+		cout << list[i.getInt1()] << "\t" << list[i.getInt2()] << endl;
+	}
+	cout << endl;
+
+//	for (auto i = list.begin(); i != list.end(); i++)
+//		cout << i->first << " " << i->second << endl;
+
+}
+
+void binInterTest()
+{
+std::vector<Interaction> interactions;
+int res = 1000;
+interactions.push_back(Interaction("chr2","chr1",12553,15273));
+interactions.push_back(Interaction("chr1","chr1",17753,15273));
+interactions.push_back(Interaction("chrX","chr7",1255,1020));
+
+for (auto i : interactions)
+{
+	i.print();
+}
+
+cout << endl;
+//binInteractions(interactions, res);
+
+std::map<std::string,int> list;
+list["chr1:17753"] = 1;
+list["chr2:12553"] = 1;
+list["chr1:15273"] = 1;
+list["chrX:1255"] = 1;
+list["chr7:1020"] = 1;
+
+std::map<std::string,int> list2;
+list2["chr1:17000"] = 1;
+list2["chr2:12000"] = 1;
+list2["chr1:15000"] = 1;
+list2["chrX:1000"] = 1;
+list2["chr7:1000"] = 1;
 
 
+for (auto i : interactions)
+{
+	i.print();
+	cout << "list " << list[i.getInt1()] << " " << list[i.getInt2()] << endl;
+	cout << "list " << list2[i.getInt1()] << " " << list2[i.getInt2()] << endl;
+}
+
+//ASSERT_TRUE(interactions[1].getInt1() == "chr2:12000");
+//EXPECT_FALSE(interactions[0].getInt1() == "chr1:17753");
+//EXPECT_TRUE(interactions[0].getInt1() == "chr1:17000");
+//EXPECT_TRUE(interactions[2].getInt1() == "chrX:1000");
+}
 
 
 

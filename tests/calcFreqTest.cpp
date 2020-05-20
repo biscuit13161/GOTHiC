@@ -23,9 +23,14 @@ TEST(calcFreqTest, first)
 
     calcFreq(interactions, cov, coverage, max);
 
-    ASSERT_TRUE(true);
-    EXPECT_TRUE(coverage == 18);
+    //ASSERT_TRUE(true);
+    ASSERT_TRUE(coverage == 18);
     EXPECT_TRUE(max == 8);
+    EXPECT_TRUE(cov["chr1:17753"] == 2);
+    EXPECT_TRUE(cov["chr2:12553"] == 6);
+    EXPECT_TRUE(cov["chr1:15273"] == 8);
+    EXPECT_TRUE(cov["chrX:1255"] == 1);
+	EXPECT_TRUE(cov["chr7:1020"] == 1);
 
 }
 

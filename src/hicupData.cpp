@@ -506,24 +506,6 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 
 
 	// calculate coverage
-
-		/*if( interations.size() > 1e8)
-			{
-				t <- ceiling(nrow(binned_df_filtered)/1e8)
-				dfList <- list()
-				dfList[[1]] <- binned_df_filtered[1:1e8,]
-				for(i in 2:t){
-					 dfList[[i]] <- binned_df_filtered[(((i-1)*1e8)+1):min((i*1e8),nrow(binned_df_filtered)),]
-					 }
-				dtList <- lapply(dfList, data.table)
-				covAs <- lapply(dtList, function(x) x[,sum(frequencies), by=int1])
-				covBs <- lapply(dtList, function(x) x[,sum(frequencies), by=int2])
-				covAm <- do.call(rbind, covAs)
-				covBm <- do.call(rbind, covBs)
-				covA <- covAm[,sum(V1),by=int1]
-				covB <- covBm[,sum(V1),by=int2]
-			}else{//*/
-
     map<string,int> cov;
     double tCoverage = 0;
     int max = 0;
@@ -534,14 +516,19 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     calcFreq(interactions, cov, tCoverage, max);
 
     //cout << "cov.size: " << cov.size() << endl;
-    cout << "total coverage: " << tCoverage << endl;
+    cout << "total coverage: " << tCoverage  << " (57358)"<< endl;
     //cout << "max: " << max << endl;
 
     if (tCoverage == 0)
     {
     	throw std::invalid_argument("binomialHiChicup: Zero coverage!");
     }
+    if (cov.size() == 0)
+        {
+        	throw std::invalid_argument("binomialHiChicup: Zero coverage!");
+        }
 
+    // Calculate Relative Coverage
     map<string,long double> rCov;
     long double diagonalProb = 0;
     for (auto i = cov.begin(); i != cov.end(); i ++)
@@ -556,6 +543,7 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     set<string> chromos;
 
 
+    // add relative coverage to BinomData objects
     for (auto i : interactions) //.begin(); i < interactions.end(); i++)
     {
     	chromos.insert(i.getChr1());
@@ -564,16 +552,16 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     	BinomData bin = BinomData(i);
     	bin.setRelCov1(rCov[int1]);
     	bin.setRelCov2(rCov[int2]);
+    	binFiltered.push_back(bin);
     }
-    cout << "chromos: " << chromos.size() << endl;
 
     //probability correction assuming on average equal probabilities for all interactions
     int covS = cov.size();
     uint32_t numberOfAllInteractions = covS*covS;
     long double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
-    cout << "covS: " << covS << endl;
-    cout << "inter: " << numberOfAllInteractions << " (" << covS << ")"<< endl;
-    cout << "half: " << std::setprecision (17)<< upperhalfBinNumber << endl;
+    cout << "Chromosomes Size: " << chromos.size() << endl;
+    cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")"<< endl;
+    cout << "upperhalfBinNumber: " << std::setprecision (17)<< upperhalfBinNumber << endl;
 
     long double cisBinNumber = 0;
     long double transBinNumber = 0;
@@ -599,16 +587,14 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     		sumSquare += pos.size()*pos.size();
 
     	}
-    	cout << "sumSquare: " << sumSquare << endl;
-    	cout << "uphalfBin: " << upperhalfBinNumber << endl;
+    	//cout << "sumSquare: " << sumSquare << endl;
+    	//cout << "uphalfBin: " << upperhalfBinNumber << endl;
 
     	cisBinNumber = (sumSquare - cov.size())/2;
     	transBinNumber = upperhalfBinNumber - cisBinNumber;
-        cout << "cisBin: " << std::setprecision (17) << cisBinNumber << endl;
-        cout << "transBin: " << std::setprecision (17)<< transBinNumber << endl;
+      //  cout << "cisBin: " << std::setprecision (17) << cisBinNumber << endl;
+     //   cout << "transBin: " << std::setprecision (17)<< transBinNumber << endl;
     }
-    cout << "test3\n";
-
 
 
 		//diagonalProb <- sum(relative_coverage^2)
@@ -626,103 +612,28 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     	cout << "pc: " << probabilityCorrection << endl;
     }
 
-    // Calculate expected read counts
-    for (auto x : binFiltered)
+    // Calculate expected read counts, probabilities and pvalues
+    #pragma omp parallel for
+    for (int i = 0; i < binFiltered.size(); i++)
     {
-    	x.setProbability(x.getRelCov1() * x.getRelCov2() * 2 * probabilityCorrection);
-    	x.setExpected(x.getProbability() * numberOfReadPairs);
-    }
-/*
-		if(parallel)
-			{
-				requireNamespace("parallel")
-				if(nrow(binned_df_filtered)>1e8)
-					{
-					 t <- ceiling(nrow(binned_df_filtered)/1e8)
-					 dfList <- list()
-					 dfList[[1]] <- binned_df_filtered[1:1e8,]
-					 for(i in 2:t){
-					 dfList[[i]] <- binned_df_filtered[(((i-1)*1e8)+1):min((i*1e8),nrow(binned_df_filtered)),]
-					}
-					 dtList <- lapply(dfList, function(x) as.data.frame(t(cbind(as.numeric(x[["frequencies"]]),
-																				as.numeric(x[["probabilityOfInteraction"]])))))
-					 pvalues=list()
-					 for(i in 1:length(dtList)){
-						 pvalues[[i]] <-unlist(parallel::mclapply(dtList[[i]], function(x)
-													{
-													binom.test(x[1]-1, numberOfReadPairs, x[2], alternative = "greater")$p.value
-													},
-													mc.cores=cores))
-					 }
-					 pvals=unlist(pvalues)
-					 binned_df_filtered$pvalue <- pvals
-				}else{
+    	// Calculate expected read counts, probabilities
+    	//double P = binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection;
+    	binFiltered[i].setProbability(binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection);
+    	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
 
-					 binomParams <- as.data.frame(t(cbind(
-														  as.numeric(binned_df_filtered[["frequencies"]]),
-														  as.numeric(binned_df_filtered[["probabilityOfInteraction"]]
-																	 ))))
+    	// Calculate pvalues
+    	// /* input Freq -1??? */
+    	double P = pbinom(double(binFiltered[i].getFreq()), double(numberOfReadPairs), binFiltered[i].getProbability(), 0, 0);
+    	binFiltered[i].setPvalue(P);
+    	cout << binFiltered[i].getInt1() << "/" << binFiltered[i].getInt2() << " - " << binFiltered[i].getFreq();
+    	cout << " - " << numberOfReadPairs  << " " << binFiltered[i].getProbability()<< " -> " << binFiltered[i].getPvalue() << endl;
 
+    	// observed over expected log ratio
+		//binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
 
-					binned_df_filtered$pvalue <- unlist(parallel::mclapply(binomParams, function(x)
-																  {
-																  binom.test(x[1]-1, numberOfReadPairs, x[2], alternative = "greater")$p.value
-																  },
-																  mc.cores=cores))
-				}
-		}else{*/
-			/*if(nrow(binned_df_filtered)>1e8)
-				{
-					 t <- ceiling(nrow(binned_df_filtered)/1e8)
-					 dfList <- list()
-					 dfList[[1]] <- binned_df_filtered[1:1e8,]
-					 for(i in 2:t){
-					 	 dfList[[i]] <- binned_df_filtered[(((i-1)*1e8)+1):min((i*1e8),nrow(binned_df_filtered)),]
-					}
-					pvalues=list()
-					for(i in 1:length(dfList)){
-						pvalues[[i]] <-apply(dfList[[i]], 1, function(x)
-										  {
-										  binom.test(as.numeric(x[["frequencies"]])-1, numberOfReadPairs, as.numeric(x[["probabilityOfInteraction"]]), alternative = "greater")$p.value
-										  }
-										  )
-					 }
-					 pvals=unlist(pvalues)
-					 binned_df_filtered$pvalue <- pvals
-					 }else{//*/
+    	//multiple testing correction separately for matrices with all interactions/only cis/only transs
 
-    int freq = 1;
-    long double prob = 6.079281e-10;
-    int num =  28679;
-    bool alt = true;
-
-    double P = pbinom(double(freq), double(num), prob, 0, 0);; //binomialTest(freq, num, prob, alt);
-    cout << "P: " << P << endl;
-
-	/*	binned_df_filtered$pvalue <- apply(binned_df_filtered, 1, function(x)
-			{
-				binom.test(as.numeric(x[["frequencies"]])-1,
-						numberOfReadPairs,
-						as.numeric(x[["probabilityOfInteraction"]]),
-						alternative = "greater")$p.value
-			}
-		)
-
-		/*
-		 * P(X = k) = (n : k) pk(1-p)(n-k)
-
-where (n : k) = (n!) ÷ (k!)(n - k)!
-fixed number n observations
-probability of success p
-		 */
-			//} //if(nrow(binned_df_filtered)>1e8) else
-		//} // parallel else
-/*
-#observed over expected log ratio
-		binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
-#multiple testing correction separately for matrices with all interactions/only cis/only transs
-
-		if(cistrans==ct_all){
+		/*if(cistrans==ct_all){
 			binned_df_filtered$qvalue <- if(removeDiagonal){p.adjust(binned_df_filtered$pvalue, method = "BH", n=upperhalfBinNumber)}else{p.adjust(binned_df_filtered$pvalue, method = "BH", n=upperhalfBinNumber+length(all_bins))}
 		}
 		if(cistrans==ct_cis){
@@ -730,7 +641,14 @@ probability of success p
 		}
 		if(cistrans==ct_trans){
 			binned_df_filtered$qvalue <- p.adjust(binned_df_filtered$pvalue, method = "BH", n=transBinNumber)
-		}
+		}//*/
+    }//*/
+
+        ofstream binFilterFile("binom.txt");
+        for (const auto &e : binFiltered) binFilterFile << e << endl;
+
+		 */
+
 
 		test <- data.frame(binned_df_filtered)
 		test[,"pvalue"] <- test$pvalue
@@ -847,7 +765,7 @@ void countDuplicates(vector<Interaction> & interactions)
 	{
 		string int1 = interactions[i].getInt1();
 		string int2 = interactions[i].getInt2();
-#pragma omp critical
+#pragma omp critical (cd1)
 		list[int1][int2]++;
 	}
 	interactions.clear();
@@ -874,7 +792,7 @@ void countDuplicates(vector<Interaction> & interactions)
 
 
 			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
-			#pragma omp critical
+			#pragma omp critical (cd2)
 			interactions.push_back(I);
 		}//*/
 
@@ -899,7 +817,7 @@ void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & 
 		Interaction T = *it;
 		if (T.getInt1() != T.getInt2())
 		{
-#pragma omp critical
+#pragma omp critical (rd1)
 			binned_df_filtered.push_back(T);
 			pos++;
 		}
@@ -919,7 +837,7 @@ void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df
 		Interaction T = *it;
 		if (T.getChr1() == T.getChr2())
 		{
-#pragma omp critical
+#pragma omp critical (fc1)
 			interactions.push_back(T);
 			pos++;
 		}
@@ -938,45 +856,46 @@ void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_
 		Interaction T = *it;
 		if (T.getChr1() != T.getChr2())
 		{
-#pragma omp critical
+#pragma omp critical (ft1)
 			interactions.push_back(T);
 			pos++;
 		}
 	}
 }
 
-void calcFreq(vector<Interaction> & interactions, map<string,int> & cov, double & tCoverage, int & max)
+void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, double & tCoverage, int & max)
 {
-	// DO NOT PARALLELISE!!
-    for (int i = 0; i < interactions.size(); i ++ )
-    {
-    	if (cov.find(interactions[i].getInt1()) == cov.end())
-    	{
-    		//cout << "CovA " << interactions[i].getInt1() << endl;
-    		cov[interactions[i].getInt1()] = interactions[i].getFreq();
-    		tCoverage += interactions[i].getFreq();
-    	}
-    	else
-    	{
-    		//cout << "CovA2 " << interactions[i].getInt1() << endl;
-    		cov[interactions[i].getInt1()] += interactions[i].getFreq();
-    		tCoverage += interactions[i].getFreq();
-    	}
-    	if (cov.find(interactions[i].getInt2()) == cov.end())
-    	{
-    		//cout << "CovB " << interactions[i].getInt1() << endl;
-    		cov[interactions[i].getInt2()] = interactions[i].getFreq();
-    		tCoverage += interactions[i].getFreq();
-    	}
-    	else
-    	{
-    		//cout << "CovB2 " << interactions[i].getInt1() << endl;
-    		cov[interactions[i].getInt2()] += interactions[i].getFreq();
-    		tCoverage += interactions[i].getFreq();
-    	}
-    	max = (cov[interactions[i].getInt1()]> max )? cov[interactions[i].getInt1()]: max;
-    	max = (cov[interactions[i].getInt2()]> max )? cov[interactions[i].getInt2()]: max;
-    }
-    //cout << "Loop Coverage: " << tCoverage << endl;
-    //cout << "Loop Max: " << max << endl;
+	// WILL NOT PARALLELISE!!! ...?
+	for (int i = 0; i < interactions.size(); i ++ )
+	{
+		/*if (cov.find(interactions[i].getInt1()) == cov.end())
+		{
+			//cout << "CovA " << interactions[i].getInt1() << endl;
+			cov[interactions[i].getInt1()] = interactions[i].getFreq();
+			tCoverage += interactions[i].getFreq();
+		}
+		else
+		{//*/
+			//cout << "CovA2 " << interactions[i].getInt1() << endl;
+			cov[interactions[i].getInt1()] += interactions[i].getFreq();
+			tCoverage += interactions[i].getFreq();
+		//}
+		/*if (cov.find(interactions[i].getInt2()) == cov.end())
+		{
+			//cout << "CovB " << interactions[i].getInt1() << endl;
+			cov[interactions[i].getInt2()] = interactions[i].getFreq();
+			tCoverage += interactions[i].getFreq();
+		}
+		else
+		{//*/
+			//cout << "CovB2 " << interactions[i].getInt1() << endl;
+			cov[interactions[i].getInt2()] += interactions[i].getFreq();
+			tCoverage += interactions[i].getFreq();
+		//}
+		max = (cov[interactions[i].getInt1()]> max )? cov[interactions[i].getInt1()]: max;
+		max = (cov[interactions[i].getInt2()]> max )? cov[interactions[i].getInt2()]: max;
+	}
+
+	//cout << "Loop Coverage: " << tCoverage << endl;
+	//cout << "Loop Max: " << max << endl;
 }

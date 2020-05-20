@@ -11,6 +11,7 @@
 #include <gtest/gtest.h>
 #include <vector>
 #include <string>
+#include <map>
 
 TEST(countDupsTests, testCountDuplicates)
 {
@@ -30,15 +31,25 @@ TEST(countDupsTests, testCountDuplicates)
 	inter.push_back(Interaction("chr6","chrX",125585523,1063441));
 	inter.push_back(Interaction("chr10","chr5",1064473,1505273));
 
-	EXPECT_TRUE(interactions.size() == inter.size());
+	std::map<std::string,int> list;
+	list["chr10:1064473"] = 1;
+	list["chr6:125585523"] = 2;
+	list["chr1:12553"] = 3;
+	list["chr5:1505273"] = 1;
+	list["chrX:1063441"] = 2;
+	list["chr2:15273"] = 3;
+
 
 	countDuplicates(interactions);
 
-	ASSERT_FALSE(interactions[0] == inter[0]);
-	EXPECT_TRUE(interactions[1].getFreq() == 3);
-	EXPECT_TRUE(interactions[0].getFreq() == 1);
-	EXPECT_FALSE(interactions.size() == inter.size());
-	EXPECT_TRUE(interactions.size() == 3);
+	ASSERT_TRUE(interactions.size() == 3);
+
+	for (auto i : interactions)
+	{
+		EXPECT_TRUE( i.getFreq() == list[i.getInt1()]);
+		EXPECT_TRUE( i.getFreq() == list[i.getInt2()]);
+	}
+
 }//*/
 
 

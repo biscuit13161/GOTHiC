@@ -118,8 +118,8 @@ public:
 			int frequency, long double relCoverage1, long double relCoverage2, \
 			long double probability, long double expected, int readCount, \
 			double pvalue, double qvalue, double logObservedOverExpected);
-	BinomData(BinomData & other);
-	BinomData(Interaction & other);
+	BinomData(const BinomData & other);
+	BinomData(const Interaction & other);
 
 	inline std::string getChr1() const {return mChr1;}
 	inline int getLocus1() const {return mLocus1;}
@@ -131,7 +131,8 @@ public:
 	inline long double getRelCov1() {return mRelCoverage1;}
 	inline long double getRelCov2() {return mRelCoverage2;}
 	inline long double getProbability() {return mProbability;}
-	inline long double getExpected() {return mExpected;}
+	inline long double getExpected() {return mExpected;} //
+	inline long double getPvalue() {return mPvalue;}
 
 	inline void setLocus1(int L) {mLocus1 = L; mInt1 = mChr1 + ":" + std::to_string(mLocus1);}
 	inline void setLocus2(int L) {mLocus2 = L; mInt2 = mChr2 + ":" + std::to_string(mLocus2);}
@@ -140,6 +141,9 @@ public:
 
 	inline void setProbability(long double L) {mProbability = L;}
 	inline void setExpected(long double L) {mExpected = L;}
+	inline void setPvalue(long double L) {mPvalue = L;}
+
+	void print();
 
 	friend std::ostream & operator<<(std::ostream & out, const BinomData & in);
 };
