@@ -12,6 +12,9 @@
 #include <cstdint>
 #include <vector>
 #include <string>
+#include "stdlib.h"
+#include "sys/types.h"
+#include "sys/sysinfo.h"
 
 enum CisTrans
 {
@@ -21,7 +24,7 @@ enum CisTrans
 };
 
 void showTime();
-void completed();
+void completed(int n = 0);
 void printUsage();
 
 std::uint32_t fact(std::uint32_t n);
@@ -29,5 +32,10 @@ int fact(int n);
 
 void writeBinary(std::vector<Site> & sites, std::string binOutFileName);
 void readBinary(std::vector<Site> & sites, std::string binInFileName);
+
+//get memory usage
+int getRealValue();
+int getVirtValue();
+int parseLine(char* line);
 
 #endif /* SRC_UTILS_H_ */

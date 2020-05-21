@@ -529,11 +529,11 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
         }
 
     // Calculate Relative Coverage
-    map<string,long double> rCov;
-    long double diagonalProb = 0;
+    map<string,double> rCov;
+    double diagonalProb = 0;
     for (auto i = cov.begin(); i != cov.end(); i ++)
     {
-    	long double V = i->second/tCoverage;
+    	double V = i->second/tCoverage;
     	rCov[i->first] = V;
     	diagonalProb += V*V;
     	//relative_coverage <- coverage/sumcov
@@ -558,17 +558,17 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     //probability correction assuming on average equal probabilities for all interactions
     int covS = cov.size();
     uint32_t numberOfAllInteractions = covS*covS;
-    long double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
+    double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
     cout << "Chromosomes Size: " << chromos.size() << endl;
     cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")"<< endl;
     cout << "upperhalfBinNumber: " << std::setprecision (17)<< upperhalfBinNumber << endl;
 
-    long double cisBinNumber = 0;
-    long double transBinNumber = 0;
+    double cisBinNumber = 0;
+    double transBinNumber = 0;
 
     if (cistrans != ct_all)
     {
-    	long double sumSquare = 0;
+    	double sumSquare = 0;
     	map<string,int> chrlens;
     	for (auto cr : chromos){
     		set<int> pos;
@@ -598,7 +598,7 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 
 
 		//diagonalProb <- sum(relative_coverage^2)
-    long double probabilityCorrection;
+    double probabilityCorrection;
     if(cistrans == ct_all){
     	probabilityCorrection = (removeDiagonal)? (1/(1-diagonalProb)) : 1;
     	cout << "pc: " << probabilityCorrection << endl;
@@ -647,10 +647,10 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
         ofstream binFilterFile("binom.txt");
         for (const auto &e : binFiltered) binFilterFile << e << endl;
 
-		 */
+		 //*/
 
 
-		test <- data.frame(binned_df_filtered)
+		/*test <- data.frame(binned_df_filtered)
 		test[,"pvalue"] <- test$pvalue
 			pval.plot <- ggplot(test,aes(x=pvalue))
 			tryCatch(

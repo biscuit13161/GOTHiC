@@ -29,10 +29,12 @@ void showTime()
 	cerr << ltm->tm_sec << flush;
 }
 
-void completed()
+void completed(int n)
 {
-
-	cerr << "\t... Completed! " << flush;
+	cerr << "\t... Completed";
+	if (n > 0)
+		cerr << " (" << n << ")";
+	cerr <<	"! ";
 	//showTime();
 	cerr << endl;
 }
@@ -134,3 +136,44 @@ void readBinary(vector<Site> & sites, string binInFileName)
 
 	completed();
 }
+
+int parseLine(char* line){
+    // This assumes that a digit will be found and the line ends in " Kb".
+    int i = strlen(line);
+    const char* p = line;
+    while (*p <'0' || *p > '9') p++;
+    line[i-3] = '\0';
+    i = atoi(p);
+    return i;
+}
+
+int getVirtValue(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmSize:", 7) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+
+int getRealValue(){ //Note: this value is in KB!
+    FILE* file = fopen("/proc/self/status", "r");
+    int result = -1;
+    char line[128];
+
+    while (fgets(line, 128, file) != NULL){
+        if (strncmp(line, "VmRSS:", 6) == 0){
+            result = parseLine(line);
+            break;
+        }
+    }
+    fclose(file);
+    return result;
+}
+

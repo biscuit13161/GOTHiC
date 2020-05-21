@@ -14,17 +14,16 @@
 
 using namespace std;
 
-BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(0), mInt2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
 BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
-		std::string int1, std::string int2, \
-		int frequency, long double relCoverage1, long double relCoverage2, \
-		long double probability, long double expected, int readCount, \
+		int frequency, double relCoverage1, double relCoverage2, \
+		double probability, double expected, int readCount, \
 		double pvalue, double qvalue, double logObservedOverExpected)\
 				: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), \
-				  mInt1(int1), mInt2(int2), mFrequency(frequency), \
+				  mFrequency(frequency), \
 				  mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), \
 				  mProbability(probability), mExpected(expected), \
 				  mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), \
@@ -36,8 +35,6 @@ BinomData::BinomData(const BinomData & other){
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
 	mLocus2 = other.mLocus2;
-	mInt1 = other.mInt1;
-	mInt2 = other.mInt2;
 	mFrequency = other.mFrequency;
 	mRelCoverage1 = other.mRelCoverage1;
 	mRelCoverage2 = other.mRelCoverage2;
@@ -54,14 +51,12 @@ BinomData::BinomData(const Interaction & other){
 	mChr2 = other.getChr2();
 	mLocus1 = other.getLocus1();
 	mLocus2 = other.getLocus2();
-	mInt1 = other.getInt1();
-	mInt2 = other.getInt2();
 	mFrequency = other.getFreq();
 }
 
 void BinomData::print()
 {	std::ostringstream streamObj;
-	string L = 	mInt1 + " " + mInt2;
+	string L = 	mChr1 + ":" + std::to_string(mLocus1) + " " + mChr2 + ":" + std::to_string(mLocus2);
 	streamObj << mFrequency;
 	string A = streamObj.str();
 			L = L + " " + A ; \
@@ -82,7 +77,8 @@ ostream & operator<<(ostream & out, const BinomData & in)
 	//string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
 				+ to_string(in.mLocus2) + "\t" + in.mInt1 + "\t" + in.mInt2 + "\t" \
 				+ to_string(in.mFrequency) + "\n";
-	out << in.mInt1 << "\t" << in.mInt2 \
+	out << in.mChr1 << ":" << in.mLocus1 << "\t" \
+		<< in.mChr2 << ":" << in.mLocus2 << "\t" \
 			<< "\t" << in.mFrequency \
 			<< "\t" << in.mRelCoverage1 \
 			<< "\t" << in.mRelCoverage2 \
@@ -92,18 +88,18 @@ ostream & operator<<(ostream & out, const BinomData & in)
 	return out;
 }
 
-Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mInt1(""), mInt2(""), mFrequency(1) {
+Interaction::Interaction():mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(1) {
 
 }
 
-Interaction::Interaction(string chr1, string chr2, int locus1, int locus2): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(1) {
-		mInt1 = mChr1 + ":" + to_string(mLocus1);
-		mInt2 = mChr2 + ":" + to_string(mLocus2);
+Interaction::Interaction(string chr1, string chr2, int locus1, int locus2): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(1)
+{
+
 }
 
-Interaction::Interaction(string chr1, string chr2, int locus1, int locus2, int freq): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(freq) {
-		mInt1 = mChr1 + ":" + to_string(mLocus1);
-		mInt2 = mChr2 + ":" + to_string(mLocus2);
+Interaction::Interaction(string chr1, string chr2, int locus1, int locus2, int freq): mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), mFrequency(freq)
+{
+
 }
 
 Interaction::Interaction(const Interaction & other){
@@ -111,8 +107,6 @@ Interaction::Interaction(const Interaction & other){
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
 	mLocus2 = other.mLocus2;
-	mInt1 = other.mInt1;
-	mInt2 = other.mInt2;
 	mFrequency = other.mFrequency;
 }
 
@@ -121,8 +115,6 @@ Interaction::Interaction(const halfInteraction & first, const halfInteraction & 
 	mChr2 = second.getChr();
 	mLocus1 = first.getLocus();
 	mLocus2 = second.getLocus();
-	mInt1 = first.getInt();
-	mInt2 = second.getInt();
 	mFrequency = 1;
 }
 
@@ -130,15 +122,13 @@ bool Interaction::operator==(const Interaction & other)
 {
 	return (mChr1 == other.getChr1()) &&
 			(mChr2 == other.getChr2()) &&
-			(mInt1 == other.getInt1()) &&
-			(mInt2 == other.getInt2()) &&
 			(mFrequency == other.getFreq());
 }
 
 
 void Interaction::print(){
 	string L = mChr1 + "\t" + mChr2 +"\t" + to_string(mLocus1)+"\t" \
-			+ to_string(mLocus2) + "\t" + mInt1 + "\t" + mInt2 + "\t" \
+			+ to_string(mLocus2) + "\t" \
 			+ to_string(mFrequency) + "\n";
 	cout << L;
 }
@@ -146,7 +136,7 @@ void Interaction::print(){
 ostream & operator<<(ostream & out, const Interaction & in)
 {
 	string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
-				+ to_string(in.mLocus2) + "\t" + in.mInt1 + "\t" + in.mInt2 + "\t" \
+				+ to_string(in.mLocus2) + "\t" \
 				+ to_string(in.mFrequency) + "\n";
 	out << L;
 	return out;
@@ -154,22 +144,20 @@ ostream & operator<<(ostream & out, const Interaction & in)
 
 
 
-halfInteraction::halfInteraction():mChr(""), mLocus(0), mInt("") {
+halfInteraction::halfInteraction():mChr(""), mLocus(0) {
 
 }
 
 halfInteraction::halfInteraction(string chr, int locus): mChr(chr), mLocus(locus) {
-		mInt = mChr + ":" + to_string(mLocus);
 }
 
 halfInteraction::halfInteraction(const halfInteraction & other){
 	mChr = other.mChr;
 	mLocus = other.mLocus;
-	mInt = other.mInt;
 }
 
 void halfInteraction::print(){
-	cout << mChr << "\t" << mLocus << "\t" << mInt << endl;;
+	cout << mChr << ":" << mLocus << endl;;
 }
 
 string fixChromosomeNames(string chr)
