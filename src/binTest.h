@@ -18,5 +18,6 @@ void binaryWriteTest(std::vector<Site> & fragments, std::string restrictionFile)
 void binaryRead(std::vector<Site> & fragments);
 void countDupsTest();
 void binInterTest();
+void pBhAdjustTest();
 
 #endif /* SRC_BINTEST_H_ */

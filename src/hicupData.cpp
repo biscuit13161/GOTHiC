@@ -8,6 +8,7 @@
 #include "hicupData.h"
 #include "pbinom.h"
 #include "Utils.h"
+#include "padjust.h"
 #include <set>
 #include <iostream>
 #include <stdio.h>
@@ -464,8 +465,6 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 
 
 	vector<Interaction> binned_df_filtered;
-	//binned_df_filtered.resize(interactions.size());
-	set<string> all_bins;
 
 
 	//diagonal removal
@@ -556,7 +555,7 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     }
 
     //probability correction assuming on average equal probabilities for all interactions
-    int covS = cov.size();
+    int covS = cov.size(); // === length(all_bins)
     uint32_t numberOfAllInteractions = covS*covS;
     double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
     cout << "Chromosomes Size: " << chromos.size() << endl;
@@ -599,17 +598,20 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
 
 		//diagonalProb <- sum(relative_coverage^2)
     double probabilityCorrection;
-    if(cistrans == ct_all){
+    switch(cistrans)
+    {
+    case ct_all :
     	probabilityCorrection = (removeDiagonal)? (1/(1-diagonalProb)) : 1;
     	cout << "pc: " << probabilityCorrection << endl;
-    }
-    else if(cistrans == ct_cis){
+    	break;
+    case ct_cis :
     	probabilityCorrection = upperhalfBinNumber/cisBinNumber;
     	cout << "pc: " << probabilityCorrection << endl;
-    }
-    else if(cistrans == ct_trans){
+    	break;
+    case ct_trans:
     	probabilityCorrection = upperhalfBinNumber/transBinNumber;
     	cout << "pc: " << probabilityCorrection << endl;
+    	break;
     }
 
     // Calculate expected read counts, probabilities and pvalues
@@ -629,89 +631,41 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     	cout << " - " << numberOfReadPairs  << " " << binFiltered[i].getProbability()<< " -> " << binFiltered[i].getPvalue() << endl;
 
     	// observed over expected log ratio
-		//binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
+    	// binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
+		binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/binFiltered[i].getExpected()));
 
     	//multiple testing correction separately for matrices with all interactions/only cis/only transs
 
-		/*if(cistrans==ct_all){
-			binned_df_filtered$qvalue <- if(removeDiagonal){p.adjust(binned_df_filtered$pvalue, method = "BH", n=upperhalfBinNumber)}else{p.adjust(binned_df_filtered$pvalue, method = "BH", n=upperhalfBinNumber+length(all_bins))}
-		}
-		if(cistrans==ct_cis){
-			binned_df_filtered$qvalue <- if(removeDiagonal){p.adjust(binned_df_filtered$pvalue, method = "BH", n=cisBinNumber)}else{p.adjust(binned_df_filtered$pvalue, method = "BH", n=cisBinNumber+length(all_bins))}
-		}
-		if(cistrans==ct_trans){
-			binned_df_filtered$qvalue <- p.adjust(binned_df_filtered$pvalue, method = "BH", n=transBinNumber)
+		//pBhAdjust(double Pi, double n);
+		switch(cistrans)
+		{
+		case ct_all :
+			if(removeDiagonal)
+			{
+				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
+			}
+			else
+			{
+				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
+			}
+			break;
+		case ct_cis :
+			if(removeDiagonal)
+			{
+				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
+			}
+			else
+			{
+				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
+			}
+			break;
+		case ct_trans:
+			binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
+			break;
 		}//*/
     }//*/
 
-        ofstream binFilterFile("binom.txt");
-        for (const auto &e : binFiltered) binFilterFile << e << endl;
-
-		 //*/
-
-
-		/*test <- data.frame(binned_df_filtered)
-		test[,"pvalue"] <- test$pvalue
-			pval.plot <- ggplot(test,aes(x=pvalue))
-			tryCatch(
-			{
-			x11()
-			print(pval.plot + geom_density())
-			},
-			error=function(cond) {
-			message("No interactive plot, try saving image")
-			message(cond)
-			return(tryCatch(
-				{
-				pdf(file=paste(sampleName,"pvalue_distribution.pdf",sep="_"))
-				print(pval.plot + geom_density())fi
-				dev.off()
-				},
-				error=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				},
-				warning=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-						}
-					))
-				},
-				warning=function(cond) {
-				message("No interactive plot, try saving image")
-				message(cond)
-				return(tryCatch(
-				{
-				pdf(file=paste(sampleName,"pvalue_distribution.pdf",sep="_"))
-				print(pval.plot + geom_density())
-				dev.off()
-				},
-				error=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				},
-				warning=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				}
-			))
-		})
-
-	binned_df_filtered=binned_df_filtered[,c('chr1','locus1','chr2','locus2','coverage_source','coverage_target','probabilityOfInteraction', 'predicted','frequencies', 'pvalue','qvalue','logFoldChange')]
-	colnames(binned_df_filtered)=c('chr1','locus1','chr2','locus2','relCoverage1','relCoverage2','probability', 'expected','readCount', 'pvalue','qvalue','logObservedOverExpected')
-
-
-return(binned_df_filtered)
-}
-	 */
-
-	vector<BinomData> binom;
-
-	return binom;//
+	return binFiltered;//
 }
 
 

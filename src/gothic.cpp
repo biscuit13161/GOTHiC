@@ -47,21 +47,30 @@ int main(int argc, char *argv[])
 
 	try {
 		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
-		//binTest();
 		/*
 		 * vector<Site> fragments;
 		 * binaryWriteTest(fragments, restrictionFile);
 		 * binaryRead(fragments);
 		 */
-		//countDupsTest();
-		//binInterTest();
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;
 	}
 
-	//vector<Site> sites;
-	//getHindIIIsitesFromHicup(sites, restrictionFile);
+    ofstream binomFile("binom.txt");
+    binomFile << "chr1" << "\t" << "locus1" \
+			<< "\t" << "chr2" << "\t" << "locus2" \
+			<< "\t" << "relCoverage1" \
+			<< "\t" << "relCoverage2" \
+			<< "\t" << "probability" \
+			<< "\t" << "expected" \
+			<< "\t" << "readCount" \
+			<< "\t" << "pvalue" \
+			<< "\t" << "qvalue" \
+			<< "\t" << "logObservedOverExpected" << endl;
+    for (const auto &e : binom) binomFile << e << endl;
+
+
 
 
 

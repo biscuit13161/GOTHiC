@@ -19,11 +19,14 @@ endforeach(lib)
 add_library(Site Site.cpp)
 target_link_libraries (Site ${CLIBS} ${Boost_LIBRARIES})
 
+add_library(padjust padjust.cpp)
+target_link_libraries (padjust ${CLIBS} ${Boost_LIBRARIES})
+
 set(LIBS Setup Utils hicupData BinomData binTest )
 
 foreach(lib ${LIBS})
   add_library(${lib} ${lib}.cpp)
-  target_link_libraries (${lib} ${CLIBS} Site ${Boost_LIBRARIES})
+  target_link_libraries (${lib} ${CLIBS} padjust Site ${Boost_LIBRARIES})
 endforeach(lib)
 
 

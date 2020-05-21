@@ -122,6 +122,7 @@ public:
 	inline double getProbability() {return mProbability;}
 	inline double getExpected() {return mExpected;} //
 	inline double getPvalue() {return mPvalue;}
+	inline double getLogObExp() {return mLogObservedOverExpected;}
 
 	inline void setLocus1(int L) {mLocus1 = L;}
 	inline void setLocus2(int L) {mLocus2 = L;}
@@ -132,6 +133,7 @@ public:
 	inline void setProbability(double L) {mProbability = L;}
 	inline void setExpected(double L) {mExpected = L;}
 	inline void setPvalue(double L) {mPvalue = L;}
+	inline void setLogObExp(double L) {mLogObservedOverExpected =L;}
 
 	void print();
 

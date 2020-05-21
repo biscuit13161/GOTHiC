@@ -6,6 +6,7 @@
  */
 
 #include "binTest.h"
+#include "padjust.h"
 #include "hicupData.h"
 #include "pbinom.h"
 //#include <set>
@@ -176,5 +177,13 @@ for (auto i : interactions)
 //EXPECT_TRUE(interactions[2].getInt1() == "chrX:1000");
 }
 
+void pBhAdjustTest()
+{
+	double P = 6.079281e-10;
+	double n = 28679;
+	double o = pBhAdjust(P, n);
+	cout << "O: " << o << endl;
+	cout << o - 1.743477e-05 << endl;
+}
 
 

@@ -74,16 +74,16 @@ void BinomData::print()
 
 ostream & operator<<(ostream & out, const BinomData & in)
 {
-	//string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
-				+ to_string(in.mLocus2) + "\t" + in.mInt1 + "\t" + in.mInt2 + "\t" \
-				+ to_string(in.mFrequency) + "\n";
-	out << in.mChr1 << ":" << in.mLocus1 << "\t" \
-		<< in.mChr2 << ":" << in.mLocus2 << "\t" \
-			<< "\t" << in.mFrequency \
+	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
+		<< in.mChr2 << "\t" << in.mLocus2 << "\t" \
 			<< "\t" << in.mRelCoverage1 \
 			<< "\t" << in.mRelCoverage2 \
 			<< "\t" << in.mProbability \
+			<< "\t" << in.mExpected \
+			<< "\t" << in.mFrequency \
 			<< "\t" << in.mPvalue \
+			<< "\t" << in.mQvalue \
+			<< "\t" << in.mLogObservedOverExpected \
 			<< endl;
 	return out;
 }
