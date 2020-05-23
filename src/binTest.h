@@ -19,5 +19,7 @@ void binaryRead(std::vector<Site> & fragments);
 void countDupsTest();
 void binInterTest();
 void pBhAdjustTest();
+void returnSizes();
+void timeTest();
 
 #endif /* SRC_BINTEST_H_ */

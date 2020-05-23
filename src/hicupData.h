@@ -30,7 +30,7 @@ void importHicupGz(std::string fileName, std::vector<Interaction> & interactions
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
 void binInteractions(std::vector<Interaction> & interactions, int res);
-std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::vector<Site> & fragments, std::string sampleName, CisTrans cistrans, bool parallel = false, bool removeDiagonal = true);
+std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::string sampleName, CisTrans cistrans, bool parallel = false, bool removeDiagonal = true);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);

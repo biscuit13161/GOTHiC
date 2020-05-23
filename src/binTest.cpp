@@ -9,6 +9,9 @@
 #include "padjust.h"
 #include "hicupData.h"
 #include "pbinom.h"
+#include <ctime>
+#include <chrono>
+#include <thread>
 //#include <set>
 #include <iostream>
 #include <string>
@@ -24,6 +27,9 @@
 //#include <boost/algorithm/string.hpp>
 
 using namespace std;
+using namespace std::this_thread;     // sleep_for, sleep_until
+using namespace std::chrono_literals; // ns, us, ms, s, h, etc.
+using std::chrono::system_clock;
 
 void binTest()
 {
@@ -186,4 +192,75 @@ void pBhAdjustTest()
 	cout << o - 1.743477e-05 << endl;
 }
 
+void returnSizes()
+{
+	cout << "Interactions Size:\t" << sizeof(Interaction) << endl;
+	cout << "Binomial Data Size:\t" << sizeof(BinomData) << endl;
+	cout << "Site Size:\t" << sizeof(Site) << endl;
+	vector<int> list{2,2};
+	map<string,vector<int>> test;
+	test["1"] = list;
+	cout << "Frag Map Size:\t" << sizeof(test) << endl;
+	cout << "  (List Size:\t" << sizeof(list) << ")" << endl;
+}
 
+void timeTest()
+{
+	map<string,array<int,2>> test;
+	vector<Site> sites;
+
+	vector<Site> testsites;
+
+	vector<string> chrs{"chr1","chr2","chr3","chr4","chr5"};
+
+	for (int i = 1; i <= 1000000; i++)
+	{
+		string chr = chrs[i%5];
+		Site I = Site(chr,2,10);
+		testsites.push_back(I);
+	}
+
+	for (int i = 0; i < 5; i++)
+	{
+		string chr = chrs[i];
+
+		array<int,2> list{2,10};
+		test[chr] = list;
+		Site I = Site(chr,2,10);
+		sites.push_back(I);
+	}
+
+
+	time_t start = time(0);
+
+	for (int i = 0; i < testsites.size(); i++)
+	{
+		for (auto it = sites.begin(); it != sites.end(); it++)
+		{
+			if (testsites[i].getChr() == (*it).getChr())
+			{
+				cout << (*it).getStart();
+				sleep_for(100us);
+				break;
+			}
+		}
+	}
+
+	time_t mid = time(0);
+
+	for (int i = 0; i < testsites.size(); i++)
+	{
+		array<int,2> I = test[testsites[i].getChr()];
+				cout << I[0];
+				sleep_for(100us);
+				break;
+	}
+
+	time_t end = time(0);
+
+	time_t vectT = mid - start;
+	time_t mapT = end - mid;
+
+	cout << "Vector time: " << vectT << endl;
+	cout << "Map time:" << mapT << endl;
+}

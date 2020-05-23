@@ -79,12 +79,10 @@ void writeBinary(vector<Site> & sites, string binOutFileName)
 			if (!chr.empty())
 			{
 				chr.resize(32);
-				int locus = P.getLocus();
 				int start = P.getStart();
 				int end = P.getEnd();
 				//size_t S = sizeof(std::string) + 3* sizeof(int);
 				binOutFile.write(chr.c_str(), 32);// need to cast the pointer
-				binOutFile.write(reinterpret_cast<char*>(&locus), sizeof(int));
 				binOutFile.write(reinterpret_cast<char*>(&start), sizeof(int));
 				binOutFile.write(reinterpret_cast<char*>(&end), sizeof(int));
 			}
@@ -117,13 +115,11 @@ void readBinary(vector<Site> & sites, string binInFileName)
 			chr.resize(chr.find('\0'));
 			if (!chr.empty())
 			{
-				int locus;
-				binInFile.read(reinterpret_cast<char*>(& locus), sizeof(int));
 				int start;
 				binInFile.read(reinterpret_cast<char*>(& start), sizeof(int));
 				int end;
 				binInFile.read(reinterpret_cast<char*>(& end), sizeof(int));
-				Site P = Site(chr,locus,start,end);
+				Site P = Site(chr,start,end);
 				sites.push_back(P);
 			}
 		}

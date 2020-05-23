@@ -19,10 +19,10 @@ TEST(overlapTests, findOverlapTest)
 	query.push_back(halfInteraction("chr2",54321));
 
 	std::vector<Site> fragments;
-	fragments.push_back(Site("chr1",10000,10000,20000));
-	fragments.push_back(Site("chr1",50000,50000,60000));
-	fragments.push_back(Site("chr2",10000,10000,20000));
-	fragments.push_back(Site("chr2",50000,50000,60000));
+	fragments.push_back(Site("chr1",10000,20000));
+	fragments.push_back(Site("chr1",50000,60000));
+	fragments.push_back(Site("chr2",10000,20000));
+	fragments.push_back(Site("chr2",50000,60000));
 
 	findOverlaps(query,fragments, "test");
 

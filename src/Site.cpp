@@ -10,18 +10,17 @@
 
 using namespace std;
 
-Site::Site(): mChr(""), mLocus(0), mStart(0), mEnd(0)
+Site::Site(): mChr(""), mStart(0), mEnd(0)
 {
 }
 
-Site::Site(string chr, int locus, int start, int end): mChr(chr), mLocus(locus), mStart(start), mEnd(end)
+Site::Site(string chr, int start, int end): mChr(chr), mStart(start), mEnd(end)
 {
 }
 
 Site::Site(const Site & other)
 {
 	mChr = other.mChr;
-	mLocus = other.mLocus;
 	mStart = other.mStart;
 	mEnd = other.mEnd;
 }
@@ -29,7 +28,6 @@ Site::Site(const Site & other)
 const Site & Site::operator=(const Site & other)
 {
 	mChr = other.mChr;
-	mLocus = other.mLocus;
 	mStart = other.mStart;
 	mEnd = other.mEnd;
 	return *this;
@@ -37,10 +35,10 @@ const Site & Site::operator=(const Site & other)
 
 bool Site::operator==(const Site & other)
 {
-	return 	mChr == other.mChr && mLocus == other.mLocus && mStart == other.mStart && mEnd == other.mEnd;
+	return 	mChr == other.mChr  && mStart == other.mStart && mEnd == other.mEnd;
 }//*/
 
 void Site::print(){
-	cout << mChr << "\t"<< mLocus << "\t"<< mStart  << "\t"<< mEnd << endl;
+	cout << mChr << "\t"<< mStart  << "\t"<< mEnd << endl;
 }
 

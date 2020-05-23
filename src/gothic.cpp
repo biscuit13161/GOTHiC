@@ -46,12 +46,14 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
-		binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
+		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
 		/*
 		 * vector<Site> fragments;
 		 * binaryWriteTest(fragments, restrictionFile);
 		 * binaryRead(fragments);
 		 */
+		//returnSizes();
+		timeTest();
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;
@@ -152,13 +154,11 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 	getHindIIIsitesFromHicup(fragments, restrictionFile);
     mapHicupToRestrictionFragment(interactions, fragments);
 
-
-
 	binInteractions(interactions, res);
 
 	// Prepare Binominal data from Hicup Data
     vector<BinomData> binom;
-	binom = binomialHiChicup(interactions, fragments, sampleName, cistrans, parallel);
+	binom = binomialHiChicup(interactions, sampleName, cistrans, parallel);
 
     return(binom);
 }

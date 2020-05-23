@@ -13,18 +13,17 @@
 class Site{
 private:
 	std::string mChr;
-	int mLocus;
 	int mStart;
 	int mEnd;
 public:
 	Site();
-	Site(std::string chr, int locus, int start, int end);
+	Site(std::string chr, int start, int end);
 	Site(const Site & other);
 
 	friend std::string fixChromosomeNames(std::string chr);
 
 	inline std::string getChr() const {return mChr;}
-	inline int getLocus() const {return mLocus;}
+	inline int getLocus() const {return mStart;}
 	inline int getEnd() const {return mEnd;}
 	inline int getStart() const {return mStart;}
 

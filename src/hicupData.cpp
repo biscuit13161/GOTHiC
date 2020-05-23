@@ -240,6 +240,9 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 		//string str = string("line ") + to_string(i) + ": " + chr1 + ":" + to_string(locus1) + " " + chr2 + ":" + to_string(locus2) +"\n";
 		//cout << str;
 
+		//#pragma omp critial (iht1)
+		//interactions.push_back(Interaction(chr1, chr2, locus1, locus2));
+
 		interactions[i] = Interaction(chr1, chr2, locus1, locus2);
 
 	}
@@ -310,14 +313,12 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	interactions.clear();
 	interactions.resize(iSize);
 
-
-
 	findOverlaps(sources, fragments, "Sources");
 	findOverlaps(targets, fragments, "Targets");
 
 	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
 
-	fragments.clear();
+	vector<Site> ().swap(fragments);
 	//sort positions into order
 
 	sortPositions(interactions, iSize, sources, targets);
@@ -353,7 +354,8 @@ void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInt
 		{
 			out = Interaction(second, first);
 		}
-		interactions[i] = out;
+#pragma omp critical (sp1)
+		interactions.push_back(out);
 	}
 }
 
@@ -391,6 +393,7 @@ void binInteractions(vector<Interaction> & interactions, int res)
 
 void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 {
+	//map<string,vector<int>> test;
 	// load sites for HindIII restriction enzyme from HiCUP_digester
 	cerr << "Loading Enzyme Restriction Sites" << endl;
 
@@ -418,7 +421,7 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 			string end;
 			getline(inFile,end,'\t');
 
-			Site site = Site(fixChromosomeNames(chr), start, start, stoi(end,nullptr,10));
+			Site site = Site(fixChromosomeNames(chr), start, stoi(end,nullptr,10));
 
 			sites.push_back(site);
 			if (!inFile) // corrects for last blank line
@@ -437,31 +440,9 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
 }
 
-vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Site> & fragments, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
+vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
 {
 	cerr << "Binomial HiC Hicup Analysis";
-//	vector<Site> hindGR;
-	string binInFileName = "Digest.bin";
-	readBinary(fragments,  binInFileName);
-//	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
-//
-//	cerr << "fragments: " << fragments.size() << endl;
-//	cerr << "hindGR: " << hindGR.size() << endl;
-//
-//	int pos = 0;
-//	for (int i= 0; i!= fragments.size(); i++)
-//	{
-//		if (hindGR[i] == fragments[i])
-//		{
-//			pos++;
-//		}
-//		else
-//		{
-//			cerr << i << " ** hindGR and fragments vectors don't match **" << endl;
-//		}
-//	}
-//
-//	cerr << pos << " Sites matched!" << endl;
 
 
 	vector<Interaction> binned_df_filtered;
@@ -624,8 +605,8 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, vector<Si
     	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
 
     	// Calculate pvalues
-    	// /* input Freq -1??? */
-    	double P = pbinom(double(binFiltered[i].getFreq()), double(numberOfReadPairs), binFiltered[i].getProbability(), 0, 0);
+    	// /* input Freq -1 as test is greater than! */
+    	double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), 0, 0);
     	binFiltered[i].setPvalue(P);
     	cout << binFiltered[i].getInt1() << "/" << binFiltered[i].getInt2() << " - " << binFiltered[i].getFreq();
     	cout << " - " << numberOfReadPairs  << " " << binFiltered[i].getProbability()<< " -> " << binFiltered[i].getPvalue() << endl;
