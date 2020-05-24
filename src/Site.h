@@ -10,6 +10,7 @@
 
 #include <string>
 
+
 class Site{
 private:
 	std::string mChr;
@@ -30,7 +31,18 @@ public:
 	const Site & operator=(const Site & other);
 	bool operator==(const Site & other);
 
+	friend bool sitecomp(const Site & a, const Site & b);
+
 	void print();
 };
+
+bool sitecomp(const Site & a, const Site & b);
+
+struct Comp
+    {
+        bool operator() ( const Site& s, std::string i ) const { return s.getChr() < i; }
+        bool operator() ( std::string i, const Site& s ) const { return i < s.getChr(); }
+    };
+
 
 #endif /* SRC_SITE_H_ */

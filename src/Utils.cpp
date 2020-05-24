@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include "version.h"
 #include <ctime>
+#include <cstdarg>
 #include <stdint.h>
 #include <iostream>
 #include <fstream>
@@ -45,6 +46,24 @@ void printUsage()
 	cerr << "    gothic <path/to/config/file>"  << endl << endl;
 	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl;
 
+}
+
+void verbosePrint(string & str, bool verbose)
+{
+	if (verbose)
+	cout << str << endl;
+}
+
+void verbose(const char * fmt, ... )
+{
+va_list args;  /* Used as a pointer to the next variable argument. */
+va_start( args, fmt );  /* Initialize the pointer to arguments. */
+
+#ifdef DEBUG_FLAG
+printf(fmt, &args);
+#endif
+/*This isn't tested, the point is to be able to pass args to
+printf*/
 }
 
 uint32_t fact(uint32_t n)

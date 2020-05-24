@@ -72,6 +72,23 @@ void BinomData::print()
 	cout << L << endl;
 }
 
+bool bincomp(const BinomData & a, const BinomData & b)
+{
+	if (a.mChr1 == b.mChr1)
+	{
+		if (a.mLocus1 == b.mLocus1)
+		{
+			if (a.mChr2 == b.mChr2)
+			{
+				return a.mLocus2 < b.mLocus2;
+			}
+			return a.mChr2 < b.mChr2;
+		}
+		return a.mLocus1 < b.mLocus1;
+	}
+	return a.mChr1 < b.mChr1;
+}
+
 ostream & operator<<(ostream & out, const BinomData & in)
 {
 	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
@@ -84,7 +101,7 @@ ostream & operator<<(ostream & out, const BinomData & in)
 			<< "\t" << in.mPvalue \
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \
-			<< endl;
+			<< flush;
 	return out;
 }
 
@@ -133,12 +150,29 @@ void Interaction::print(){
 	cout << L;
 }
 
+bool intcomp(const Interaction & a, const Interaction & b)
+{
+	if (a.mChr1 == b.mChr1)
+	{
+		if (a.mLocus1 == b.mLocus1)
+		{
+			if (a.mChr2 == b.mChr2)
+			{
+				return a.mLocus2 < b.mLocus2;
+			}
+			return a.mChr2 < b.mChr2;
+		}
+		return a.mLocus1 < b.mLocus1;
+	}
+	return a.mChr1 < b.mChr1;
+}
+
 ostream & operator<<(ostream & out, const Interaction & in)
 {
 	string L = in.mChr1 + "\t" + in.mChr2 +"\t" + to_string(in.mLocus1)+"\t" \
 				+ to_string(in.mLocus2) + "\t" \
-				+ to_string(in.mFrequency) + "\n";
-	out << L;
+				+ to_string(in.mFrequency);
+	out << L << endl;
 	return out;
 }
 

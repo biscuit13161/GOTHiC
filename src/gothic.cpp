@@ -1,5 +1,5 @@
 #include "gothic.h"
-#include "Setup.h"
+//#include "Setup.h"
 #include "binTest.h"
 #include "Utils.h"
 #include "BinomData.h"
@@ -16,6 +16,7 @@
 
 using namespace std;
 
+
 int main(int argc, char *argv[])
 {
 	if ( argc != 2 ) // argc should be 2 for correct execution
@@ -30,15 +31,6 @@ int main(int argc, char *argv[])
 	Setup setupValues = loadConfig(allArgs[1]);
 
 
-	//string fileName = "damage.txt";
-	string fileName = setupValues.getInput();
-	string sampleName = setupValues.getSname();
-	int res = setupValues.getRes();
-	string restrictionFile = setupValues.getEnzyme();
-	CisTrans cistrans = setupValues.getCisTrans();
-	bool parallel = false;
-	int cores = setupValues.getThreads();
-
 	setupValues.print();
 
 	omp_set_num_threads(setupValues.getThreads());
@@ -46,6 +38,7 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
+		binom = gothicHicup(setupValues);
 		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
 		/*
 		 * vector<Site> fragments;
@@ -53,11 +46,14 @@ int main(int argc, char *argv[])
 		 * binaryRead(fragments);
 		 */
 		//returnSizes();
-		timeTest();
+		//timeTest();
+
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;
 	}
+
+	sort(binom.begin(), binom.end(), bincomp);
 
     ofstream binomFile("binom.txt");
     binomFile << "chr1" << "\t" << "locus1" \
@@ -115,7 +111,7 @@ gothic(string fileName1, string fileName2, string sampleName, res, string genome
 
 // GOTHiC main tool based on hicup alignment
 
-vector<BinomData> gothicHicup(string fileName, string sampleName, int res, string restrictionFile, CisTrans cistrans, bool parallel)
+vector<BinomData> gothicHicup(Setup & setupValues)
 {
 	/*
 	 * fileName
@@ -145,20 +141,39 @@ vector<BinomData> gothicHicup(string fileName, string sampleName, int res, strin
 	 *          if parellel=TRUE. The default is NULL.
 	 */
 
+
+	string fileName = setupValues.getInput();
+	string sampleName = setupValues.getSname();
+	int res = setupValues.getRes();
+	string restrictionFile = setupValues.getEnzyme();
+	CisTrans cistrans = setupValues.getCisTrans();
+
+
 	// Get Hicup data
     vector<Interaction> interactions;
 
     importHicup(fileName, interactions);
 
-	std::vector<Site> fragments;
-	getHindIIIsitesFromHicup(fragments, restrictionFile);
+    //cout << "fast value" << setupValues.getFast() << endl;
+
+    const bool fast = false; // set true to use map version and false to use Vector version
+
+    typedef conditional< (fast == true),
+    		multimap<string,array<int,2>>,
+			std::vector<Site> >::type fragType;
+    //std::vector<Site> fragments; //** Site based run **//
+    //multimap<string,array<int,2>> fragments; //** map based run **//
+
+    fragType fragments;
+    getHindIIIsitesFromHicup(fragments, restrictionFile);
+
     mapHicupToRestrictionFragment(interactions, fragments);
 
 	binInteractions(interactions, res);
 
 	// Prepare Binominal data from Hicup Data
     vector<BinomData> binom;
-	binom = binomialHiChicup(interactions, sampleName, cistrans, parallel);
+	binom = binomialHiChicup(interactions, sampleName, cistrans);
 
     return(binom);
 }

@@ -43,7 +43,7 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 
 	//seqan3::alignment_file_input fin_from_filename{filename};
 
-	cerr << "importing HiCUP file: " << fileName << endl;
+	cerr << "Importing HiCUP file: " << fileName << endl;
 
 	//the output of hicup is a sam file, that looks like uniques_ORIGINALFILE_trunc.sam
 	//this has to be converted using the hicupToTable tool
@@ -77,6 +77,8 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 	{
 		importHicupTxt(fileName, interactions, checkConsistency);
 	}
+
+	sort(interactions.begin(),interactions.end(), intcomp);
 	completed();
 }
 
@@ -165,92 +167,6 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 		throw std::invalid_argument("importHicup: unable to open input file!");
 	}
 
-	vector<string> list(2);
-	vector<vector<string>> file;
-
-	//read file into temporary vector
-	while(inFile)
-	{
-		string start1;
-		getline(inFile,start1,'\n');
-		if (start1.length() == 0)
-		{
-			break;
-		}
-		list[0] = start1;
-
-		string start2;
-		getline(inFile,start2,'\n');
-		list[1] = start2;;
-
-		file.push_back(list);
-
-		if (!inFile) // corrects for last blank line
-		{
-			break;
-		}
-	}
-
-	interactions.resize(file.size());
-
-	//Parallel parse line data
-	bool foundCondition = false;
-	#pragma omp parallel for
-	for (int i = 0; i < file.size(); i++)
-	{
-		string one = file[i][0];
-		string two = file[i][1];
-		//string str = string("line ") + to_string(i) + ": " + one + "\n\t" + two +"\n";
-		//cout << str;
-		string delimiter = "\t";
-		size_t pos = one.find(delimiter);
-		string id1 = one.substr(0,pos);
-		if (id1.length() == 0)
-		{
-			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
-		}
-		one.erase(0, one.find(delimiter) + delimiter.length());
-		pos = one.find(delimiter);
-		string flag1 = one.substr(0,pos);
-		one.erase(0, one.find(delimiter) + delimiter.length());
-		pos = one.find(delimiter);
-		string chr1 = one.substr(0,pos);
-		one.erase(0, one.find(delimiter) + delimiter.length());
-		pos = one.find(delimiter);
-		string start1 = one.substr(0,pos);
-		int locus1 = stoi(start1,nullptr,10);
-
-		pos = two.find(delimiter);
-		string id2 = two.substr(0,pos);
-		if (checkConsistency && (id2.length() == 0 | id1 != id2))
-		{
-			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
-		}
-		two.erase(0, two.find(delimiter) + delimiter.length());
-		pos = two.find(delimiter);
-		string flag2 = two.substr(0,pos);
-		two.erase(0, two.find(delimiter) + delimiter.length());
-		pos = two.find(delimiter);
-		string chr2 = two.substr(0,pos);
-		two.erase(0, two.find(delimiter) + delimiter.length());
-		pos = one.find(delimiter);
-		string start2 = two.substr(0,pos);
-		int locus2 = stoi(start2,nullptr,10);
-
-		//string str = string("line ") + to_string(i) + ": " + chr1 + ":" + to_string(locus1) + " " + chr2 + ":" + to_string(locus2) +"\n";
-		//cout << str;
-
-		//#pragma omp critial (iht1)
-		//interactions.push_back(Interaction(chr1, chr2, locus1, locus2));
-
-		interactions[i] = Interaction(chr1, chr2, locus1, locus2);
-
-	}
-	//throw std::invalid_argument("finished");
-
-}
-
-/*
 	while(inFile)
 	{
 		string id1;
@@ -259,25 +175,25 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 		{
 			break;
 		}
-		string flag1;
+		string flag1 = "";
 		getline(inFile,flag1,'\t');
-		string chr1;
+		string chr1 = "";
 		getline(inFile,chr1,'\t');
 		string start1;
 		getline(inFile,start1,'\n');
 		int locus1 = stoi(start1,nullptr,10);
 
-		string id2;
+		string id2 = "";
 		getline(inFile,id2,'\t');
 		if (checkConsistency && (id2.length() == 0 | id1 != id2))
 		{
 			throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
 		}
-		string flag2;
+		string flag2 = "";
 		getline(inFile,flag1,'\t');
-		string chr2;
+		string chr2 = "";
 		getline(inFile,chr2,'\t');
-		string start2;
+		string start2 = "";
 		getline(inFile,start2,'\n');
 		int locus2 = stoi(start2,nullptr,10);
 
@@ -291,12 +207,14 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 			break;
 		}
 	}
- */
+	//throw std::invalid_argument("finished");
+
+}//*/
 
 void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Site> & fragments)
 {
 	int iSize = interactions.size();
-	cerr << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
+	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
 	string binOutFileName = "Digest.bin";
 	writeBinary(fragments, binOutFileName);
@@ -326,9 +244,45 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	completed();
 }
 
+void mapHicupToRestrictionFragment(vector<Interaction> & interactions, multimap<string,array<int,2>> & fragments)
+{
+	int iSize = interactions.size();
+	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
+
+	//string binOutFileName = "Digest.bin";
+	//writeBinary(fragments, binOutFileName);
+
+
+
+	vector<halfInteraction> sources;
+	vector<halfInteraction> targets;
+
+	for (int i = 0; i < iSize; i++)
+	{
+		sources.push_back(halfInteraction(interactions[i].getChr1(), interactions[i].getLocus1() ));
+		targets.push_back(halfInteraction(interactions[i].getChr2(), interactions[i].getLocus2() ));
+	}
+
+	interactions.clear();
+	interactions.resize(iSize);
+
+	findOverlaps(sources, fragments, "Sources");
+	findOverlaps(targets, fragments, "Targets");
+
+	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
+
+	fragments.clear();
+	//multimap<string,array<int,2>> ().swap(fragments);
+	//sort positions into order
+
+	sortPositions(interactions, iSize, sources, targets);
+
+	completed();
+}
+
 void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInteraction> & sources, vector<halfInteraction> & targets)
 {
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for (int i = 0; i < iSize; i++)
 	{
 		halfInteraction first = sources[i];
@@ -355,7 +309,8 @@ void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInt
 			out = Interaction(second, first);
 		}
 #pragma omp critical (sp1)
-		interactions.push_back(out);
+		//interactions.push_back(out);
+		interactions[i] = out;
 	}
 }
 
@@ -383,9 +338,11 @@ void binInteractions(vector<Interaction> & interactions, int res)
 		interactions[i].setLocus2(V);
 	}
 
-	// --------- count the number of interactions between bins -------
-	cout << "Singles: " << interactions.size()  << endl;
 
+	// --------- count the number of interactions between bins -------
+#ifdef DEBUG_FLAG
+	cout << "Singles: " << interactions.size()  << endl;
+#endif
 	countDuplicates(interactions);
 
 	completed();
@@ -393,9 +350,10 @@ void binInteractions(vector<Interaction> & interactions, int res)
 
 void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 {
-	//map<string,vector<int>> test;
+	// ** getHindIIIsitesFromHicup using vector of Sites **
+
 	// load sites for HindIII restriction enzyme from HiCUP_digester
-	cerr << "Loading Enzyme Restriction Sites" << endl;
+	cerr << endl << "Loading Enzyme Restriction Sites" << endl;
 
 	ifstream inFile;
 	inFile.open(fileName);
@@ -433,16 +391,75 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 		getline(inFile,waste);
 		rows++;
 	}
-
 	inFile.close();
+	cout << "  -- Vector Variant --" << endl;
+
+	sort(sites.begin(), sites.end(), sitecomp);
 
 	completed();
 	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
-}
+}//*/
+
+void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string fileName)
+{
+	// ** getHindIIIsitesFromHicup using multimap structure **
+
+	// load sites for HindIII restriction enzyme from HiCUP_digester
+	cerr << endl << "Loading Enzyme Restriction Sites" << endl;
+
+	ifstream inFile;
+	inFile.open(fileName);
+
+	if (!inFile.is_open()){
+		throw std::invalid_argument("getHindIIIsitesFromHicup: unable to open Restriction List file!");
+	}
+	int rows = 1;
+
+	//array<int,2> pos{0,0};
+	string chr;
+	while (inFile)
+	{
+
+		multimap<string,array<int,2>>::iterator it = sites.begin();
+		if (rows > 2)
+		{
+			getline(inFile,chr,'\t');
+			if (chr.length() == 0)
+			{
+				break;
+			}
+			string start;
+			getline(inFile,start,'\t');
+			//pos[0] = stoi(start,nullptr,10);
+			string end;
+			getline(inFile,end,'\t');
+			//pos[1] = stoi(end,nullptr,10);
+
+			//sites[chr] = pos;
+			//sites.emplace(chr,pos);
+			sites.insert(it++, pair(chr,array{stoi(start,nullptr,10),stoi(end,nullptr,10)}));
+			if (!inFile) // corrects for last blank line
+			{
+				break;
+			}
+		}
+		string waste;
+		getline(inFile,waste);
+		rows++;
+	}
+
+	inFile.close();
+	cout << "  -- Map Variant --" << endl;
+
+	completed();
+	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
+}//*/
+
+
 
 vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
 {
-	cerr << "Binomial HiC Hicup Analysis";
+	cerr << "Binomial HiC Hicup Analysis" << endl;
 
 
 	vector<Interaction> binned_df_filtered;
@@ -451,8 +468,9 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 	//diagonal removal
 	if(removeDiagonal)
 	{
-		cerr << "Removing Diagonals!";
+		cerr << "\tRemoving Diagonals!" << endl;
 		removeDuplicates(interactions, binned_df_filtered);
+		cerr << "\t";
 		completed();
 		interactions.clear();
 	}
@@ -463,15 +481,17 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 	//cout << "size " << binned_df_filtered.size() << endl;
 
 	if(cistrans == ct_cis){
-		cerr << "Finding Cis interactions!";
+		cerr << "\tFinding Cis interactions!";
 		findCis(interactions, binned_df_filtered);
 		//interactions.resize(pos);
+		cerr << "|\t";
 		completed();
 	}
 	else if(cistrans == ct_trans){
-		cerr << "Finding Trans interactions!";
+		cerr << "\tFinding Trans interactions!";
 		findTrans(interactions, binned_df_filtered);
 		//interactions.resize(pos);
+		cerr << "|\t";
 		completed();
 	}
 	else
@@ -495,9 +515,10 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 
     calcFreq(interactions, cov, tCoverage, max);
 
-    //cout << "cov.size: " << cov.size() << endl;
-    cout << "total coverage: " << tCoverage  << " (57358)"<< endl;
-    //cout << "max: " << max << endl;
+#ifdef DEBUG_FLAG
+    cerr << "Total Coverage: " << tCoverage  << " (57358/172074)"<< endl;
+    cerr << "Max Individual Coverage: " << max << endl;
+    #endif
 
     if (tCoverage == 0)
     {
@@ -539,9 +560,12 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
     int covS = cov.size(); // === length(all_bins)
     uint32_t numberOfAllInteractions = covS*covS;
     double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
+
+#ifdef DEBUG_FLAG
     cout << "Chromosomes Size: " << chromos.size() << endl;
     cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")"<< endl;
     cout << "upperhalfBinNumber: " << std::setprecision (17)<< upperhalfBinNumber << endl;
+#endif
 
     double cisBinNumber = 0;
     double transBinNumber = 0;
@@ -567,13 +591,9 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
     		sumSquare += pos.size()*pos.size();
 
     	}
-    	//cout << "sumSquare: " << sumSquare << endl;
-    	//cout << "uphalfBin: " << upperhalfBinNumber << endl;
 
     	cisBinNumber = (sumSquare - cov.size())/2;
     	transBinNumber = upperhalfBinNumber - cisBinNumber;
-      //  cout << "cisBin: " << std::setprecision (17) << cisBinNumber << endl;
-     //   cout << "transBin: " << std::setprecision (17)<< transBinNumber << endl;
     }
 
 
@@ -583,35 +603,33 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
     {
     case ct_all :
     	probabilityCorrection = (removeDiagonal)? (1/(1-diagonalProb)) : 1;
-    	cout << "pc: " << probabilityCorrection << endl;
     	break;
     case ct_cis :
     	probabilityCorrection = upperhalfBinNumber/cisBinNumber;
-    	cout << "pc: " << probabilityCorrection << endl;
     	break;
     case ct_trans:
     	probabilityCorrection = upperhalfBinNumber/transBinNumber;
-    	cout << "pc: " << probabilityCorrection << endl;
     	break;
     }
+#ifdef DEBUG_FLAG
+    printf("Probability Correction: %.10f \n", probabilityCorrection);
+#endif
 
     // Calculate expected read counts, probabilities and pvalues
     #pragma omp parallel for
     for (int i = 0; i < binFiltered.size(); i++)
     {
-    	// Calculate expected read counts, probabilities
+    	/** Calculate expected read counts, probabilities **/
     	//double P = binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection;
     	binFiltered[i].setProbability(binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection);
     	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
 
-    	// Calculate pvalues
+    	/** Calculate pvalues **/
     	// /* input Freq -1 as test is greater than! */
     	double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), 0, 0);
     	binFiltered[i].setPvalue(P);
-    	cout << binFiltered[i].getInt1() << "/" << binFiltered[i].getInt2() << " - " << binFiltered[i].getFreq();
-    	cout << " - " << numberOfReadPairs  << " " << binFiltered[i].getProbability()<< " -> " << binFiltered[i].getPvalue() << endl;
 
-    	// observed over expected log ratio
+    	/** observed over expected log ratio **/
     	// binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
 		binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/binFiltered[i].getExpected()));
 
@@ -646,19 +664,26 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 		}//*/
     }//*/
 
+#ifdef DEBUG_FLAG
+    cerr << "BinomialData Size: " << binFiltered.size() << endl;
+#endif
+
+    completed();
 	return binFiltered;//
 }
 
 
-void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, string name, bool drop)
+void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, string name)
 {
+	// ** findOverlaps using vector and equal_range **
 	cerr << "Finding Overlaps in " << name << endl;
 	int i;
 
 	#pragma omp parallel for
 	for (i = 0; i < query.size(); i++)
 	{
-		for (auto it = fragments.begin(); it != fragments.end(); it++)
+		auto result = equal_range(fragments.begin(),fragments.end(),query[i].getChr(), Comp{});
+		for ( auto it = result.first; it != result.second; ++it )
 		{
 			if (query[i].getChr() == (*it).getChr())
 			{
@@ -675,22 +700,33 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 }//*/
 
 
-/*
-int binomialCoefficients(int n, int k) {
-   int C[k+1];
-   memset(C, 0, sizeof(C));
-   C[0] = 1;
-   for (int i = 1; i <= n; i++) {
-      for (int j = min(i, k); j > 0; j--)
-         C[j] = C[j] + C[j-1];
-   }
-   return C[k];
-}
-//*/
+void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> & fragments, string name)
+{
+	// ** findOverlaps for map **
+	cerr << "Finding Overlaps in " << name << endl;
+	int i;
+
+	typedef multimap<string,array<int,2>>::iterator MMAPIterator;
+	#pragma omp parallel for
+	for (i = 0; i < query.size(); i++)
+	{
+		pair<MMAPIterator, MMAPIterator> result = fragments.equal_range(query[i].getChr());
+		for (auto it = result.first; it != result.second; it++)
+		{
+			array<int,2> list = it->second;
+				if ((query[i].getLocus() >= list[0]) && (list[1] >= query[i].getLocus()) )
+				{
+					query[i] = halfInteraction(query[i].getChr(), list[0]);
+					break;
+				}
+		}
+	}
+	completed();
+}//*/
 
 void countDuplicates(vector<Interaction> & interactions)
 {
-	cerr << "Counting Duplicates" << endl;
+	cerr << "\tCounting Duplicates" << endl;
 
 	map<string , map<string, int>> list;
 
@@ -733,8 +769,11 @@ void countDuplicates(vector<Interaction> & interactions)
 
 	}
 
-	cout << "Duplicates: " << interactions.size()  << endl;
+#ifdef DEBUG_FLAG
+	cerr << "Duplicates: " << interactions.size()  << endl;
+#endif
 
+	cerr << "\t";
 	completed();
 }
 
@@ -814,8 +853,8 @@ void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, d
 			//cout << "CovA2 " << interactions[i].getInt1() << endl;
 			cov[interactions[i].getInt1()] += interactions[i].getFreq();
 			tCoverage += interactions[i].getFreq();
-		//}
-		/*if (cov.find(interactions[i].getInt2()) == cov.end())
+		/*}
+		if (cov.find(interactions[i].getInt2()) == cov.end())
 		{
 			//cout << "CovB " << interactions[i].getInt1() << endl;
 			cov[interactions[i].getInt2()] = interactions[i].getFreq();
@@ -831,6 +870,4 @@ void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, d
 		max = (cov[interactions[i].getInt2()]> max )? cov[interactions[i].getInt2()]: max;
 	}
 
-	//cout << "Loop Coverage: " << tCoverage << endl;
-	//cout << "Loop Max: " << max << endl;
 }

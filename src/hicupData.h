@@ -28,14 +28,18 @@ void importHicup(std::string fileName, std::vector<Interaction> & interactions, 
 void importHicupTxt(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupGz(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency);
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
+void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
 void binInteractions(std::vector<Interaction> & interactions, int res);
 std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::string sampleName, CisTrans cistrans, bool parallel = false, bool removeDiagonal = true);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
+void getHindIIIsitesFromHicup(std::multimap<std::string,std::array<int,2>> & sites, std::string fileName);
 
-void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name, bool drop = false);
+void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name);
+void findOverlaps(std::vector<halfInteraction>& query, std::multimap<std::string,std::array<int,2>> & subject, std::string name);
+
 void countDuplicates(std::vector<Interaction> & interactions);
 void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 

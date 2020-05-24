@@ -72,8 +72,11 @@ public:
 
 	bool operator==(const Interaction & other);
 	friend std::ostream & operator<<(std::ostream & out, const Interaction & in);
+	friend bool intcomp(const Interaction & a, const Interaction & b);
 
 };
+
+bool intcomp(const Interaction & a, const Interaction & b);
 
 std::ostream & operator<<(std::ostream & out, const Interaction & in);
 
@@ -138,9 +141,11 @@ public:
 	void print();
 
 	friend std::ostream & operator<<(std::ostream & out, const BinomData & in);
+	friend bool bincomp(const BinomData &, const BinomData &);
 };
 
 std::ostream & operator<<(std::ostream & out, const BinomData & in);
+bool bincomp(const BinomData & a, const BinomData & b);
 
 class Coverage
 {

@@ -26,6 +26,9 @@ enum CisTrans
 void showTime();
 void completed(int n = 0);
 void printUsage();
+void verbosePrint(std::string & str, bool verbose = true);
+
+void verbose(const char * fmt, ... );
 
 std::uint32_t fact(std::uint32_t n);
 int fact(int n);

@@ -11,14 +11,15 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include "Setup.h"
 
-#include "../src/BinomData.h"
-#include "../src/hicupData.h"
+#include "BinomData.h"
+#include "hicupData.h"
 
 
 
-
-std::vector<BinomData> gothicHicup(std::string fileName, std::string sampleName, int res, std::string restrictionFile, CisTrans cistrans, bool parallel = false);
+std::vector<BinomData> gothicHicup(Setup & setupValues);
+//std::vector<BinomData> gothicHicup(std::string fileName, std::string sampleName, int res, std::string restrictionFile, CisTrans cistrans, bool parallel = false);
 
 
 #endif /* SRC_GOTHIC_H_ */

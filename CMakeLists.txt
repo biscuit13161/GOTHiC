@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.4)
-project (GOTHiC VERSION 0.0.4 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
+project (GOTHiC VERSION 0.0.5 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
 
 include(CTest) # note: this adds a BUILD_TESTING which defaults to ON
 
@@ -7,6 +7,9 @@ set(CMAKE_C_STANDARD 99)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp ")
+
+# to allow verbose output
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_FLAG ")
 
 include_directories(${Boost_INCLUDE_DIRS})
 
