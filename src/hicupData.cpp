@@ -457,16 +457,17 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 
 
 
-vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sampleName, CisTrans cistrans, bool parallel, bool removeDiagonal)
+void binomialHiChicup(vector<Interaction> & interactions, string sampleName, CisTrans cistrans, vector<BinomData> & binFiltered)
 {
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
 
 	vector<Interaction> binned_df_filtered;
 
+	bool removeDiagonal = true;
 
 	//diagonal removal
-	if(removeDiagonal)
+	if (removeDiagonal)
 	{
 		cerr << "\tRemoving Diagonals!" << endl;
 		removeDuplicates(interactions, binned_df_filtered);
@@ -480,14 +481,16 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 	}
 	//cout << "size " << binned_df_filtered.size() << endl;
 
-	if(cistrans == ct_cis){
+	if (cistrans == ct_cis)
+	{
 		cerr << "\tFinding Cis interactions!";
 		findCis(interactions, binned_df_filtered);
 		//interactions.resize(pos);
 		cerr << "|\t";
 		completed();
 	}
-	else if(cistrans == ct_trans){
+	else if (cistrans == ct_trans)
+	{
 		cerr << "\tFinding Trans interactions!";
 		findTrans(interactions, binned_df_filtered);
 		//interactions.resize(pos);
@@ -501,33 +504,36 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 
 
 	// all read pairs used in binomial
-	int numberOfReadPairs = interactions.size(); // before binning!!
-	cout << "Read Pairs " << numberOfReadPairs << endl;
+	//int numberOfReadPairs = interactions.size(); // before binning!!
+	//cout << "Read Pairs " << numberOfReadPairs << endl;
 
 
 	// calculate coverage
     map<string,int> cov;
     double tCoverage = 0;
+    int numberOfReadPairs = 0;
     int max = 0;
 
     ofstream outFile("my_file.txt");
     for (const auto &e : interactions) outFile << e << "\n";
 
-    calcFreq(interactions, cov, tCoverage, max);
+    calcFreq(interactions, cov, numberOfReadPairs, tCoverage, max);
 
-#ifdef DEBUG_FLAG
+    cout << "Read Pairs " << numberOfReadPairs << endl;
+
+//#ifdef DEBUG_FLAG
     cerr << "Total Coverage: " << tCoverage  << " (57358/172074)"<< endl;
     cerr << "Max Individual Coverage: " << max << endl;
-    #endif
+//    #endif
 
     if (tCoverage == 0)
     {
     	throw std::invalid_argument("binomialHiChicup: Zero coverage!");
     }
     if (cov.size() == 0)
-        {
-        	throw std::invalid_argument("binomialHiChicup: Zero coverage!");
-        }
+    {
+    	throw std::invalid_argument("binomialHiChicup: Zero coverage!");
+    }
 
     // Calculate Relative Coverage
     map<string,double> rCov;
@@ -540,7 +546,6 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
     	//relative_coverage <- coverage/sumcov
     }
 
-    vector<BinomData> binFiltered;
     set<string> chromos;
 
 
@@ -558,14 +563,15 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 
     //probability correction assuming on average equal probabilities for all interactions
     int covS = cov.size(); // === length(all_bins)
-    uint32_t numberOfAllInteractions = covS*covS;
-    double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2.0f;
+    uint32_t numberOfAllInteractions = pow(covS,2);
+    int upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2;
 
-#ifdef DEBUG_FLAG
+//#ifdef DEBUG_FLAG
     cout << "Chromosomes Size: " << chromos.size() << endl;
-    cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")"<< endl;
-    cout << "upperhalfBinNumber: " << std::setprecision (17)<< upperhalfBinNumber << endl;
-#endif
+    cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")" << endl;
+    cout << "upperhalfBinNumber: " << upperhalfBinNumber << endl;
+    cout << "diagonalProb: " << diagonalProb << endl;
+//#endif
 
     double cisBinNumber = 0;
     double transBinNumber = 0;
@@ -598,22 +604,25 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 
 
 		//diagonalProb <- sum(relative_coverage^2)
-    double probabilityCorrection;
+    double probabilityCorrection = 0;
     switch(cistrans)
     {
     case ct_all :
     	probabilityCorrection = (removeDiagonal)? (1/(1-diagonalProb)) : 1;
     	break;
     case ct_cis :
-    	probabilityCorrection = upperhalfBinNumber/cisBinNumber;
+    	probabilityCorrection = double(upperhalfBinNumber)/cisBinNumber;
     	break;
     case ct_trans:
-    	probabilityCorrection = upperhalfBinNumber/transBinNumber;
+    	probabilityCorrection = double(upperhalfBinNumber)/transBinNumber;
     	break;
     }
-#ifdef DEBUG_FLAG
+//#ifdef DEBUG_FLAG
     printf("Probability Correction: %.10f \n", probabilityCorrection);
-#endif
+//#endif
+
+    vector<array<double,3>> values;
+    values.resize(binFiltered.size());
 
     // Calculate expected read counts, probabilities and pvalues
     #pragma omp parallel for
@@ -626,50 +635,67 @@ vector<BinomData> binomialHiChicup(vector<Interaction> & interactions, string sa
 
     	/** Calculate pvalues **/
     	// /* input Freq -1 as test is greater than! */
-    	double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), 0, 0);
+    	double P = pbinom(double(binFiltered[i].getFreq()-2), double(numberOfReadPairs), binFiltered[i].getProbability(), false, false);
     	binFiltered[i].setPvalue(P);
 
     	/** observed over expected log ratio **/
     	// binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
-		binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/binFiltered[i].getExpected()));
+		binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/double(binFiltered[i].getExpected())));
 
-    	//multiple testing correction separately for matrices with all interactions/only cis/only transs
+		array<double,3> ls = {double(i), binFiltered[i].getPvalue(), 0.5};
+		values[i] = ls;
 
-		//pBhAdjust(double Pi, double n);
-		switch(cistrans)
-		{
-		case ct_all :
-			if(removeDiagonal)
-			{
-				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
-			}
-			else
-			{
-				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
-			}
-			break;
-		case ct_cis :
-			if(removeDiagonal)
-			{
-				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
-			}
-			else
-			{
-				binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
-			}
-			break;
-		case ct_trans:
-			binFiltered[i].setLogObExp(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
-			break;
-		}//*/
     }//*/
 
-#ifdef DEBUG_FLAG
+
+
+    //multiple testing correction separately for matrices with all interactions/only cis/only transs
+
+	//pBhAdjust(double Pi, double n);
+	switch(cistrans)
+	{
+	case ct_all :
+		if(removeDiagonal)
+		{
+			pBhAdjust(values, upperhalfBinNumber);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
+		}
+		else
+		{
+			pBhAdjust(values, upperhalfBinNumber+covS);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
+		}
+		break;
+	case ct_cis :
+		if(removeDiagonal)
+		{
+			pBhAdjust(values, cisBinNumber);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
+		}
+		else
+		{
+			pBhAdjust(values, cisBinNumber+covS);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
+		}
+		break;
+	case ct_trans:
+		pBhAdjust(values, transBinNumber);
+		//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
+		break;
+	}//*/
+
+#pragma omp parallel for
+	for (int i = 0; i < binFiltered.size(); i++)
+	{
+		binFiltered[i].setQvalue(values[i][2]);
+	}//*/
+
+//#ifdef DEBUG_FLAG
     cerr << "BinomialData Size: " << binFiltered.size() << endl;
-#endif
+//#endif
 
     completed();
-	return binFiltered;//
+	//return binFiltered;//
 }
 
 
@@ -837,7 +863,7 @@ void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_
 	}
 }
 
-void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, double & tCoverage, int & max)
+void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max)
 {
 	// WILL NOT PARALLELISE!!! ...?
 	for (int i = 0; i < interactions.size(); i ++ )
@@ -853,6 +879,7 @@ void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, d
 			//cout << "CovA2 " << interactions[i].getInt1() << endl;
 			cov[interactions[i].getInt1()] += interactions[i].getFreq();
 			tCoverage += interactions[i].getFreq();
+			numberOfReadPairs += interactions[i].getFreq();
 		/*}
 		if (cov.find(interactions[i].getInt2()) == cov.end())
 		{

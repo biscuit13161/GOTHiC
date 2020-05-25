@@ -31,7 +31,7 @@ void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std:
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
 void binInteractions(std::vector<Interaction> & interactions, int res);
-std::vector<BinomData> binomialHiChicup(std::vector<Interaction> & interactions, std::string sampleName, CisTrans cistrans, bool parallel = false, bool removeDiagonal = true);
+void binomialHiChicup(std::vector<Interaction> & interactions, std::string sampleName, CisTrans cistrans, std::vector<BinomData> & binFiltered);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
@@ -46,7 +46,7 @@ void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Inter
 void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 
-void calcFreq(const std::vector<Interaction> & interactions, std::map<std::string,int> & cov, double & tCoverage, int & max);
+void calcFreq(const std::vector<Interaction> & interactions, std::map<std::string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max);
 //void completed();
 
 #endif /* SRC_HICUPDATA_H_ */

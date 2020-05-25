@@ -20,12 +20,14 @@ TEST(calcFreqTest, first)
 	std::map<std::string,int> cov;
     double coverage = 0;
     int max = 0;
+    int numberOfReadPairs = 0;
 
-    calcFreq(interactions, cov, coverage, max);
+    calcFreq(interactions, cov, numberOfReadPairs, coverage, max);
 
     //ASSERT_TRUE(true);
     ASSERT_TRUE(coverage == 18);
     EXPECT_TRUE(max == 8);
+    //EXPECT_TRUE(numberOfReadPairs == 7);
     EXPECT_TRUE(cov["chr1:17753"] == 2);
     EXPECT_TRUE(cov["chr2:12553"] == 6);
     EXPECT_TRUE(cov["chr1:15273"] == 8);

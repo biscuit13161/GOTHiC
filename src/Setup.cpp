@@ -74,7 +74,6 @@ Setup loadConfig(string & fileName)
 			optionValues["Res"] = Res;
 			optionValues["Output"] = Output;
 			optionValues["CisTrans"] = Cistrans;
-			optionValues["Algorithm"] = Fast;
 			
 			std::map<std::string,CisTrans> CToptionValues;
 			CToptionValues["all"] = ct_all;

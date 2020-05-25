@@ -18,7 +18,7 @@
 
 
 
-std::vector<BinomData> gothicHicup(Setup & setupValues);
+void gothicHicup(Setup & setupValues, std::vector<BinomData> & binom);
 //std::vector<BinomData> gothicHicup(std::string fileName, std::string sampleName, int res, std::string restrictionFile, CisTrans cistrans, bool parallel = false);
 
 

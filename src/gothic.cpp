@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 	vector<BinomData> binom;
 
 	try {
-		binom = gothicHicup(setupValues);
+		gothicHicup(setupValues,binom);
 		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
 		/*
 		 * vector<Site> fragments;
@@ -48,12 +48,16 @@ int main(int argc, char *argv[])
 		//returnSizes();
 		//timeTest();
 
+		cerr << "BinomialData Size3: " << binom.size() << endl;
+		sort(binom.begin(), binom.end(), bincomp);
 	}
 	catch(const std::invalid_argument& e){
 		cout << "Error: " << e.what() << endl;
 	}
 
-	sort(binom.begin(), binom.end(), bincomp);
+
+
+
 
     ofstream binomFile("binom.txt");
     binomFile << "chr1" << "\t" << "locus1" \
@@ -111,7 +115,7 @@ gothic(string fileName1, string fileName2, string sampleName, res, string genome
 
 // GOTHiC main tool based on hicup alignment
 
-vector<BinomData> gothicHicup(Setup & setupValues)
+void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
 {
 	/*
 	 * fileName
@@ -172,8 +176,7 @@ vector<BinomData> gothicHicup(Setup & setupValues)
 	binInteractions(interactions, res);
 
 	// Prepare Binominal data from Hicup Data
-    vector<BinomData> binom;
-	binom = binomialHiChicup(interactions, sampleName, cistrans);
+	binomialHiChicup(interactions, sampleName, cistrans, binom);
 
-    return(binom);
+    cerr << "BinomialData Size2: " << binom.size() << endl;
 }
