@@ -6,14 +6,16 @@
  */
 
 #include "binomTest.h"
+#include "pbinom.h"
 #include <map>
-#include <string>
+#include <iostream>
+
 
 using namespace std;
 
-double binomTest(int & x, int & n, double & p = 0.5, string alternative ,  conf.level = 0.95)
+double binomTest(int x, int n, double p, string alternative)
 {
-    if ( x.empty() || x < 0)
+    if ( x < 0)
     	throw std::invalid_argument("binomTest: 'x' must be nonnegative and integer");
 
 	/*if (length(x) == 2L) {
@@ -30,12 +32,12 @@ double binomTest(int & x, int & n, double & p = 0.5, string alternative ,  conf.
     }
     else stop("incorrect length of 'x'")//*/
 
-    if (p.empty() || p < 0 || p > 1)
+    if ( p < 0 || p > 1)
     	throw std::invalid_argument("binomTest: 'p' must be a single number between 0 and 1");
 
-    if (!((length(conf.level) == 1L) && is.finite(conf.level) &&
+    /*if (!((length(conf.level) == 1L) && is.finite(conf.level) &&
         (conf.level > 0) && (conf.level < 1)))
-        stop("'conf.level' must be a single number between 0 and 1")
+        stop("'conf.level' must be a single number between 0 and 1")//*/
 
 
 		map<string, altOptions> optionValues;
@@ -52,8 +54,11 @@ double binomTest(int & x, int & n, double & p = 0.5, string alternative ,  conf.
     	break;
     case ao_greater:
     	pval = pbinom(x - 1, n, p, false,false);
-    case ao_two_sided = {
-        if (p == 0)
+    	break;
+    case ao_two_sided:
+    	/** needs work **/
+    	cerr << "*** BEWARE: tow.sided binomTest incomplete ***" << endl;
+    	if (p == 0)
         	{
         	pval = (x == 0);
         	}
@@ -63,9 +68,9 @@ double binomTest(int & x, int & n, double & p = 0.5, string alternative ,  conf.
         	}
         else
         {
-            relErr <- 1 + 1e-07
-            d <- dbinom(x, n, p,true, false)
-            m <- n * p
+            double relErr = 1 + 1e-07;
+            //d <- dbinom(x, n, p,true, false)
+          /*  m <- n * p;
             if (x == m)
             {
             	pval = 1;
@@ -81,7 +86,7 @@ double binomTest(int & x, int & n, double & p = 0.5, string alternative ,  conf.
                 i <- seq.int(from = 0, to = floor(m))
                 y <- sum(dbinom(i, n, p,true, false) <= d * relErr)
                 pval = pbinom(y - 1, n, p,true, false) + pbinom(x - 1, n, p, false,false);
-            }
+            }//*/
         }
         break;
     }

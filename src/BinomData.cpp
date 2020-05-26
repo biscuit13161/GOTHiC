@@ -1,11 +1,11 @@
 /*
- * BiinomData.cpp
+ * BinomData.cpp
  *
  *  Created on: 5 May 2020
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#include "../src/BinomData.h"
+#include "BinomData.h"
 #include "pbinom.h"
 #include <regex>
 #include <iostream>
@@ -91,8 +91,9 @@ bool bincomp(const BinomData & a, const BinomData & b)
 
 ostream & operator<<(ostream & out, const BinomData & in)
 {
+	//out.precision(15);
 	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
-		<< in.mChr2 << "\t" << in.mLocus2 << "\t" \
+		<< in.mChr2 << "\t" << in.mLocus2 \
 			<< "\t" << in.mRelCoverage1 \
 			<< "\t" << in.mRelCoverage2 \
 			<< "\t" << in.mProbability \
@@ -138,8 +139,28 @@ Interaction::Interaction(const halfInteraction & first, const halfInteraction & 
 bool Interaction::operator==(const Interaction & other)
 {
 	return (mChr1 == other.getChr1()) &&
+			(mLocus1 == other.getLocus1()) &&
 			(mChr2 == other.getChr2()) &&
+			(mLocus2 == other.getLocus2()) &&
 			(mFrequency == other.getFreq());
+}
+
+void checkInteractions(const vector<Interaction> & interactions, const vector<Interaction> & interactions2)
+{
+	cout << "Sizes:" << interactions.size() << " : " << interactions2.size() << endl;
+	int same= 0;
+	if (interactions.size() == interactions2.size())
+	{
+		for (int i =0 ; i < interactions.size(); i++)
+		{
+			if (interactions[i] == interactions2[i]){same++;}
+			else
+			{
+				cout << "diff: " << i << " : " << interactions[i] << " : " << interactions2[i] << endl;
+			}
+		}
+		cout << same << " interactions matched" << endl;
+	}
 }
 
 
@@ -174,6 +195,87 @@ ostream & operator<<(ostream & out, const Interaction & in)
 				+ to_string(in.mFrequency);
 	out << L << endl;
 	return out;
+}
+
+void writeBinary(vector<Interaction> & interactions, string binOutFileName)
+{
+	ofstream binOutFile;
+	binOutFile.open(binOutFileName, ios::binary);
+
+	int max = 0;
+	if (binOutFile.is_open())
+	{
+		for (int i = 0; i != interactions.size(); i++)
+		{
+			Interaction P = interactions[i];
+			string Int1 = P.getInt1();
+			string Int2 = P.getInt2();
+			if (!Int1.empty())
+			{
+				Int1.resize(32);
+				Int2.resize(32);
+				int freq = P.getFreq();
+				//size_t S = sizeof(std::string) + 3* sizeof(int);
+				binOutFile.write(Int1.c_str(), 32);
+				binOutFile.write(Int2.c_str(), 32);// need to cast the pointer
+				binOutFile.write(reinterpret_cast<char*>(&freq), sizeof(int));
+			}
+		}
+
+		binOutFile.close();
+	}
+	else
+	{
+		cout << "Unable to create binary write file: " + binOutFileName << endl;
+	}
+	cout << endl;
+
+}
+
+void readBinary(vector<Interaction> & interactions, string binInFileName)
+{
+	cerr << "Reading Binary input file" << endl;
+	ifstream binInFile;
+	binInFile.open(binInFileName, ios::binary);
+
+	if (binInFile.is_open())
+	{
+		while(binInFile)
+		{
+			string Int1;
+			Int1.resize(32);
+			//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
+			binInFile.read(& Int1[0], 32);
+			Int1.resize(Int1.find('\0'));
+			if (!Int1.empty())
+			{
+				size_t pos = Int1.find(":");
+				string chr1 = Int1.substr(0,pos);
+				int locus1 = atoi(Int1.substr(pos+1).c_str());
+
+				string Int2;
+				Int2.resize(32);
+				//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
+				binInFile.read(& Int2[0], 32);
+				Int2.resize(Int2.find('\0'));
+				pos = Int2.find(":");
+				string chr2 = Int2.substr(0,pos);
+				int locus2 = atoi(Int2.substr(pos+1).c_str());
+
+				int freq;
+				binInFile.read(reinterpret_cast<char*>(& freq), sizeof(int));
+				Interaction P = Interaction(chr1,chr2,locus1,locus2,freq);
+				interactions.push_back(P);
+			}
+		}
+		binInFile.close();
+	}
+	else
+	{
+		cout << "Unable to read binary file: " + binInFileName << endl;
+	}
+
+	completed();
 }
 
 

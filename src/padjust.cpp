@@ -28,12 +28,12 @@ double pBhAdjust(double Pi, double n)
 
 bool poscomp(const array<double,3> & a, const array<double,3> & b)
 {
-	return a[0] > b[0];
+	return a[0] < b[0]; // < ascending
 }
 
 bool valcomp(const array<double,3> & a, const array<double,3> & b)
 {
-	return a[1] < b[1];
+	return a[1] < b[1]; // > descending
 }
 
 
@@ -44,33 +44,34 @@ void pBhAdjust(vector<array<double,3>> & p, double n) // int,2 -> pos, pval, qva
 
 	int x = p.size() - 1;
 
-	cout << p.size() << endl;
+	//cout << p.size() << endl;
+	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
+	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
+	sort(p.begin(),p.end(), valcomp); // increasing by pval
+	double minP = 1;
+	double maxP = 0;
+	double minQ = 1;
+	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
+	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
 
-    cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
-    cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
-        sort(p.begin(),p.end(), valcomp); // decreasing by pval
-        double minP = 1;
-        double maxP = 0;
-        double minQ = 1;
-        cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
-        cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
+	for (int i = p.size()-1 ; i >= 0; i--)
+	{
+		double P = p[i][1]; //Pvalue input
+		minP = min(minP, P);
+		maxP = max(maxP, P);
+		double a = (n * P) /(i+1);
+		minQ = min(minQ,a); //? a : minQ ;
+		//cout  << "(" << p[i][0] << ", " << p[i][1] << ", " << a << ", "  << minQ << ")  " << endl;
+		minQ = min(minQ, 1.0d);
+		p[i][2] = minQ;
+	}
+	cout << "Minimum Pvalue: " << minP << endl;
+	cout << "Maximum Pvalue: " << maxP << endl;
+	cout << "Minimum Qvalue:" << minQ << endl;
 
-		for (int i = 0; i < p.size(); i++)
-		{
-			double P = p[i][1];
-			minP = min(minP, P);
-			maxP = max(maxP, P);
-			double a = (n * P) /i;
-			//cout  << "(" << p[i-1][0] << ", " << p[i-1][1] << ", " << a << ", "<< flush;
-			minQ = min(minQ,a); //? a : minQ ;
-			//cout  << minP << ")  " << flush;
-			p[i][2] = minQ;
-		}
-	    cout << "Minimum Pvalue: " << minP << endl;
-	    cout << "Maximum Pvalue: " << maxP << endl;
-		cout << "Minimum Qvalue:" << minQ << endl;
-
-        sort(p.begin(),p.end(), poscomp); // increasing by pos
+	sort(p.begin(),p.end(), poscomp); // increasing by pos
+	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
+	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
 }
 
 /*

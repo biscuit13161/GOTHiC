@@ -48,7 +48,6 @@ int main(int argc, char *argv[])
 		//returnSizes();
 		//timeTest();
 
-		cerr << "BinomialData Size3: " << binom.size() << endl;
 		sort(binom.begin(), binom.end(), bincomp);
 	}
 	catch(const std::invalid_argument& e){
@@ -175,8 +174,14 @@ void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
 
 	binInteractions(interactions, res);
 
+	// save binary file of interactions
+	writeBinary(interactions, "test.inter.bin");
+
+	//vector<Interaction> interactions2;
+	//readBinary(interactions2, "test.inter.bin");
+
+
 	// Prepare Binominal data from Hicup Data
 	binomialHiChicup(interactions, sampleName, cistrans, binom);
 
-    cerr << "BinomialData Size2: " << binom.size() << endl;
 }

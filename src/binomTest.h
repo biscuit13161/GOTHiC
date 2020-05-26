@@ -8,8 +8,9 @@
 #ifndef SRC_BINOMTEST_H_
 #define SRC_BINOMTEST_H_
 
-class binomTest {
-};
+#include <string>
+
+double binomTest(int x, int n, double p, std::string alternative);
 
 enum altOptions{
 	ao_less = 0,

@@ -9,24 +9,30 @@ set(GOTH_MINOR_VERSION ${CMAKE_PROJECT_VERSION_MINOR})
 set(GOTH_PATCH_VERSION ${CMAKE_PROJECT_VERSION_PATCH}) 
 configure_file("version.h.in" "version.h" @ONLY)
 
-set(CLIBS pbinom toms708)
+set(CLIBS pbinom toms708 )
 
 foreach(lib ${CLIBS})
   add_library(${lib} ${lib}.c)
   target_link_libraries (${lib} ${Boost_LIBRARIES})
 endforeach(lib)
 
-add_library(Site Site.cpp)
-target_link_libraries (Site ${CLIBS} ${Boost_LIBRARIES})
+#add_library(Site Site.cpp)
+#target_link_libraries (Site ${CLIBS} ${Boost_LIBRARIES})
 
-add_library(padjust padjust.cpp)
-target_link_libraries (padjust ${CLIBS} ${Boost_LIBRARIES})
+#add_library(padjust padjust.cpp)
+#target_link_libraries (padjust ${CLIBS} ${Boost_LIBRARIES})
+set(ALIBS Site padjust binomTest)
+
+foreach(lib ${ALIBS})
+  add_library(${lib} ${lib}.cpp)
+  target_link_libraries (${lib} ${CLIBS} ${Boost_LIBRARIES})
+endforeach(lib)
 
 set(LIBS Setup Utils hicupData BinomData binTest )
 
 foreach(lib ${LIBS})
   add_library(${lib} ${lib}.cpp)
-  target_link_libraries (${lib} ${CLIBS} padjust Site ${Boost_LIBRARIES})
+  target_link_libraries (${lib} ${CLIBS} ${ALIBS} ${Boost_LIBRARIES})
 endforeach(lib)
 
 

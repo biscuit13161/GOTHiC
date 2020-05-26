@@ -77,8 +77,12 @@ public:
 };
 
 bool intcomp(const Interaction & a, const Interaction & b);
+void checkInteractions(const vector<Interaction> & interactions, const vector<Interaction> & interactions2)
 
 std::ostream & operator<<(std::ostream & out, const Interaction & in);
+
+void writeBinary(std::vector<Interaction> & interactions, std::string binOutFileName);
+void readBinary(std::vector<Interaction> & interactions, std::string binInFileName);
 
 class BinomData
 {

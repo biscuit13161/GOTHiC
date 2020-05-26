@@ -9,6 +9,7 @@
 #include "pbinom.h"
 #include "Utils.h"
 #include "padjust.h"
+#include "binomTest.h"
 #include <set>
 #include <iostream>
 #include <stdio.h>
@@ -635,7 +636,8 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
 
     	/** Calculate pvalues **/
     	// /* input Freq -1 as test is greater than! */
-    	double P = pbinom(double(binFiltered[i].getFreq()-2), double(numberOfReadPairs), binFiltered[i].getProbability(), false, false);
+    	double P = binomTest(binFiltered[i].getFreq(), numberOfReadPairs, binFiltered[i].getProbability(), "greater");
+    	//double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), false, false);
     	binFiltered[i].setPvalue(P);
 
     	/** observed over expected log ratio **/
