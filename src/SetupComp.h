@@ -8,7 +8,7 @@
 #ifndef SRC_SETUPCOMP_H_
 #define SRC_SETUPCOMP_H_
 
-#include "Utils.h"
+#include "UtilsComp.h"
 #include <string>
 #include <vector>
 

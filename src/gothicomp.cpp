@@ -6,13 +6,16 @@
  */
 
 #include "gothicomp.h"
-#include "hicupDataComp.h"
 #include "Interactions.h"
+#include "hicupDataComp.h"
+#include "binTest.h"
 #include <iostream>
 #include <stdio.h>
 #include <omp.h>
+#include "tbb/concurrent_vector.h"
 
 using namespace std;
+using namespace tbb;
 
 
 int main(int argc, char *argv[])
@@ -21,7 +24,7 @@ int main(int argc, char *argv[])
 	{
 		// We print argv[0] assuming it is the program name
 		cerr<<"usage: "<< argv[0] <<" <filename>\n";
-		printUsage();
+		printUsageComp();
 		return 0;
 	}
 
@@ -32,18 +35,11 @@ int main(int argc, char *argv[])
 
 	omp_set_num_threads(setupValues.getThreads());
 
-	vector<BinomDataComp> binom;
+	concurrent_vector<BinomDataComp> binom;
 
 	try {
 		gothicHicupComp(setupValues,binom);
-		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
-		/*
-		 * vector<Site> fragments;
-		 * binaryWriteTest(fragments, restrictionFile);
-		 * binaryRead(fragments);
-		 */
-		//returnSizes();
-		//timeTest();
+		//sumSquareTest();
 
 		sort(binom.begin(), binom.end(), bincompcomp);
 	}
@@ -68,13 +64,13 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void gothicHicupComp(SetupComp & setupValues, vector<BinomDataComp> & binom)
+void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> & binom)
 {
 	/** load data from GOTHiC++ **/
-	vector<Interaction> interactions1;
+	concurrent_vector<Interaction> interactions1;
 	readBinary(interactions1, setupValues.getCondition1());
 
-	vector<Interaction> interactions2;
+	concurrent_vector<Interaction> interactions2;
 	readBinary(interactions2, setupValues.getCondition2());
 
 	if (setupValues.getVerbose())

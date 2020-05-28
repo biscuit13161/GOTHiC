@@ -35,6 +35,7 @@ void Setup::print()
 	cerr << "# Threads:          " << mThreads << endl;
 	cerr << "# Resolution:       " << mRes << endl;
 	cerr << "# Config File:      " << mCliName << endl;
+	cerr << "# Verbose:          " << mVerbose << endl;
 	cerr << "#" << endl << endl;
 }
 
@@ -77,6 +78,7 @@ Setup loadConfig(string & fileName)
 			optionValues["Analysis"] = Analysis;
 			optionValues["RemoveDiagonals"] = RemDiag;
 			optionValues["Logfile"] = Logfile;
+			optionValues["Verbose"] = Verbose;
 			
 			std::map<std::string,CisTrans> CToptionValues;
 			CToptionValues["all"] = ct_all;
@@ -132,6 +134,12 @@ Setup loadConfig(string & fileName)
 				break;
 			case Logfile:
 				setupValues.setLogFile(value);
+				break;
+			case Verbose:
+				std::transform(value.begin(), value.end(), value.begin(),
+						[](unsigned char c){ return std::tolower(c); });
+				if (value == "true")
+					setupValues.setVerbose(true);
 				break;
 			}//*/
 		}

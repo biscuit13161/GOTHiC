@@ -21,5 +21,6 @@ void binInterTest();
 void pBhAdjustTest();
 void returnSizes();
 void timeTest();
+void sumSquareTest();
 
 #endif /* SRC_BINTEST_H_ */

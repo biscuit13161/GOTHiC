@@ -6,15 +6,22 @@
  */
 
 #include "hicupDataComp.h"
-#include "hicupData.h"
+#include "Interactions.h"
+#include "UtilsComp.h"
 #include <algorithm>
 #include <math.h> //pow
 #include <stdint.h> // uint32_t
+#include "tbb/parallel_for.h"
+#include "tbb/blocked_range.h"
+#include "tbb/concurrent_unordered_set.h"
+#include "tbb/concurrent_unordered_map.h"
+#include "tbb/parallel_reduce.h"
 
 
 using namespace std;
+using namespace tbb;
 
-void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interaction> & interactions2, SetupComp & setupValues, vector<BinomDataComp> & binFiltered)
+void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concurrent_vector<Interaction> & interactions2, SetupComp & setupValues, concurrent_vector<BinomDataComp> & binFiltered)
 {
 	/*
 	 * interaction set1 that will be used as background
@@ -31,30 +38,61 @@ void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interactio
 		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
 	}
 
-	cerr << "\tGetting Pairs" << endl;
-	set<string> Int1; // Ints from Control
-	set<string> Int2; // Ints from Sample
-	set<string> AllInt; // all_bin
-	map<string,int> pairs1;
-	map<string,int> pairs2;
 
-	for (auto e : interactions1)
+
+	cerr << "\tGetting Pairs" << endl;
+	concurrent_unordered_set<string> Int1; // Ints from Control
+	concurrent_unordered_set<string> Int2; // Ints from Sample
+	concurrent_unordered_set<string> AllInt; // all_bin
+	concurrent_unordered_map<string,int> pairs1;
+	concurrent_unordered_map<string,int> pairs2;
+
+
+	parallel_for(
+			blocked_range<concurrent_vector<Interaction>::iterator>(interactions1.begin(),	interactions1.end()),
+			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
+		for (concurrent_vector<Interaction>::iterator it = inter.begin(); it != inter.end(); it++) {
+			Interaction e = (*it);
+			Int1.insert(e.getInt1());
+			Int1.insert(e.getInt2());
+			AllInt.insert(e.getInt1());
+			AllInt.insert(e.getInt2());
+			pairs1.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
+		}
+	});//*/
+
+	parallel_for(
+			blocked_range<concurrent_vector<Interaction>::iterator>(interactions2.begin(),	interactions2.end()),
+			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
+		for (concurrent_vector<Interaction>::iterator it = inter.begin(); it != inter.end(); it++) {
+			Interaction e = (*it);
+			Int2.insert(e.getInt1());
+			Int2.insert(e.getInt2());
+			AllInt.insert(e.getInt1());
+			AllInt.insert(e.getInt2());
+			pairs2.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
+		}
+	});
+	/*for (auto e : interactions1)
 	{
 		Int1.insert(e.getInt1());
 		Int1.insert(e.getInt2());
 		AllInt.insert(e.getInt1());
 		AllInt.insert(e.getInt2());
 		pairs1.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
-	}
+	}//*/
 
-	for (auto e : interactions2)
+	cout << "sizes:\t" << Int1.size() << "\t" << AllInt.size() << "\t" << pairs1.size() << endl;
+
+	/*for (auto e : interactions2)
 	{
 		Int2.insert(e.getInt1());
 		Int2.insert(e.getInt2());
 		AllInt.insert(e.getInt1());
 		AllInt.insert(e.getInt2());
 		pairs2.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
-	}
+	}//*/
+	cout << "sizes:\t" << Int2.size() << "\t" << AllInt.size() << "\t" << pairs2.size() << endl;
 	cerr << "\t" << flush;
 	completed();
 
@@ -82,7 +120,29 @@ void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interactio
 		{
 			numberOfReadPairs1 += a.second;
 		}
-	}//*/
+	}
+	/*parallel_reduce(pairs1.range(), 0,
+			[&] (decltype( pairs1)::range_type & inter,int init) -> int {
+		for (auto it = inter.begin(); it != inter.end(); it++)
+		{
+			string e = it->first;
+			if (pairs2.find(e) == pairs2.end())
+			{
+				only1.insert(e);
+				Interaction I = splitPair(e);
+				//cout << I << endl;
+				interactions2.push_back(I);
+				init += 1;
+				return init;
+			}
+			else
+			{
+				init += it->second;
+				return init;
+			}
+		}
+	},[](int x, int y) -> int { return x+y;}
+	);//*/
 	set<string> only2;
 	int numberOfReadPairs2 = 0;
 	for (auto a :pairs2)
@@ -101,6 +161,7 @@ void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interactio
 			numberOfReadPairs2 += a.second;
 		}
 	}
+
 	if (setupValues.getVerbose())
 	{
 		cout << "\t" << only1.size() << " interactions unique to Control" << endl;
@@ -133,26 +194,15 @@ void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interactio
 		cerr << "\tUpperHalfBinNumber: " << upperhalfBinNumber << " (R = 32562626806)"<< endl;
 	}
 
-	/*set<string> chromos;
+	set<string> chromos;
 	for (auto i : interactions2)
 	{
 		chromos.insert(i.getChr1());
 	}//*/
 
 	double sumSquare = 0;
-	map<string,set<int>> loci;
-	for(auto a: interactions2)
-	{
-		loci[a.getChr1()].insert(a.getLocus1());
-		loci[a.getChr2()].insert(a.getLocus2());
-         //<- length(unique(c(unique(binned_df_filtered2$locus1[binned_df_filtered2$chr1==cr]),unique(binned_df_filtered2$locus2[binned_df_filtered2$chr2==cr]))))
-		 //chrlens[a] = loci.size();
-	}
-	for (auto i : loci)
-	{
-		sumSquare += pow(i.second.size(),2);
-				//(sum(chrlens^2)
-	}
+	getSumSquare(sumSquare, chromos, interactions2);
+
 	double cisBinNumber = (sumSquare - covS)/2;
 	double transBinNumber = upperhalfBinNumber - cisBinNumber;
 
@@ -174,14 +224,7 @@ void binomialHiChicupComp(vector<Interaction> & interactions1, vector<Interactio
 
 #all read pairs used in binomial: numberOfReadPairs1 used for computing expected and numberOfReadPairs2 as total number
 
-		chrlens <- c()
-		for(cr in chromos){
-             chrlens[cr] <- length(unique(c(unique(binned_df_filtered2$locus1[binned_df_filtered2$chr1==cr]),unique(binned_df_filtered2$locus2[binned_df_filtered2$chr2==cr]))))
-		}
-		cisBinNumber <-(sum(chrlens^2)-length(all.bins))/2
-		transBinNumber <- upperhalfBinNumber-cisBinNumber
-		print(cisBinNumber)
-		print(transBinNumber)
+
 		binned_df_filtered2$probabilityOfInteraction <- binned_df_filtered1$frequencies/numberOfReadPairs1
 		freq1 <- binned_df_filtered1$frequencies>1
 		freq2 <- binned_df_filtered2$frequencies>1

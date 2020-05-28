@@ -6,6 +6,7 @@
  */
 
 #include "Interactions.h"
+#include "tbb/concurrent_vector.h"
 #include "Utils.h"
 #include <iostream>
 #include <fstream>
@@ -108,86 +109,9 @@ ostream & operator<<(ostream & out, const Interaction & in)
 	return out;
 }
 
-void writeBinary(vector<Interaction> & interactions, string binOutFileName)
-{
-	ofstream binOutFile;
-	binOutFile.open(binOutFileName, ios::binary);
 
-	int max = 0;
-	if (binOutFile.is_open())
-	{
-		for (int i = 0; i != interactions.size(); i++)
-		{
-			Interaction P = interactions[i];
-			string Int1 = P.getInt1();
-			string Int2 = P.getInt2();
-			if (!Int1.empty())
-			{
-				Int1.resize(32);
-				Int2.resize(32);
-				int freq = P.getFreq();
-				//size_t S = sizeof(std::string) + 3* sizeof(int);
-				binOutFile.write(Int1.c_str(), 32);
-				binOutFile.write(Int2.c_str(), 32);// need to cast the pointer
-				binOutFile.write(reinterpret_cast<char*>(&freq), sizeof(int));
-			}
-		}
 
-		binOutFile.close();
-	}
-	else
-	{
-		cout << "Unable to create binary write file: " + binOutFileName << endl;
-	}
-	cout << endl;
 
-}
-
-void readBinary(vector<Interaction> & interactions, string binInFileName)
-{
-	cerr << "Reading Binary input file" << endl;
-	ifstream binInFile;
-	binInFile.open(binInFileName, ios::binary);
-
-	if (binInFile.is_open())
-	{
-		while(binInFile)
-		{
-			string Int1;
-			Int1.resize(32);
-			//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
-			binInFile.read(& Int1[0], 32);
-			Int1.resize(Int1.find('\0'));
-			if (!Int1.empty())
-			{
-				size_t pos = Int1.find(":");
-				string chr1 = Int1.substr(0,pos);
-				int locus1 = atoi(Int1.substr(pos+1).c_str());
-
-				string Int2;
-				Int2.resize(32);
-				//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
-				binInFile.read(& Int2[0], 32);
-				Int2.resize(Int2.find('\0'));
-				pos = Int2.find(":");
-				string chr2 = Int2.substr(0,pos);
-				int locus2 = atoi(Int2.substr(pos+1).c_str());
-
-				int freq;
-				binInFile.read(reinterpret_cast<char*>(& freq), sizeof(int));
-				Interaction P = Interaction(chr1,chr2,locus1,locus2,freq);
-				interactions.push_back(P);
-			}
-		}
-		binInFile.close();
-	}
-	else
-	{
-		cout << "Unable to read binary file: " + binInFileName << endl;
-	}
-
-	completed();
-}
 
 
 

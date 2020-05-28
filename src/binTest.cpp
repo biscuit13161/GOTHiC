@@ -7,7 +7,10 @@
 
 #include "binTest.h"
 #include "padjust.h"
-#include "hicupData.h"
+#include "Interactions.h"
+#include "BinomData.h"
+//#include "hicupData.h"
+#include "Utils.h"
 #include "pbinom.h"
 #include <ctime>
 #include <chrono>
@@ -62,7 +65,7 @@ void binaryWriteTest(vector<Site> & fragments, string restrictionFile)
 {
 	cerr << "Binary Write Test" << endl;
 
-	getHindIIIsitesFromHicup(fragments, restrictionFile);
+	//getHindIIIsitesFromHicup(fragments, restrictionFile);
 	string binOutFileName = "Digest.bin";
 	writeBinary(fragments, binOutFileName);
 	completed();
@@ -125,7 +128,7 @@ void countDupsTest()
 	list["chrX:1063441"] = 2;
 	list["chr2:15273"] = 3;
 
-	countDuplicates(interactions);
+	//countDuplicates(interactions);
 
 	for (auto i : interactions)
 	{
@@ -263,4 +266,26 @@ void timeTest()
 
 	cout << "Vector time: " << vectT << endl;
 	cout << "Map time:" << mapT << endl;
+}
+
+void sumSquareTest()
+{
+	std::vector<Interaction> interactions;
+	interactions.push_back(Interaction("chr2","chr1",12553,15273));
+	interactions.push_back(Interaction("chr1","chr1",17753,150273));
+	interactions.push_back(Interaction("chrX","chr7",1255,1020));
+	interactions.push_back(Interaction("chr1","chr1",17753,17753));
+	interactions.push_back(Interaction("chr1","chr1",17753,15273));
+	interactions.push_back(Interaction("chrX","chr7",12550,1020));
+	interactions.push_back(Interaction("chr21","chrX",1255,1255));
+
+	std::set<std::string> chromos;
+	for (auto i : interactions)
+	{
+		chromos.insert(i.getChr1());
+	}
+	double sumSquare = 0;
+
+	getSumSquare(sumSquare, chromos, interactions);
+	cout << "SumSquaresTest: " << sumSquare << endl;
 }

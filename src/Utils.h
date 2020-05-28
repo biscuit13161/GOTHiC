@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <regex>
 #include <vector>
+#include <set>
 #include <string>
 #include "stdlib.h"
 #include "sys/types.h"
@@ -52,6 +53,11 @@ void removeDiagonals(std::vector<Interaction> & interactions, CisTrans cistrans,
 void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 
+void writeBinary(std::vector<Interaction> & interactions, std::string binOutFileName);
+void readBinary(std::vector<Interaction> & interactions, std::string binInFileName);
+
+
 std::string fixChromosomeNames(std::string chr);
+void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const std::vector<Interaction> & interactions);
 
 #endif /* SRC_UTILS_H_ */

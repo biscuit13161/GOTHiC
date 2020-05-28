@@ -541,24 +541,7 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     if (setupValues.getCisTrans() != ct_all)
     {
     	double sumSquare = 0;
-    	map<string,int> chrlens;
-    	for (auto cr : chromos){
-    		set<int> pos;
-    		for (auto x : interactions)
-    		{
-    			if (x.getChr1() == cr)
-    			{
-    				pos.insert(x.getLocus1());
-    			}
-    			if (x.getChr2() == cr)
-    			{
-    				pos.insert(x.getLocus2());
-    			}
-    		}
-    		chrlens[cr] = pos.size();
-    		sumSquare += pos.size()*pos.size();
-
-    	}
+    	getSumSquare(sumSquare, chromos, interactions);
 
     	cisBinNumber = (sumSquare - cov.size())/2;
     	transBinNumber = upperhalfBinNumber - cisBinNumber;

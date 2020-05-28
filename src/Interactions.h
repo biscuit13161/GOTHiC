@@ -11,6 +11,7 @@
 #include "Utils.h"
 #include <string>
 #include <vector>
+#include "tbb/concurrent_vector.h"
 
 class halfInteraction
 {
@@ -77,8 +78,8 @@ void checkInteractions(const std::vector<Interaction> & interactions, const std:
 
 std::ostream & operator<<(std::ostream & out, const Interaction & in);
 
-void writeBinary(std::vector<Interaction> & interactions, std::string binOutFileName);
-void readBinary(std::vector<Interaction> & interactions, std::string binInFileName);
+
+
 
 bool comp(const halfInteraction & a, const halfInteraction & b);
 

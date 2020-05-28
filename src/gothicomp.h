@@ -10,8 +10,9 @@
 
 #include "SetupComp.h"
 #include "BinomDataComp.h"
+#include "tbb/concurrent_vector.h"
 #include <vector>
 
-void gothicHicupComp(SetupComp & setupValues, std::vector<BinomDataComp> & binom);
+void gothicHicupComp(SetupComp & setupValues, tbb::concurrent_vector<BinomDataComp> & binom);
 
 #endif /* SRC_GOTHICOMP_H_ */

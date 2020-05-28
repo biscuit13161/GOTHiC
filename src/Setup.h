@@ -32,6 +32,7 @@ private:
 	int mRes;
 	bool mRemoveDiagonal;
 	AnalysisOptions mAnalysisType;
+	bool mVerbose;
 public:
 	Setup();
 	Setup(std::string outDir, std::string enzyme, std::string input, int threads);
@@ -49,6 +50,7 @@ public:
 	inline CisTrans getCisTrans() const {return mCisTrans;}
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
 	inline AnalysisOptions getAnalysisType() const {return mAnalysisType;}
+	inline bool getVerbose() const {return mVerbose;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -61,6 +63,7 @@ public:
 	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
 	inline void setAnalysisType(AnalysisOptions L) {mAnalysisType = L;}
+	inline void setVerbose(bool L) {mVerbose = L;}
 
 };
 
@@ -77,6 +80,7 @@ enum Options {
 	Analysis,
 	RemDiag,
 	Logfile,
+	Verbose,
 };
 
 

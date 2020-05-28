@@ -1,11 +1,11 @@
 /*
- * Utils.cpp
+ * UtilsComp.cpp
  *
  *  Created on: 11 May 2020
  *      Author: rich
  */
 
-#include "Utils.h"
+#include "UtilsComp.h"
 #include "Site.h"
 #include "Interactions.h"
 #include "version.h"
@@ -20,19 +20,6 @@
 using namespace std;
 using namespace tbb;
 
-void showTime()
-{
-	// current date/time based on current system
-	time_t now = time(0);
-
-	// convert now to string form
-	//char* dt = ctime(&now);
-	tm *ltm = localtime(&now);
-
-	cerr << ltm->tm_hour << ":" << flush;
-	cerr << ltm->tm_min << ":" << flush;
-	cerr << ltm->tm_sec << flush;
-}
 
 void completed(int n)
 {
@@ -44,7 +31,7 @@ void completed(int n)
 	cerr << endl;
 }
 
-void printUsage()
+void printUsageComp()
 {
 	cerr << "GOTHiC++ usage:" << endl << endl;
 	cerr << "    gothic <path/to/config/file>"  << endl << endl;
@@ -87,74 +74,7 @@ int fact(int n)
       return n*fact(n-1);
 }
 
-void writeBinary(vector<Site> & sites, string binOutFileName)
-{
-	ofstream binOutFile;
-	binOutFile.open(binOutFileName, ios::binary);
 
-	int max = 0;
-	if (binOutFile.is_open())
-	{
-		for (int i = 0; i != sites.size(); i++)
-		{
-			Site P = sites[i];
-			string chr = P.getChr();
-			if (!chr.empty())
-			{
-				chr.resize(32);
-				int start = P.getStart();
-				int end = P.getEnd();
-				//size_t S = sizeof(std::string) + 3* sizeof(int);
-				binOutFile.write(chr.c_str(), 32);// need to cast the pointer
-				binOutFile.write(reinterpret_cast<char*>(&start), sizeof(int));
-				binOutFile.write(reinterpret_cast<char*>(&end), sizeof(int));
-			}
-		}
-
-		binOutFile.close();
-	}
-	else
-	{
-		cout << "Unable to create binary write file: " + binOutFileName << endl;
-	}
-	cout << endl;
-
-}
-
-void readBinary(vector<Site> & sites, string binInFileName)
-{
-	cerr << "Reading Binary input file" << endl;
-	ifstream binInFile;
-	binInFile.open(binInFileName, ios::binary);
-
-	if (binInFile.is_open())
-	{
-		while(binInFile)
-		{
-			string chr;
-			chr.resize(32);
-			//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
-			binInFile.read(& chr[0], 32);
-			chr.resize(chr.find('\0'));
-			if (!chr.empty())
-			{
-				int start;
-				binInFile.read(reinterpret_cast<char*>(& start), sizeof(int));
-				int end;
-				binInFile.read(reinterpret_cast<char*>(& end), sizeof(int));
-				Site P = Site(chr,start,end);
-				sites.push_back(P);
-			}
-		}
-		binInFile.close();
-	}
-	else
-	{
-		cout << "Unable to read binary file: " + binInFileName << endl;
-	}
-
-	completed();
-}
 
 int parseLine(char* line){
     // This assumes that a digit will be found and the line ends in " Kb".
@@ -196,7 +116,7 @@ int getRealValue(){ //Note: this value is in KB!
     return result;
 }
 
-void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
 	//for (auto it = interactions.begin(); it != interactions.end(); it++)
@@ -215,11 +135,13 @@ void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & 
 		}
 	}
 }
-void removeDiagonals(vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
+
+
+void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
 {
 	/** Remove Diagonals and Cis/Trans filter values **/
 
-	vector<Interaction> binned_df_filtered;
+	concurrent_vector<Interaction> binned_df_filtered;
 
 	if (removeDiagonal)
 	{
@@ -258,8 +180,6 @@ void removeDiagonals(vector<Interaction> & interactions, CisTrans cistrans, bool
 
 }
 
-
-
 string fixChromosomeNames(string chr)
 {
 	//capital to small
@@ -269,46 +189,7 @@ string fixChromosomeNames(string chr)
 	return chr;
 }
 
-void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
-{
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		advance(it, i);
-		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		//	{
-		Interaction T = *it;
-		if (T.getChr1() == T.getChr2())
-		{
-#pragma omp critical (fc1)
-			interactions.push_back(T);
-			pos++;
-		}
-	}
-}
-
-void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
-{
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		std::advance(it, i);
-
-		Interaction T = *it;
-		if (T.getChr1() != T.getChr2())
-		{
-#pragma omp critical (ft1)
-			interactions.push_back(T);
-			pos++;
-		}
-	}
-}
-
-void getSumSquare(double & sumSquare, const set<string> & chromos, const vector<Interaction> & interactions)
+void getSumSquare(double & sumSquare, const set<string> & chromos, const concurrent_vector<Interaction> & interactions)
 {
 	/** counts unique interactions **/
 	double s2 = 0;
@@ -330,7 +211,46 @@ void getSumSquare(double & sumSquare, const set<string> & chromos, const vector<
 	}
 }
 
-void writeBinary(vector<Interaction> & interactions, string binOutFileName)
+void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
+	{
+		auto it = binned_df_filtered.begin();
+		advance(it, i);
+		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+		//	{
+		Interaction T = *it;
+		if (T.getChr1() == T.getChr2())
+		{
+#pragma omp critical (fc1)
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}
+
+void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
+	{
+		auto it = binned_df_filtered.begin();
+		std::advance(it, i);
+
+		Interaction T = *it;
+		if (T.getChr1() != T.getChr2())
+		{
+#pragma omp critical (ft1)
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}
+
+void writeBinary(tbb::concurrent_vector<Interaction> & interactions, string binOutFileName)
 {
 	ofstream binOutFile;
 	binOutFile.open(binOutFileName, ios::binary);
@@ -365,7 +285,7 @@ void writeBinary(vector<Interaction> & interactions, string binOutFileName)
 
 }
 
-void readBinary(vector<Interaction> & interactions, string binInFileName)
+void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binInFileName)
 {
 	cerr << "Reading Binary input file" << endl;
 	ifstream binInFile;
