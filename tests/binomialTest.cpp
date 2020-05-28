@@ -9,7 +9,6 @@
 //#include "hicupData.h"
 //#include "Utils.h"
 #include "pbinom.h"
-#include <iostream>
 #include <gtest/gtest.h>
 #include <vector>
 

@@ -1,3 +1,10 @@
+/*
+ * gothic.cpp
+ *
+ *  Created on: 26 May 2020
+ *      Author: rich
+ */
+
 #include "gothic.h"
 //#include "Setup.h"
 #include "binTest.h"
@@ -30,7 +37,6 @@ int main(int argc, char *argv[])
 	vector<string> allArgs(argv, argv + argc);
 	Setup setupValues = loadConfig(allArgs[1]);
 
-
 	setupValues.print();
 
 	omp_set_num_threads(setupValues.getThreads());
@@ -48,32 +54,30 @@ int main(int argc, char *argv[])
 		//returnSizes();
 		//timeTest();
 
-		sort(binom.begin(), binom.end(), bincomp);
 	}
 	catch(const std::invalid_argument& e){
-		cout << "Error: " << e.what() << endl;
+		cerr << "Error: " << e.what() << endl;
 	}
 
 
+	if (setupValues.getAnalysisType() == ao_single)
+	{
+		sort(binom.begin(), binom.end(), bincomp);
 
-
-
-    ofstream binomFile("binom.txt");
-    binomFile << "chr1" << "\t" << "locus1" \
-			<< "\t" << "chr2" << "\t" << "locus2" \
-			<< "\t" << "relCoverage1" \
-			<< "\t" << "relCoverage2" \
-			<< "\t" << "probability" \
-			<< "\t" << "expected" \
-			<< "\t" << "readCount" \
-			<< "\t" << "pvalue" \
-			<< "\t" << "qvalue" \
-			<< "\t" << "logObservedOverExpected" << endl;
-    for (const auto &e : binom) binomFile << e << endl;
-
-
-
-
+		string fileName = setupValues.getSname()+".binom.txt";
+		ofstream binomFile(fileName);
+		binomFile << "chr1" << "\t" << "locus1" \
+				<< "\t" << "chr2" << "\t" << "locus2" \
+				<< "\t" << "relCoverage1" \
+				<< "\t" << "relCoverage2" \
+				<< "\t" << "probability" \
+				<< "\t" << "expected" \
+				<< "\t" << "readCount" \
+				<< "\t" << "pvalue" \
+				<< "\t" << "qvalue" \
+				<< "\t" << "logObservedOverExpected" << endl;
+		for (const auto &e : binom) binomFile << e << endl;
+	}
 
 	return 0;
 }
@@ -145,17 +149,10 @@ void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
 	 */
 
 
-	string fileName = setupValues.getInput();
-	string sampleName = setupValues.getSname();
-	int res = setupValues.getRes();
-	string restrictionFile = setupValues.getEnzyme();
-	CisTrans cistrans = setupValues.getCisTrans();
-
-
 	// Get Hicup data
     vector<Interaction> interactions;
 
-    importHicup(fileName, interactions);
+    importHicup(setupValues.getInput(), interactions);
 
     //cout << "fast value" << setupValues.getFast() << endl;
 
@@ -168,20 +165,27 @@ void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
     //multimap<string,array<int,2>> fragments; //** map based run **//
 
     fragType fragments;
-    getHindIIIsitesFromHicup(fragments, restrictionFile);
+    getHindIIIsitesFromHicup(fragments, setupValues.getEnzyme());
 
     mapHicupToRestrictionFragment(interactions, fragments);
 
-	binInteractions(interactions, res);
+	binInteractions(interactions, setupValues.getRes());
 
-	// save binary file of interactions
-	writeBinary(interactions, "test.inter.bin");
+	switch (setupValues.getAnalysisType())
+	{
+	case ao_single :
+		// Prepare Binominal data from Hicup Data
+		binomialHiChicup(interactions, setupValues, binom);
+		break;
+	case ao_comparative:
+		// save binary file of interactions
+		string outBinName = setupValues.getSname()+".inter.bin";
+		writeBinary(interactions, outBinName);
 
-	//vector<Interaction> interactions2;
-	//readBinary(interactions2, "test.inter.bin");
+		//vector<Interaction> interactions2;
+		//readBinary(interactions2, "test.inter.bin");
 
-
-	// Prepare Binominal data from Hicup Data
-	binomialHiChicup(interactions, sampleName, cistrans, binom);
+		break;
+	}
 
 }

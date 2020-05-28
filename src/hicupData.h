@@ -10,6 +10,7 @@
 
 #include "BinomData.h"
 #include "Site.h"
+#include "Setup.h"
 #include <vector>
 #include <string>
 #include <math.h>
@@ -31,7 +32,7 @@ void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std:
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
 void binInteractions(std::vector<Interaction> & interactions, int res);
-void binomialHiChicup(std::vector<Interaction> & interactions, std::string sampleName, CisTrans cistrans, std::vector<BinomData> & binFiltered);
+void binomialHiChicup(std::vector<Interaction> & interactions, Setup & setupValues, std::vector<BinomData> & binFiltered);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
@@ -41,12 +42,10 @@ void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subje
 void findOverlaps(std::vector<halfInteraction>& query, std::multimap<std::string,std::array<int,2>> & subject, std::string name);
 
 void countDuplicates(std::vector<Interaction> & interactions);
-void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 
-void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
-void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
 
 void calcFreq(const std::vector<Interaction> & interactions, std::map<std::string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max);
 //void completed();
+
 
 #endif /* SRC_HICUPDATA_H_ */

@@ -46,6 +46,27 @@ Once compiled, the compilation can be tested using:
 make test
 ```
 
+###Running Single Sample GOTHiC++
+
+```bash
+<path/to>/gothic <path/to>gothic.conf
+```
+
+###Running Comparative GOTHiC++ 
+
+In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file. These files are then used as input for gothicomp.
+
+```bash
+<path/to>/gothicomp <path/to>gothicomp.conf
+```
+
+###Notes on config files
+
+
++ GOTHiC and GOTHiCOMP can carry out analysis using only cis (defined as on the same chromosome) or trans (defined as between chromosomes) or all. The config default is to analyse all interactions, but can be changed by altering the "CisTrans" option
+
++ By default, GOTHiC and GOTHiComp will remove diagnals. if this is not required, please uncomment the "#RemoveDiagonals: false" line
+
 ###Installing googletest
 
 GOTHiC++ uses the googletest framework, this can be acquired using

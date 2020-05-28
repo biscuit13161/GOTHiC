@@ -1,29 +1,24 @@
 /*
- * Utils.h
+ * SetupComp.h
  *
- *  Created on: 11 May 2020
+ *  Created on: 27 May 2020
  *      Author: rich
  */
 
-#ifndef SRC_SETUP_H_
-#define SRC_SETUP_H_
+#ifndef SRC_SETUPCOMP_H_
+#define SRC_SETUPCOMP_H_
 
 #include "Utils.h"
 #include <string>
-#include <map>
+#include <vector>
 
-enum AnalysisOptions {
-	ao_single,
-	ao_comparative
-};
-
-class Setup
+class SetupComp
 {
 private:
 	std::string mOutDir;
 	std::string mEnzyme;
-
-	std::string mInput;
+	std::string mCondition1;
+	std::string mCondition2;
 	std::string mSname;
 	std::string mCliName;
 	std::string mLogFile;
@@ -31,10 +26,10 @@ private:
 	int mThreads;
 	int mRes;
 	bool mRemoveDiagonal;
-	AnalysisOptions mAnalysisType;
+	bool mVerbose;
 public:
-	Setup();
-	Setup(std::string outDir, std::string enzyme, std::string input, int threads);
+	SetupComp();
+	SetupComp(std::string outDir, std::string enzyme, std::string input, int threads);
 
 	void print();
 
@@ -42,13 +37,14 @@ public:
 	inline int getRes() const {return mRes;}
 	inline std::string getEnzyme() const {return mEnzyme;}
 	inline std::string getOutDir() const {return mOutDir;}
-	inline std::string getInput() const {return mInput;}
+	inline std::string getCondition1() const {return mCondition1;}
+	inline std::string getCondition2() const {return mCondition2;}
 	inline std::string getSname() const {return mSname;}
 	inline std::string getCliName() const {return mCliName;}
 	inline std::string getLogFile() const {return mLogFile;}
 	inline CisTrans getCisTrans() const {return mCisTrans;}
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
-	inline AnalysisOptions getAnalysisType() const {return mAnalysisType;}
+	inline bool getVerbose() const {return mVerbose;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -56,30 +52,29 @@ public:
 	inline void setSname(std::string name) {mSname = name;}
 	inline void setCliName(std::string name) {mCliName = name;}
 	inline void setOutDir(std::string outDir) {mOutDir = outDir;}
-	inline void setInput(std::string input) {mInput = input;}
+	inline void setCondition1(std::string input) {mCondition1 = input;}
+	inline void setCondition2(std::string input) {mCondition2 = input;}
 	inline void setLogFile(std::string L) {mLogFile = L;}
 	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
-	inline void setAnalysisType(AnalysisOptions L) {mAnalysisType = L;}
+	inline void setVerbose(bool L) {mVerbose = L;}
 
 };
 
-Setup loadConfig(std::string & fileName);
+SetupComp loadConfigComp(std::string & fileName);
 
-enum Options {
-	Input = 0,
-	Sname,
-	Digest,
-	Threads,
-	Res,
-	Output,
-	Cistrans,
-	Analysis,
-	RemDiag,
-	Logfile,
+enum SC_Options {
+	sc_Cond1 = 0,
+	sc_Cond2,
+	sc_Sname,
+	sc_Digest,
+	sc_Threads,
+	sc_Res,
+	sc_Output,
+	sc_Cistrans,
+	sc_RemDiag,
+	sc_Logfile,
+	sc_Verbose,
 };
 
-
-
-
-#endif /* SRC_SETUP_H_ */
+#endif /* SRC_SETUPCOMP_H_ */

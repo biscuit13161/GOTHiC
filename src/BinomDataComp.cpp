@@ -1,24 +1,19 @@
 /*
- * BinomData.cpp
+ * BinomDataComp.cpp
  *
- *  Created on: 5 May 2020
- *  Author: Richard Thompson (ithompson@hbku.edu.qa)
+ *  Created on: 27 May 2020
+ *      Author: rich
  */
 
-#include "BinomData.h"
-#include "pbinom.h"
-//#include <regex>
-#include <iostream>
-#include <cmath>
-#include <boost/algorithm/string.hpp>
+#include "BinomDataComp.h"
 
 using namespace std;
 
-BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomDataComp::BinomDataComp(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
-BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
+BinomDataComp::BinomDataComp(std::string chr1, std::string chr2, int locus1, int locus2, \
 		int frequency, double relCoverage1, double relCoverage2, \
 		double probability, double expected, int readCount, \
 		double pvalue, double qvalue, double logObservedOverExpected)\
@@ -30,7 +25,7 @@ BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2,
 				  mLogObservedOverExpected(logObservedOverExpected) {
 }
 
-BinomData::BinomData(const BinomData & other){
+BinomDataComp::BinomDataComp(const BinomDataComp & other){
 	mChr1 = other.mChr1;
 	mChr2 = other.mChr2;
 	mLocus1 = other.mLocus1;
@@ -46,7 +41,7 @@ BinomData::BinomData(const BinomData & other){
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
 }
 
-BinomData::BinomData(const Interaction & other){
+BinomDataComp::BinomDataComp(const Interaction & other){
 	mChr1 = other.getChr1();
 	mChr2 = other.getChr2();
 	mLocus1 = other.getLocus1();
@@ -54,7 +49,7 @@ BinomData::BinomData(const Interaction & other){
 	mFrequency = other.getFreq();
 }
 
-void BinomData::print()
+void BinomDataComp::print()
 {	std::ostringstream streamObj;
 	string L = 	mChr1 + ":" + std::to_string(mLocus1) + " " + mChr2 + ":" + std::to_string(mLocus2);
 	streamObj << mFrequency;
@@ -72,7 +67,7 @@ void BinomData::print()
 	cout << L << endl;
 }
 
-bool bincomp(const BinomData & a, const BinomData & b)
+bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 {
 	if (a.mChr1 == b.mChr1)
 	{
@@ -89,7 +84,7 @@ bool bincomp(const BinomData & a, const BinomData & b)
 	return a.mChr1 < b.mChr1;
 }
 
-ostream & operator<<(ostream & out, const BinomData & in)
+ostream & operator<<(ostream & out, const BinomDataComp & in)
 {
 	//out.precision(15);
 	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
@@ -105,6 +100,3 @@ ostream & operator<<(ostream & out, const BinomData & in)
 			<< flush;
 	return out;
 }
-
-
-

@@ -8,13 +8,18 @@
 #ifndef SRC_UTILS_H_
 #define SRC_UTILS_H_
 
-#include "Site.h"
+//#include "Interactions.h"
+//#include "Site.h"
 #include <cstdint>
+#include <regex>
 #include <vector>
 #include <string>
 #include "stdlib.h"
 #include "sys/types.h"
 #include "sys/sysinfo.h"
+
+class Interaction;
+class Site;
 
 enum CisTrans
 {
@@ -40,5 +45,13 @@ void readBinary(std::vector<Site> & sites, std::string binInFileName);
 int getRealValue();
 int getVirtValue();
 int parseLine(char* line);
+
+void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+void removeDiagonals(std::vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal);
+
+void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+
+std::string fixChromosomeNames(std::string chr);
 
 #endif /* SRC_UTILS_H_ */

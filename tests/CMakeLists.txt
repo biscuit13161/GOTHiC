@@ -12,7 +12,7 @@ include_directories (${TEST_SOURCE_DIR}../src)
 #ADD_DEFINITIONS(-DBOOST_TEST_DYN_LINK) 
 
 set(LIBS hicupTest sysTests overlapTest importHicupTest binInterTest calcFreqTest pBhAdjustTest)
-set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest binomialTest)
+set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest binomialTest binomTestTest)
 set(LIBS ${LIBS} findTransTest fixChromoTest halfInteractionTest hicupCompFreqTest hicupCompInterTest)
 
 foreach(lib ${LIBS})

@@ -12,6 +12,7 @@
 #include <vector>
 #include <math.h>
 #include "Setup.h"
+#include "Interactions.h"
 
 #include "BinomData.h"
 #include "hicupData.h"

@@ -8,6 +8,10 @@
 #ifndef SRC_GOTHICOMP_H_
 #define SRC_GOTHICOMP_H_
 
+#include "SetupComp.h"
+#include "BinomDataComp.h"
+#include <vector>
 
+void gothicHicupComp(SetupComp & setupValues, std::vector<BinomDataComp> & binom);
 
 #endif /* SRC_GOTHICOMP_H_ */

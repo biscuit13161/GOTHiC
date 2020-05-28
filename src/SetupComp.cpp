@@ -1,11 +1,11 @@
 /*
- * Utils.cpp
+ * SetupComp.cpp
  *
- *  Created on: 11 May 2020
+ *  Created on: 27 May 2020
  *      Author: rich
  */
 
-#include "Setup.h"
+#include "SetupComp.h"
 #include "version.h"
 #include <ctime>
 #include <iostream>
@@ -14,31 +14,28 @@
 
 using namespace std;
 
-Setup::Setup(): mOutDir(""), mEnzyme(""), mInput(""), mThreads(0), mRes(10000), mRemoveDiagonal(true)
+SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mRemoveDiagonal(true), mVerbose(false)
 {
 
 }
 
-Setup::Setup(string outDir, string enzyme, string input, int threads): mOutDir(outDir), mEnzyme(enzyme), mInput(input), mThreads(threads)
-{
-
-}
-
-void Setup::print()
+void SetupComp::print()
 {
 	cerr << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
 	cerr << "#" << endl;
 	cerr << "# Output Directory: " << mOutDir << endl;
 	cerr << "# Restriction File: " << mEnzyme << endl;
 	cerr << "# Sample Name:      " << mSname << endl;
-	cerr << "# Input Data File:  " << mInput << endl;
+	cerr << "# Control File:     " << mCondition1 << endl;
+	cerr << "# Sample File:      " << mCondition2 << endl;
 	cerr << "# Threads:          " << mThreads << endl;
 	cerr << "# Resolution:       " << mRes << endl;
 	cerr << "# Config File:      " << mCliName << endl;
+	cerr << "# Verbose:          " << mVerbose << endl;
 	cerr << "#" << endl << endl;
 }
 
-Setup loadConfig(string & fileName)
+SetupComp loadConfigComp(string & fileName)
 {
 	ifstream inFile;
 	inFile.open(fileName);
@@ -48,7 +45,7 @@ Setup loadConfig(string & fileName)
 		throw std::invalid_argument("Could not load Config file!");
 	}
 
-	Setup setupValues;
+	SetupComp setupValues;
 	setupValues.setCliName(fileName);
 
 	while (inFile)
@@ -66,46 +63,45 @@ Setup loadConfig(string & fileName)
 				}
 
 			//cout << id << "_" << value << endl;
-			std::map<std::string, Options> optionValues;
-			optionValues["Input"] = Input;
-			optionValues["SampleName"] = Sname;
-			optionValues["Digest"] = Digest;
-			optionValues["Threads"] = Threads;
-			optionValues["Res"] = Res;
-			optionValues["Output"] = Output;
-			optionValues["CisTrans"] = Cistrans;
-			optionValues["Analysis"] = Analysis;
-			optionValues["RemoveDiagonals"] = RemDiag;
-			optionValues["Logfile"] = Logfile;
-			
+			std::map<std::string, SC_Options> optionValues;
+			optionValues["Control"] = sc_Cond1;
+			optionValues["Sample"] = sc_Cond2;
+			optionValues["SampleName"] = sc_Sname;
+			optionValues["Digest"] = sc_Digest;
+			optionValues["Threads"] = sc_Threads;
+			optionValues["Res"] = sc_Res;
+			optionValues["Output"] = sc_Output;
+			optionValues["CisTrans"] = sc_Cistrans;
+			optionValues["RemoveDiagonals"] = sc_RemDiag;
+			optionValues["Verbose"] = sc_Verbose;
+
 			std::map<std::string,CisTrans> CToptionValues;
 			CToptionValues["all"] = ct_all;
 			CToptionValues["cis"] = ct_cis;
 			CToptionValues["trans"] = ct_trans;
 
-			std::map<std::string,AnalysisOptions> AOoptionValues;
-			AOoptionValues["single"] = ao_single;
-			AOoptionValues["comparative"] = ao_comparative;
-
 
 			switch(optionValues[id])
 			{
-			case Input:
-				setupValues.setInput(value);
+			case sc_Cond1:
+				setupValues.setCondition1(value);
 				break;
-			case Sname:
+			case sc_Cond2:
+				setupValues.setCondition2(value);
+				break;
+			case sc_Sname:
 				setupValues.setSname(value);
 				break;
-			case Digest:
+			case sc_Digest:
 				setupValues.setEnzyme(value);
 				break;
-			case Threads:
+			case sc_Threads:
 				setupValues.setThreads(atoi(value.c_str()));
 				break;
-			case Res:
+			case sc_Res:
 				setupValues.setRes(atoi(value.c_str()));
 				break;
-			case Output:
+			case sc_Output:
 				if (value == "")
 				{
 					//auto cwd = boost::filesystem::current_path();
@@ -116,22 +112,26 @@ Setup loadConfig(string & fileName)
 					setupValues.setOutDir(value);
 				}
 				break;
-			case Cistrans:
-				setupValues.setCisTrans(CToptionValues[value]);
+			case sc_Cistrans:
+				if (value.empty())
+					setupValues.setCisTrans(ct_all);
+				else
+					setupValues.setCisTrans(CToptionValues[value]);
 				break;
-			case Analysis:
-				setupValues.setAnalysisType(AOoptionValues[value]);
-				break;
-			case RemDiag:
+			case sc_RemDiag:
 				std::transform(value.begin(), value.end(), value.begin(),
 				    [](unsigned char c){ return std::tolower(c); });
 				if (value == "false")
 					setupValues.setRemoveDiagonal(false);
-				else
-					setupValues.setRemoveDiagonal(true);
 				break;
-			case Logfile:
+			case sc_Logfile:
 				setupValues.setLogFile(value);
+				break;
+			case sc_Verbose:
+				std::transform(value.begin(), value.end(), value.begin(),
+						[](unsigned char c){ return std::tolower(c); });
+				if (value == "true")
+					setupValues.setVerbose(true);
 				break;
 			}//*/
 		}
@@ -140,4 +140,3 @@ Setup loadConfig(string & fileName)
 
 	return setupValues;
 }
-

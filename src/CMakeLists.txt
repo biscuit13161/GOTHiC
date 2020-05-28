@@ -9,36 +9,30 @@ set(GOTH_MINOR_VERSION ${CMAKE_PROJECT_VERSION_MINOR})
 set(GOTH_PATCH_VERSION ${CMAKE_PROJECT_VERSION_PATCH}) 
 configure_file("version.h.in" "version.h" @ONLY)
 
-set(CLIBS pbinom toms708 )
+list (APPEND CLIBS pbinom toms708 )
 
 foreach(lib ${CLIBS})
   add_library(${lib} ${lib}.c)
   target_link_libraries (${lib} ${Boost_LIBRARIES})
 endforeach(lib)
 
-#add_library(Site Site.cpp)
-#target_link_libraries (Site ${CLIBS} ${Boost_LIBRARIES})
-
-#add_library(padjust padjust.cpp)
-#target_link_libraries (padjust ${CLIBS} ${Boost_LIBRARIES})
-set(ALIBS Site padjust binomTest)
-
-foreach(lib ${ALIBS})
-  add_library(${lib} ${lib}.cpp)
-  target_link_libraries (${lib} ${CLIBS} ${Boost_LIBRARIES})
-endforeach(lib)
-
-set(LIBS Setup Utils hicupData BinomData binTest )
+list (APPEND LIBS Site padjust binomTest Utils Interactions Setup SetupComp hicupData hicupDataComp BinomData BinomDataComp binTest )
 
 foreach(lib ${LIBS})
+  ## copy list (zero-based, -1 refers to end) ##
+  list (SUBLIST LIBS 0 -1 xlibs)
+  ##  remove current library from list ##
+  list (REMOVE_ITEM xlibs ${lib}) 
+  #message(STATUS "xlibs = ${xlibs}")
   add_library(${lib} ${lib}.cpp)
-  target_link_libraries (${lib} ${CLIBS} ${ALIBS} ${Boost_LIBRARIES})
+  target_link_libraries (${lib} ${CLIBS} ${xlibs} ${Boost_LIBRARIES})
 endforeach(lib)
 
+list(APPEND EXE gothic gothicomp)
 
-add_executable (gothic gothic.cpp)
- 
-target_link_libraries (gothic ${CLIBS} Site ${LIBS} ${Boost_LIBRARIES})
-
+foreach(exe ${EXE})
+  add_executable (${exe} ${exe}.cpp)
+  target_link_libraries (${exe} ${CLIBS} ${LIBS} ${Boost_LIBRARIES})
+endforeach(exe)
 
 

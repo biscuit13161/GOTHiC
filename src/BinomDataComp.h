@@ -1,24 +1,16 @@
 /*
- * BinomData.h
+ * BinomDataComp.h
  *
- *  Created on: 5 May 2020
- *  Author: Richard Thompson (ithompson@hbku.edu.qa)
+ *  Created on: 27 May 2020
+ *      Author: rich
  */
 
-#ifndef SRC_BINOMDATA_H_
-#define SRC_BINOMDATA_H_
+#ifndef SRC_BINOMDATACOMP_H_
+#define SRC_BINOMDATACOMP_H_
 
-#include "Interactions.h"
-#include "Utils.h"
-#include <string>
-#include <math.h>
-#include <gtest/gtest.h>
-#include <fstream>
-#include <iostream>
+#include "BinomData.h"
 
-
-
-class BinomData
+class BinomDataComp
 {
 private:
 	std::string mChr1;
@@ -43,13 +35,13 @@ private:
 	double mLogObservedOverExpected; // observed/expected read numbers log ratio
 
 public:
-	BinomData();
-	BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
+	BinomDataComp();
+	BinomDataComp(std::string chr1, std::string chr2, int locus1, int locus2, \
 			int frequency, double relCoverage1, double relCoverage2, \
 			double probability, double expected, int readCount, \
 			double pvalue, double qvalue, double logObservedOverExpected);
-	BinomData(const BinomData & other);
-	BinomData(const Interaction & other);
+	BinomDataComp(const BinomDataComp & other);
+	BinomDataComp(const Interaction & other);
 
 	inline std::string getChr1() const {return mChr1;}
 	inline int getLocus1() const {return mLocus1;}
@@ -80,27 +72,13 @@ public:
 
 	void print();
 
-	friend std::ostream & operator<<(std::ostream & out, const BinomData & in);
-	friend bool bincomp(const BinomData &, const BinomData &);
+	friend std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);
+	friend bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b);
 };
 
-std::ostream & operator<<(std::ostream & out, const BinomData & in);
-bool bincomp(const BinomData & a, const BinomData & b);
-
-class Coverage
-{
-private:
-	std::string mInt;
-	int mFreq1;
-	int mFreq2;
-
-public:
-	Coverage();
-	inline int getFreq() const {return mFreq2;}
-};
+std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);
+bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b);
 
 
-//double relCoverage1, double relCoverage2, double probability, int mExpected, int mReadCount, double mPvalue, double mQvalue, double mLogObservedOverExpected
 
-
-#endif /* SRC_BINOMDATA_H_ */
+#endif /* SRC_BINOMDATACOMP_H_ */

@@ -23,14 +23,6 @@ TEST(countDupsTests, testCountDuplicates)
 	interactions.push_back(Interaction("chr6","chrX",125585523,1063441));
 	interactions.push_back(Interaction("chr10","chr5",1064473,1505273));
 
-	std::vector<Interaction> inter;
-	inter.push_back(Interaction("chr1","chr2",12553,15273));
-	inter.push_back(Interaction("chr1","chr2",12553,15273));
-	inter.push_back(Interaction("chr1","chr2",12553,15273));
-	inter.push_back(Interaction("chr6","chrX",125585523,1063441));
-	inter.push_back(Interaction("chr6","chrX",125585523,1063441));
-	inter.push_back(Interaction("chr10","chr5",1064473,1505273));
-
 	std::map<std::string,int> list;
 	list["chr10:1064473"] = 1;
 	list["chr6:125585523"] = 2;

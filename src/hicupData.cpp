@@ -11,6 +11,7 @@
 #include "padjust.h"
 #include "binomTest.h"
 #include <set>
+#include <syslog.h>
 #include <iostream>
 #include <stdio.h>
 #include <omp.h>
@@ -458,51 +459,11 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 
 
 
-void binomialHiChicup(vector<Interaction> & interactions, string sampleName, CisTrans cistrans, vector<BinomData> & binFiltered)
+void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, vector<BinomData> & binFiltered)
 {
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
-
-	vector<Interaction> binned_df_filtered;
-
-	bool removeDiagonal = true;
-
-	//diagonal removal
-	if (removeDiagonal)
-	{
-		cerr << "\tRemoving Diagonals!" << endl;
-		removeDuplicates(interactions, binned_df_filtered);
-		cerr << "\t";
-		completed();
-		interactions.clear();
-	}
-	else
-	{
-		binned_df_filtered.swap(interactions);
-	}
-	//cout << "size " << binned_df_filtered.size() << endl;
-
-	if (cistrans == ct_cis)
-	{
-		cerr << "\tFinding Cis interactions!";
-		findCis(interactions, binned_df_filtered);
-		//interactions.resize(pos);
-		cerr << "|\t";
-		completed();
-	}
-	else if (cistrans == ct_trans)
-	{
-		cerr << "\tFinding Trans interactions!";
-		findTrans(interactions, binned_df_filtered);
-		//interactions.resize(pos);
-		cerr << "|\t";
-		completed();
-	}
-	else
-	{
-		interactions.swap(binned_df_filtered);
-	}
-
+	removeDiagonals(interactions, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
 
 	// all read pairs used in binomial
 	//int numberOfReadPairs = interactions.size(); // before binning!!
@@ -577,7 +538,7 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
     double cisBinNumber = 0;
     double transBinNumber = 0;
 
-    if (cistrans != ct_all)
+    if (setupValues.getCisTrans() != ct_all)
     {
     	double sumSquare = 0;
     	map<string,int> chrlens;
@@ -606,10 +567,10 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
 
 		//diagonalProb <- sum(relative_coverage^2)
     double probabilityCorrection = 0;
-    switch(cistrans)
+    switch(setupValues.getCisTrans())
     {
     case ct_all :
-    	probabilityCorrection = (removeDiagonal)? (1/(1-diagonalProb)) : 1;
+    	probabilityCorrection = (setupValues.getRemoveDiagonal())? (1/(1-diagonalProb)) : 1;
     	break;
     case ct_cis :
     	probabilityCorrection = double(upperhalfBinNumber)/cisBinNumber;
@@ -654,10 +615,10 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
     //multiple testing correction separately for matrices with all interactions/only cis/only transs
 
 	//pBhAdjust(double Pi, double n);
-	switch(cistrans)
+	switch(setupValues.getCisTrans())
 	{
 	case ct_all :
-		if(removeDiagonal)
+		if(setupValues.getRemoveDiagonal())
 		{
 			pBhAdjust(values, upperhalfBinNumber);
 			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
@@ -669,7 +630,7 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
 		}
 		break;
 	case ct_cis :
-		if(removeDiagonal)
+		if(setupValues.getRemoveDiagonal())
 		{
 			pBhAdjust(values, cisBinNumber);
 			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
@@ -693,7 +654,7 @@ void binomialHiChicup(vector<Interaction> & interactions, string sampleName, Cis
 	}//*/
 
 //#ifdef DEBUG_FLAG
-    cerr << "BinomialData Size: " << binFiltered.size() << endl;
+    cout << "BinomialData Size: " << binFiltered.size() << endl;
 //#endif
 
     completed();
@@ -732,6 +693,7 @@ void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> 
 {
 	// ** findOverlaps for map **
 	cerr << "Finding Overlaps in " << name << endl;
+
 	int i;
 
 	typedef multimap<string,array<int,2>>::iterator MMAPIterator;
@@ -797,73 +759,14 @@ void countDuplicates(vector<Interaction> & interactions)
 
 	}
 
-#ifdef DEBUG_FLAG
-	cerr << "Duplicates: " << interactions.size()  << endl;
-#endif
+
+	syslog(LOG_NOTICE, "Duplicates: %d", interactions.size());
+
 
 	cerr << "\t";
 	completed();
 }
 
-
-void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
-{
-	int pos = 0;
-	//for (auto it = interactions.begin(); it != interactions.end(); it++)
-	//{
-#pragma omp parallel for
-	for (int i = 0; i< interactions.size(); i++)
-	{
-		auto it = interactions.begin();
-		std::advance(it, i);//*/
-		Interaction T = *it;
-		if (T.getInt1() != T.getInt2())
-		{
-#pragma omp critical (rd1)
-			binned_df_filtered.push_back(T);
-			pos++;
-		}
-	}
-}
-
-void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
-{
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		advance(it, i);
-		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		//	{
-		Interaction T = *it;
-		if (T.getChr1() == T.getChr2())
-		{
-#pragma omp critical (fc1)
-			interactions.push_back(T);
-			pos++;
-		}
-	}
-}
-
-void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
-{
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		std::advance(it, i);
-
-		Interaction T = *it;
-		if (T.getChr1() != T.getChr2())
-		{
-#pragma omp critical (ft1)
-			interactions.push_back(T);
-			pos++;
-		}
-	}
-}
 
 void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max)
 {
@@ -900,3 +803,5 @@ void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, i
 	}
 
 }
+
+

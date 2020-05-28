@@ -6,6 +6,8 @@
  */
 
 #include "Utils.h"
+#include "Site.h"
+#include "Interactions.h"
 #include "version.h"
 #include <ctime>
 #include <cstdarg>
@@ -192,3 +194,113 @@ int getRealValue(){ //Note: this value is in KB!
     return result;
 }
 
+void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+	//for (auto it = interactions.begin(); it != interactions.end(); it++)
+	//{
+#pragma omp parallel for
+	for (int i = 0; i< interactions.size(); i++)
+	{
+		auto it = interactions.begin();
+		std::advance(it, i);//*/
+		Interaction T = *it;
+		if (T.getInt1() != T.getInt2())
+		{
+#pragma omp critical (rd1)
+			binned_df_filtered.push_back(T);
+			pos++;
+		}
+	}
+}
+
+void removeDiagonals(vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
+{
+	/** Remove Diagonals and Cis/Trans filter values **/
+
+	vector<Interaction> binned_df_filtered;
+
+	if (removeDiagonal)
+	{
+		cerr << "\tRemoving Diagonals!" << endl;
+		removeDuplicates(interactions, binned_df_filtered);
+		cerr << "\t";
+		completed();
+		interactions.clear();
+	}
+	else
+	{
+		binned_df_filtered.swap(interactions);
+	}
+	//cout << "size " << binned_df_filtered.size() << endl;
+
+	if (cistrans == ct_cis)
+	{
+		cerr << "\tFinding Cis interactions!";
+		findCis(interactions, binned_df_filtered);
+		//interactions.resize(pos);
+		cerr << "|\t";
+		completed();
+	}
+	else if (cistrans == ct_trans)
+	{
+		cerr << "\tFinding Trans interactions!";
+		findTrans(interactions, binned_df_filtered);
+		//interactions.resize(pos);
+		cerr << "|\t";
+		completed();
+	}
+	else
+	{
+		interactions.swap(binned_df_filtered);
+	}
+
+}
+
+string fixChromosomeNames(string chr)
+{
+	//capital to small
+	chr = "chr" + chr;
+	chr = regex_replace(chr, regex("CHR"), "chr");
+	chr = regex_replace(chr, regex("chrchr"), "chr");
+	return chr;
+}
+
+void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
+	{
+		auto it = binned_df_filtered.begin();
+		advance(it, i);
+		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
+		//	{
+		Interaction T = *it;
+		if (T.getChr1() == T.getChr2())
+		{
+#pragma omp critical (fc1)
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}
+
+void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+{
+	int pos = 0;
+#pragma omp parallel for
+	for (int i = 0; i< binned_df_filtered.size(); i++)
+	{
+		auto it = binned_df_filtered.begin();
+		std::advance(it, i);
+
+		Interaction T = *it;
+		if (T.getChr1() != T.getChr2())
+		{
+#pragma omp critical (ft1)
+			interactions.push_back(T);
+			pos++;
+		}
+	}
+}
