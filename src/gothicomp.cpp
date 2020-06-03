@@ -11,8 +11,8 @@
 #include "binTest.h"
 #include <iostream>
 #include <stdio.h>
-#include <omp.h>
 #include "tbb/concurrent_vector.h"
+#include "tbb/task_scheduler_init.h"
 
 using namespace std;
 using namespace tbb;
@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
 	setupValues.print();
 
-	omp_set_num_threads(setupValues.getThreads());
+	tbb::task_scheduler_init init(setupValues.getThreads());
 
 	concurrent_vector<BinomDataComp> binom;
 

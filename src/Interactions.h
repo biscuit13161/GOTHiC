@@ -67,7 +67,8 @@ public:
 	inline void setLocus2(int L) {mLocus2 = L;}
 	void print();
 
-	bool operator==(const Interaction & other);
+	friend bool operator==(const Interaction & first, const Interaction & other);
+	friend bool operator!=(const Interaction & first, const Interaction & other);
 	friend std::ostream & operator<<(std::ostream & out, const Interaction & in);
 	friend bool intcomp(const Interaction & a, const Interaction & b);
 
@@ -77,6 +78,9 @@ bool intcomp(const Interaction & a, const Interaction & b);
 void checkInteractions(const std::vector<Interaction> & interactions, const std::vector<Interaction> & interactions2);
 
 std::ostream & operator<<(std::ostream & out, const Interaction & in);
+
+bool operator==(const Interaction & first, const Interaction & other);
+bool operator!=(const Interaction & first, const Interaction & other);
 
 
 

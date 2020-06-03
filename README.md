@@ -16,6 +16,8 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 + Cmake 3.4
 + C99 and C++17-compatible compiler
 + googletest
++ tbb
++ SamTools (for Bam to txt conversion by hicupToTable.sh)
 
 ###Building and Installing
 
@@ -47,6 +49,13 @@ make test
 ```
 
 ###Running Single Sample GOTHiC++
+
+GOTHiC++, currently, only accepts Bam files from HiCUP converted to txt files as input; this can be acheived using the hicupToTable.sh script found in the same src directory with the gothic and gothicomp binaries.
+
+```bash
+src/hicupToTable.sh <input.bam>
+```
+N.B. please ensurethe configuration file lists the correct file - <input.bam.txt> rather than <input.bam>.
 
 ```bash
 <path/to>/gothic <path/to>gothic.conf
@@ -89,5 +98,14 @@ Google test uses c++11 standard; if make fails to compile googletest, try adding
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ```
+###intel tbb
+
+```bash
+git clone https://github.com/oneapi-src/oneTBB.git
+cd oneTBB
+gmake
+```
+
+cmake -DTBB_DIR=~/apps/oneTBB -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ .. 2>&1 | tee cmake.log
 
  

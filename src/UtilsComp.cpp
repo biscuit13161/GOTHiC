@@ -16,10 +16,26 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include "tbb/concurrent_vector.h"
+#include "tbb/parallel_for.h"
+#include "tbb/parallel_reduce.h"
 
 using namespace std;
 using namespace tbb;
 
+void showTime()
+{
+	// current date/time based on current system
+	time_t now = time(0);
+
+	// convert now to string form
+	//char* dt = ctime(&now);
+	tm *ltm = localtime(&now);
+
+	cerr << ltm->tm_hour << ":" << flush;
+	cerr << ltm->tm_min << ":" << flush;
+	cerr << ltm->tm_sec << flush;
+}
 
 void completed(int n)
 {
@@ -118,22 +134,21 @@ int getRealValue(){ //Note: this value is in KB!
 
 void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	int pos = 0;
+	//int pos = 0;
 	//for (auto it = interactions.begin(); it != interactions.end(); it++)
 	//{
-#pragma omp parallel for
-	for (int i = 0; i< interactions.size(); i++)
+	parallel_for(
+			blocked_range<concurrent_vector<Interaction>::iterator>(interactions.begin(),	interactions.end()),
+			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
+		for (auto T : inter)
 	{
-		auto it = interactions.begin();
-		std::advance(it, i);//*/
-		Interaction T = *it;
 		if (T.getInt1() != T.getInt2())
 		{
-#pragma omp critical (rd1)
 			binned_df_filtered.push_back(T);
-			pos++;
+			//pos++;
 		}
 	}
+});
 }
 
 
@@ -194,60 +209,72 @@ void getSumSquare(double & sumSquare, const set<string> & chromos, const concurr
 	/** counts unique interactions **/
 	double s2 = 0;
 
-	for (auto cr : chromos){
-		set<int> pos;
-		for (auto x : interactions)
-		{
-			if (x.getChr1() == cr)
+	concurrent_vector<string> chrom(chromos.begin(),chromos.end());
+
+	typedef concurrent_vector<string> csstring;
+	typedef blocked_range<csstring::iterator> range;
+	sumSquare = parallel_reduce(range(chrom.begin(), chrom.end()),sumSquare,
+			[&] (range & inter, int init)
 			{
-				pos.insert(x.getLocus1());
-			}
-			if (x.getChr2() == cr)
+		for (auto cr : inter){
+			set<double> pos;
+			for (auto x : interactions)
 			{
-				pos.insert(x.getLocus2());
+				if (x.getChr1() == cr)
+				{
+					pos.insert(x.getLocus1());
+				}
+				if (x.getChr2() == cr)
+				{
+					pos.insert(x.getLocus2());
+				}
 			}
+			init += pow(pos.size(),2);
 		}
-		sumSquare += pow(pos.size(),2);
-	}
+		return init;
+		}, [](double x, double y){return x+y;}
+	);
 }
 
 void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		advance(it, i);
-		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		//	{
-		Interaction T = *it;
-		if (T.getChr1() == T.getChr2())
+	//int pos = 0;
+	//int i = 0; i< binned_df_filtered.size(); i++)
+	parallel_for(
+			blocked_range<concurrent_vector<Interaction>::iterator>(binned_df_filtered.begin(),	binned_df_filtered.end()),
+			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
+		for (auto T : inter)
 		{
-#pragma omp critical (fc1)
-			interactions.push_back(T);
-			pos++;
+			//auto it = binned_df_filtered.begin();
+			//advance(it, i);
+			//Interaction T = *it;
+			if (T.getChr1() == T.getChr2())
+			{
+				interactions.push_back(T);
+				//pos++;
+			}
 		}
-	}
+	});
 }
 
 void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		std::advance(it, i);
+	//int pos = 0;
+//#pragma omp parallel for
+	//for (int i = 0; i< binned_df_filtered.size(); i++)
 
-		Interaction T = *it;
-		if (T.getChr1() != T.getChr2())
+	parallel_for(
+			blocked_range<concurrent_vector<Interaction>::iterator>(binned_df_filtered.begin(),	binned_df_filtered.end()),
+			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
+		for (auto T : inter)
 		{
-#pragma omp critical (ft1)
-			interactions.push_back(T);
-			pos++;
+			if (T.getChr1() != T.getChr2())
+			{
+				interactions.push_back(T);
+				//pos++;
+			}
 		}
-	}
+	});
 }
 
 void writeBinary(tbb::concurrent_vector<Interaction> & interactions, string binOutFileName)

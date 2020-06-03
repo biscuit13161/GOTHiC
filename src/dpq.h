@@ -21,6 +21,7 @@
 #ifndef SRC_DPQ_H_
 #define SRC_DPQ_H_
 
+#include "gamma.h"
 #include <float.h>
 #include <limits.h>
 #include <math.h>
@@ -47,9 +48,19 @@
 #ifndef M_LOG10_2
 #define M_LOG10_2	0.301029995663981195213738894724	/* log10(2) */
 #endif
+#ifndef M_LN_2PI
+#define M_LN_2PI       1.837877066409345483560659472811
+#endif
+#ifndef M_LN_SQRT_PId2
+#define M_LN_SQRT_PId2 0.225791352644727432363097614947        /* log(sqrt(pi/2))
+																	== log(pi/2)/2 */
+#endif
 
 #define ISNAN(x)     (isnan(x)!=0)
 #define R_FINITE(x)    isfinite(x)
+
+#define R_forceint(x)   round(x)
+#define R_nonint(x) 	  (fabs((x) - R_forceint(x)) > 1e-7*fmax2(1., fabs(x)))
 
 #define R_D__0	(log_p ? ML_NEGINF : 0.)		/* 0 */
 #define R_D__1	(log_p ? 0. : 1.)			/* 1 */
@@ -150,7 +161,7 @@
 // for discrete d<distr>(x, ...) :
 #define R_D_nonint_check(x)				\
    if(R_nonint(x)) {					\
-       MATHLIB_WARNING(_("non-integer x = %f"), x);	\
+       printf("non-integer x = %f", x);	\
 	return R_D__0;					\
    }
 

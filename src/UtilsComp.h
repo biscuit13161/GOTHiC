@@ -30,6 +30,7 @@ enum CisTrans
 	ct_trans,
 };
 
+void showTime();
 void completed(int n = 0);
 void printUsageComp();
 void verbosePrint(std::string & str, bool verbose = true);
@@ -58,5 +59,6 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, std::string 
 
 std::string fixChromosomeNames(std::string chr);
 void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const tbb::concurrent_vector<Interaction> & interactions);
+
 
 #endif /* SRC_UTILS_H_ */

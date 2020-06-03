@@ -100,3 +100,11 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 			<< flush;
 	return out;
 }
+
+bool BinomDataComp::operator==(const BinomDataComp & other)
+{
+	return (mChr1 == other.getChr1()) &&
+			(mLocus1 == other.getLocus1()) &&
+			(mChr2 == other.getChr2()) &&
+			(mLocus2 == other.getLocus2());//*/
+}

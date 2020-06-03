@@ -150,7 +150,8 @@ void readBinary(vector<Site> & sites, string binInFileName)
 	}
 	else
 	{
-		cout << "Unable to read binary file: " + binInFileName << endl;
+		string str = string("Unable to read binary file: ") + binInFileName;
+			throw std::invalid_argument(str);
 	}
 
 	completed();
@@ -405,8 +406,52 @@ void readBinary(vector<Interaction> & interactions, string binInFileName)
 	}
 	else
 	{
-		cout << "Unable to read binary file: " + binInFileName << endl;
+		string str = string("Unable to read binary file: ") + binInFileName;
+			throw std::invalid_argument(str);
 	}
 
 	completed();
+}
+
+int binarySearch(int arr[], int l, int r, int x)
+{
+	// x = search value
+	// l = first (left) element index (0)
+	// r = last (right) element index (size() - 1)
+	// arr[] = array of elements
+	if (r >= 1)
+	{
+		int mid = l + (r-1) /2;
+		//check if mid point matches
+		if (arr[mid] == x)
+			return mid;
+		// check if lower than mid
+		if (arr[mid] > x)
+			return binarySearch(arr, l, mid-1, x);
+		//else check above mid
+		return binarySearch(arr, mid+1, r, x);
+	}
+	return -1;
+}
+
+int binarySearch2(int arr[], int l, int r, int x)
+{
+	// x = search value
+	// l = first (left) element index (0)
+	// r = last (right) element index (size() - 1)
+	// arr[] = array of elements
+	int m = 0;
+
+	while (r - l > 1)
+	{
+		m =  l + (r-1) / 2;
+		if (arr[m] <= x)
+			l = m;
+		else
+			r = m;
+	}
+	if (arr[l] == x)
+		return l;
+	else
+		return -1;
 }

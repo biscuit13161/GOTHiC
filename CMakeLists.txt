@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp ")
 
 # to allow verbose output
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_FLAG ")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG_FLAG ")
 
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -17,5 +17,12 @@ add_subdirectory (src)
 if(BUILD_TESTING)
   add_subdirectory(tests)
 endif()
+
+## print list of cmake variables
+get_cmake_property(_variableNames VARIABLES)
+list (SORT _variableNames)
+foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+endforeach()
 
 

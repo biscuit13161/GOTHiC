@@ -73,6 +73,7 @@ public:
 	void print();
 
 	friend std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);
+	bool operator==(const BinomDataComp & other);
 	friend bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b);
 };
 

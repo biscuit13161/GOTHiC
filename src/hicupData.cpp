@@ -7,6 +7,7 @@
 
 #include "hicupData.h"
 #include "pbinom.h"
+#include "dbinom.h"
 #include "Utils.h"
 #include "padjust.h"
 #include "binomTest.h"
@@ -14,6 +15,7 @@
 #include <syslog.h>
 #include <iostream>
 #include <stdio.h>
+#include <string>
 #include <omp.h>
 #include <cstdlib>
 #include <istream>
@@ -667,9 +669,55 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 
 			}
 		}
-	}
+	}//*/
+
+/*#pragma omp parallel for
+	for (i = 0; i < query.size(); i++)
+	{
+		auto result = equal_range(fragments.begin(),fragments.end(),query[i].getChr(), Comp{});
+
+		int m = 0;
+		int l = result.first - fragments.begin();
+		int r = result.second - fragments.begin();
+		while (r - l > 1)
+		{
+			m =  l + (r-1) / 2;
+			if ((query[i].getLocus() >= fragments[m].getStart()) && (fragments[m].getEnd() >= query[i].getLocus()) )
+			{
+				query[i] = halfInteraction(fragments[m].getChr(), fragments[m].getStart());
+				//cout << "found: " << i << endl;
+				l=m;
+				r=m;
+			}
+			else if (query[i].getLocus() <= fragments[m].getEnd())
+				l = m;
+			else
+				r = m;
+		}
+		string str = string("found: ") + to_string(i) + " - " + fragments[m].getChr() + " : " + to_string(fragments[m].getStart()) + "\n";
+		cout << str;
+	}//*/
 	completed();
 }//*/
+
+// x = search value
+// l = first (left) element index (0)
+// r = last (right) element index (size() - 1)
+// arr[] = array of elements
+/*int m = 0;
+
+while (r - l > 1)
+{
+	m =  l + (r-1) / 2;
+	if (arr[m] <= x)
+		l = m;
+	else
+		r = m;
+}
+if (arr[l] == x)
+	return l;
+else
+	return -1;//*/
 
 
 void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> & fragments, string name)

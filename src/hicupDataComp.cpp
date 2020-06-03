@@ -8,6 +8,7 @@
 #include "hicupDataComp.h"
 #include "Interactions.h"
 #include "UtilsComp.h"
+#include "binomTest.h"
 #include <algorithm>
 #include <math.h> //pow
 #include <stdint.h> // uint32_t
@@ -16,10 +17,14 @@
 #include "tbb/concurrent_unordered_set.h"
 #include "tbb/concurrent_unordered_map.h"
 #include "tbb/parallel_reduce.h"
+#include "tbb/parallel_sort.h"
+#include "tbb/queuing_mutex.h"
 
 
 using namespace std;
 using namespace tbb;
+
+typedef queuing_mutex Mutex;
 
 void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concurrent_vector<Interaction> & interactions2, SetupComp & setupValues, concurrent_vector<BinomDataComp> & binFiltered)
 {
@@ -73,25 +78,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 			pairs2.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
 		}
 	});
-	/*for (auto e : interactions1)
-	{
-		Int1.insert(e.getInt1());
-		Int1.insert(e.getInt2());
-		AllInt.insert(e.getInt1());
-		AllInt.insert(e.getInt2());
-		pairs1.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
-	}//*/
 
 	cout << "sizes:\t" << Int1.size() << "\t" << AllInt.size() << "\t" << pairs1.size() << endl;
 
-	/*for (auto e : interactions2)
-	{
-		Int2.insert(e.getInt1());
-		Int2.insert(e.getInt2());
-		AllInt.insert(e.getInt1());
-		AllInt.insert(e.getInt2());
-		pairs2.insert(make_pair(e.getInt1() + ":" + e.getInt2(),e.getFreq()));
-	}//*/
 	cout << "sizes:\t" << Int2.size() << "\t" << AllInt.size() << "\t" << pairs2.size() << endl;
 	cerr << "\t" << flush;
 	completed();
@@ -103,67 +92,67 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cout << "\tAll Ints:     " << AllInt.size() << " unique positions"  << endl;
 	}
 
-	set<string> only1;
-	int numberOfReadPairs1 = 0;
-	for (auto a :pairs1)
-	{
-		string e = a.first;
-		if (pairs2.find(e) == pairs2.end())
-		{
-			only1.insert(e);
-			Interaction I = splitPair(e);
-			numberOfReadPairs1 += 1;
-			//cout << I << endl;
-			interactions2.push_back(I);
-		}
-		else
-		{
-			numberOfReadPairs1 += a.second;
-		}
-	}
-	/*parallel_reduce(pairs1.range(), 0,
-			[&] (decltype( pairs1)::range_type & inter,int init) -> int {
-		for (auto it = inter.begin(); it != inter.end(); it++)
+	concurrent_unordered_set<string> only1;
+	parallel_for(pairs1.range(),
+			[&] (decltype( pairs1)::range_type & inter) {
+		for (concurrent_unordered_map<string,int>::iterator it = inter.begin(); it != inter.end(); it++)
 		{
 			string e = it->first;
 			if (pairs2.find(e) == pairs2.end())
 			{
 				only1.insert(e);
 				Interaction I = splitPair(e);
-				//cout << I << endl;
 				interactions2.push_back(I);
-				init += 1;
-				return init;
 			}
-			else
+		}
+	});
+	cout << "\tfirst finished!" << endl;
+
+	concurrent_unordered_set<string> only2;
+	parallel_for(pairs2.range(),
+			[&] (decltype( pairs2)::range_type & inter) {
+		for (concurrent_unordered_map<string,int>::iterator it = inter.begin(); it != inter.end(); it++)
+		{
+			string e = it->first;
+			if (pairs1.find(e) == pairs1.end())
 			{
-				init += it->second;
-				return init;
+				only2.insert(e);
+				Interaction I = splitPair(e);
+				interactions1.push_back(I);
 			}
 		}
-	},[](int x, int y) -> int { return x+y;}
-	);//*/
-	set<string> only2;
+	});
+
+	cout << "\tSecond finished!" << endl;
+
+	int numberOfReadPairs1 = 0;
+	int max1 = 0;
+	int min1 = 100;
+	for (auto e: interactions1)
+		{
+		int l = e.getFreq();
+		numberOfReadPairs1 += l;
+		max1 = (l > max1)? l : max1;
+		min1 = (l < min1)? l : min1;
+		}
+
 	int numberOfReadPairs2 = 0;
-	for (auto a :pairs2)
-	{
-		string e = a.first;
-		if (pairs1.find(e) == pairs1.end())
+	int max2 = 0;
+	int min2 = 100;
+	for (auto e: interactions2)
 		{
-			only2.insert(e);
-			Interaction I = splitPair(e);
-			numberOfReadPairs2 += 1;
-			//cout << I << endl;
-			interactions1.push_back(I);
+		int l = e.getFreq();
+		numberOfReadPairs2 += l;
+		max2 = (l > max2)? l : max2;
+		min2 = (l < min2)? l : min2;
 		}
-		else
-		{
-			numberOfReadPairs2 += a.second;
-		}
-	}
 
 	if (setupValues.getVerbose())
 	{
+		cout << "\tnumberOfReadPairs1: " << numberOfReadPairs1 << " (R = 5612394)" << endl;
+		cout << "\tmax: " << max1 << "\tmin: " << min1 << endl;
+		cout << "\tnumberOfReadPairs2: " << numberOfReadPairs2 << " (R = 8001137)" << endl;
+		cout << "\tmax: " << max2 << "\tmin: " << min2 << endl;
 		cout << "\t" << only1.size() << " interactions unique to Control" << endl;
 		cout << "\t" << only2.size() << " interactions unique to Sample" << endl;
 	}
@@ -171,8 +160,8 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	if (interactions1.size() != interactions2.size())
 		throw std::invalid_argument("binomialHiChicupComp: imbalanced interactions");
 
-	sort(interactions1.begin(),interactions1.end(),intcomp);
-	sort(interactions2.begin(),interactions2.end(),intcomp);
+	parallel_sort(interactions1.begin(),interactions1.end(),intcomp);
+	parallel_sort(interactions2.begin(),interactions2.end(),intcomp);
 
 	if (setupValues.getVerbose())
 	{
@@ -200,6 +189,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		chromos.insert(i.getChr1());
 	}//*/
 
+	cout << "\tChromos finished!" << endl;
 	double sumSquare = 0;
 	getSumSquare(sumSquare, chromos, interactions2);
 
@@ -214,6 +204,81 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cerr << "\tNumber of Trans: " << transBinNumber << " (R = 30857963494)" << endl;
 	}
 
+	/** all read pairs used in binomial **/
+	// numberOfReadPairs1 used for computing expected and numberOfReadPairs2 as total number
+
+	/*cout << interactions1[4] ;
+	cout << interactions2[4] ;
+	cout << interactions1[1000] ;
+	cout << interactions2[1000] ;
+	cout << interactions1[5500] ;
+	cout << interactions2[5500] ;
+	int v = interactions1.size() - 10;
+	int y = v / 2;
+	cout << y << " : " << interactions1[y] ;
+	cout << y << " : " << interactions2[y] ;
+	cout << v << " : " << interactions1[v] ;
+	cout << v << " : " << interactions2[v] ;//*/
+	//throw std::invalid_argument("");
+
+	//parallel_for(size_t(0),size_t(interactions2.size()),
+	//		[&] (size_t i) {
+	for (int i = 0; i < interactions2.size(); i++)
+		{
+		Interaction f = interactions1[i];
+		Interaction s = interactions2[i];
+		if ( f != s )
+		{
+			cout << "Mismatched Interactions:" << endl << f << s;
+		}
+		else if (f.getFreq() > 1 && s.getFreq() > 1)
+		{
+			//cout << f << endl << s << endl;
+			double prob = double(f.getFreq())/numberOfReadPairs1;
+			string str = string("prob: ") + to_string(f.getFreq()) + " / " + to_string(numberOfReadPairs1) + " = " + to_string(prob) + "\n";
+			//cout << str << prob << endl;
+
+
+			BinomDataComp I = BinomDataComp(s);
+			I.setProbability(prob);
+			I.setExpected(f.getFreq());
+
+			binFiltered.push_back(I);
+		}
+	}//);
+
+	if (setupValues.getVerbose())
+	{
+		cout << "\tBinomial Vector Size: " << binFiltered.size() << " (R = 126)" << endl;
+	}
+
+	//throw std::invalid_argument("");
+
+	//for (int i = 0; i < binFiltered.size(); i++)
+		//cout << i <<"\t"<< binFiltered[i].getFreq() <<"\t"<< numberOfReadPairs2 <<"\t"<< binFiltered[i].getProbability() << endl;
+
+
+	cout << "\tcalculating P values" << endl;
+	parallel_for(size_t(0),size_t(binFiltered.size()),
+			[&] (size_t i) {
+		for (int i = 0; i < binFiltered.size(); i++)
+		{
+			int F = binFiltered[i].getFreq();
+			double V = binFiltered[i].getProbability();
+			//cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << flush;
+			double P = binomTest(F, numberOfReadPairs2, V, "two.sided");
+			binFiltered[i].setPvalue(P);
+			//cout << " " << P << flush;
+		}
+	});
+	cout << "\t" << flush;
+	completed();
+
+	for (auto e : binFiltered)
+	{
+		cout << e << endl;
+	}
+
 	completed();
 }
 
@@ -225,62 +290,15 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 #all read pairs used in binomial: numberOfReadPairs1 used for computing expected and numberOfReadPairs2 as total number
 
 
-		binned_df_filtered2$probabilityOfInteraction <- binned_df_filtered1$frequencies/numberOfReadPairs1
-		freq1 <- binned_df_filtered1$frequencies>1
-		freq2 <- binned_df_filtered2$frequencies>1
-		binned_df_filtered2 <- binned_df_filtered2[freq1 & freq2,]
-		binned_df_filtered1 <- binned_df_filtered1[freq1 & freq2,]
-		print(dim(binned_df_filtered2))
-		#rm(binned_df_filtered1)
-		#print("binned_df_filtered1 has been removed")
-		if (!is.null(baits)){
-		   load(baits) # baitGR
-		   #print(baitGR)
-		   locus1GR <- GRanges(binned_df_filtered2$chr1,ranges=IRanges(binned_df_filtered2$locus1,(binned_df_filtered2$locus1+res)))
-		   locus2GR <- GRanges(binned_df_filtered2$chr2,ranges=IRanges(binned_df_filtered2$locus2,(binned_df_filtered2$locus2+res)))
-		   #print(locus1GR)
-		   #print(locus2GR)
-		   ovl1 <- findOverlaps(locus1GR,baitGR,select="first",ignore.strand=T)
-		   print(length(which(!is.na(ovl1))))
-		   ovl2	<- findOverlaps(locus2GR,baitGR,select="first",ignore.strand=T)
-		   print("ovl OK")
 
-		   binned_df_filtered2[,"bait1"] <- NA
-		   binned_df_filtered2[!is.na(ovl1),"bait1"] <- baitGR$names[ovl1[!is.na(ovl1)]]
-		   binned_df_filtered2[,"bait2"] <- NA
-                   binned_df_filtered2[!is.na(ovl2),"bait2"] <-	baitGR$names[ovl2[!is.na(ovl2)]]
-		   binned_df_filtered2 <- binned_df_filtered2[!is.na(ovl1) | !is.na(ovl2),]
-		   binned_df_filtered1 <- binned_df_filtered1[!is.na(ovl1) | !is.na(ovl2),]
-		   print(binned_df_filtered2[,c("bait1","bait2")])
-		}
-		binned_df_filtered2[,"predicted"] <- binned_df_filtered1$frequencies
 
-			if(nrow(binned_df_filtered2)>1e8)
-				{
-					 t <- ceiling(nrow(binned_df_filtered2)/1e8)
-					 dfList <- list()
-					 dfList[[1]] <- binned_df_filtered2[1:1e8,]
-					 for(i in 2:t){
-					 dfList[[i]] <- binned_df_filtered2[(((i-1)*1e8)+1):min((i*1e8),nrow(binned_df_filtered2)),]
-				}
-			pvalues=list()
-			for(i in 1:length(dfList)){
-				pvalues[[i]] <-apply(dfList[[i]], 1, function(x)
-										  {
-										  binom.test(as.numeric(x[["frequencies"]])-1, numberOfReadPairs2, as.numeric(x[["probabilityOfInteraction"]]), alternative = "two.sided")$p.value
-										  }
-										  )
-					 }
-					 pvals=unlist(pvalues)
-					 binned_df_filtered2$pvalue <- pvals
-					 }else{
+
 
 					 binned_df_filtered2$pvalue <- apply(binned_df_filtered2, 1, function(x)
 														{
 														binom.test(as.numeric(x[["frequencies"]])-1, numberOfReadPairs2, as.numeric(x[["probabilityOfInteraction"]]), alternative = "two.sided")$p.value
 														}
 														)
-			}
 
 #observed over expected log ratio
 		binned_df_filtered2$logFoldChange <- log2((binned_df_filtered2$frequencies/numberOfReadPairs2)/(binned_df_filtered1$frequencies/numberOfReadPairs1))

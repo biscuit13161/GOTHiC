@@ -44,14 +44,19 @@ Interaction::Interaction(const halfInteraction & first, const halfInteraction & 
 	mFrequency = 1;
 }
 
-bool Interaction::operator==(const Interaction & other)
+bool operator==(const Interaction & first, const Interaction & other)
 {
-	return (mChr1 == other.getChr1()) &&
-			(mLocus1 == other.getLocus1()) &&
-			(mChr2 == other.getChr2()) &&
-			(mLocus2 == other.getLocus2()) &&
-			(mFrequency == other.getFreq());
+	return (first.mChr1 == other.mChr1) &&
+			(first.mLocus1 == other.mLocus1) &&
+			(first.mChr2 == other.mChr2) &&
+			(first.mLocus2 == other.mLocus2);// &&
+			//(mFrequency == other.getFreq());
 }
+
+bool operator!=(const Interaction & first, const Interaction & other)
+		{
+	return !(first == other);
+		}
 
 void checkInteractions(vector<Interaction> & interactions, vector<Interaction> & interactions2)
 {
