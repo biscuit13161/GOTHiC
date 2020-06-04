@@ -23,10 +23,6 @@ private:
 
 	int mFrequency;
 
-	double mRelCoverage1;
-	double mRelCoverage2;
-	// relative coverage corresponding to regions 1 and 2
-
 	double mProbability; // expected frequency - probabilityOfInteraction
 	double mExpected; // expected number of reads - predicted
 	int mReadCount; // observed reads number
@@ -37,8 +33,7 @@ private:
 public:
 	BinomDataComp();
 	BinomDataComp(std::string chr1, std::string chr2, int locus1, int locus2, \
-			int frequency, double relCoverage1, double relCoverage2, \
-			double probability, double expected, int readCount, \
+			int frequency, double probability, double expected, int readCount, \
 			double pvalue, double qvalue, double logObservedOverExpected);
 	BinomDataComp(const BinomDataComp & other);
 	BinomDataComp(const Interaction & other);
@@ -50,8 +45,6 @@ public:
 	inline std::string getInt1() const {return mChr1 + ":" + std::to_string(mLocus1);}
 	inline std::string getInt2() const {return mChr2 + ":" + std::to_string(mLocus2);}
 	inline int getFreq() const {return mFrequency;}
-	inline double getRelCov1() {return mRelCoverage1;}
-	inline double getRelCov2() {return mRelCoverage2;}
 	inline double getProbability() {return mProbability;}
 	inline double getExpected() {return mExpected;} //
 	inline double getPvalue() {return mPvalue;}
@@ -60,9 +53,6 @@ public:
 
 	inline void setLocus1(int L) {mLocus1 = L;}
 	inline void setLocus2(int L) {mLocus2 = L;}
-
-	inline void setRelCov1(double L) {mRelCoverage1 = L;}
-	inline void setRelCov2(double L) {mRelCoverage2 = L;}
 
 	inline void setProbability(double L) {mProbability = L;}
 	inline void setExpected(double L) {mExpected = L;}

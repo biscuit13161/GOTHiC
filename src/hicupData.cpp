@@ -581,7 +581,7 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
 
     	/** Calculate pvalues **/
-    	// /* input Freq -1 as test is greater than! */
+    	// /* input Freq -1 as test is greater than! -- binomTest corrects for this! */
     	double P = binomTest(binFiltered[i].getFreq(), numberOfReadPairs, binFiltered[i].getProbability(), "greater");
     	//double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), false, false);
     	binFiltered[i].setPvalue(P);

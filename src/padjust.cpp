@@ -37,41 +37,30 @@ bool valcomp(const array<double,3> & a, const array<double,3> & b)
 }
 
 
-void pBhAdjust(vector<array<double,3>> & p, double n) // int,2 -> pos, pval, qval
+void pBhAdjust(vector<array<double,3>> & p, double n) // double,2 -> pos, pval, qval
 {
 	if (p.size() == 0 || p.empty())
 		throw std::invalid_argument("pBhAdjust: input vector empty");
 
 	int x = p.size() - 1;
 
-	//cout << p.size() << endl;
-	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
-	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
 	sort(p.begin(),p.end(), valcomp); // increasing by pval
-	double minP = 1;
-	double maxP = 0;
+	//double minP = 1;
+	//double maxP = 0;
 	double minQ = 1;
-	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
-	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
 
 	for (int i = p.size()-1 ; i >= 0; i--)
 	{
 		double P = p[i][1]; //Pvalue input
-		minP = min(minP, P);
-		maxP = max(maxP, P);
+		//minP = min(minP, P);
+		//maxP = max(maxP, P);
 		double a = (n * P) /(i+1);
 		minQ = min(minQ,a); //? a : minQ ;
-		//cout  << "(" << p[i][0] << ", " << p[i][1] << ", " << a << ", "  << minQ << ")  " << endl;
 		minQ = min(minQ, 1.0d);
 		p[i][2] = minQ;
 	}
-	cout << "Minimum Pvalue: " << minP << endl;
-	cout << "Maximum Pvalue: " << maxP << endl;
-	cout << "Minimum Qvalue:" << minQ << endl;
 
 	sort(p.begin(),p.end(), poscomp); // increasing by pos
-	//cout << p[0][0] << " - " << p[0][1] << " - " << p[0][2] << endl;
-	//cout << p[x][0] << " - " << p[x][1] << " - " << p[x][2] << endl;
 }
 
 /*

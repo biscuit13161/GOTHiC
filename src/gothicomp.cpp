@@ -51,8 +51,6 @@ int main(int argc, char *argv[])
 	ofstream binomFile(fileName);
 	binomFile << "chr1" << "\t" << "locus1" \
 			<< "\t" << "chr2" << "\t" << "locus2" \
-			<< "\t" << "relCoverage1" \
-			<< "\t" << "relCoverage2" \
 			<< "\t" << "probability" \
 			<< "\t" << "expected" \
 			<< "\t" << "readCount" \

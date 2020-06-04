@@ -9,6 +9,7 @@
 #include "Interactions.h"
 #include "UtilsComp.h"
 #include "binomTest.h"
+#include "padjust.h"
 #include <algorithm>
 #include <math.h> //pow
 #include <stdint.h> // uint32_t
@@ -79,9 +80,6 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		}
 	});
 
-	cout << "sizes:\t" << Int1.size() << "\t" << AllInt.size() << "\t" << pairs1.size() << endl;
-
-	cout << "sizes:\t" << Int2.size() << "\t" << AllInt.size() << "\t" << pairs2.size() << endl;
 	cerr << "\t" << flush;
 	completed();
 
@@ -106,7 +104,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 			}
 		}
 	});
-	cout << "\tfirst finished!" << endl;
+	cout << "\tFinished finding [mis]matching pairs in Control!" << endl;
 
 	concurrent_unordered_set<string> only2;
 	parallel_for(pairs2.range(),
@@ -123,7 +121,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		}
 	});
 
-	cout << "\tSecond finished!" << endl;
+	cout << "\tFinished finding [mis]matching pairs in Sample!" << endl;
 
 	int numberOfReadPairs1 = 0;
 	int max1 = 0;
@@ -149,9 +147,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose())
 	{
-		cout << "\tnumberOfReadPairs1: " << numberOfReadPairs1 << " (R = 5612394)" << endl;
+		cout << "\tnumberOfReadPairs1: " << numberOfReadPairs1  << endl;
 		cout << "\tmax: " << max1 << "\tmin: " << min1 << endl;
-		cout << "\tnumberOfReadPairs2: " << numberOfReadPairs2 << " (R = 8001137)" << endl;
+		cout << "\tnumberOfReadPairs2: " << numberOfReadPairs2  << endl;
 		cout << "\tmax: " << max2 << "\tmin: " << min2 << endl;
 		cout << "\t" << only1.size() << " interactions unique to Control" << endl;
 		cout << "\t" << only2.size() << " interactions unique to Sample" << endl;
@@ -178,9 +176,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	if (setupValues.getVerbose())
 	{
 		cerr.precision(15);
-		cerr << "\tNumber of All Int:  " << covS << " (R = 255197)" << endl;
-		cerr << "\tTotal Interactions: " << numberOfAllInteractions << " ( R = 65125508809)" << endl;
-		cerr << "\tUpperHalfBinNumber: " << upperhalfBinNumber << " (R = 32562626806)"<< endl;
+		cerr << "\tNumber of All Int:  " << covS << endl;
+		cerr << "\tTotal Interactions: " << numberOfAllInteractions  << endl;
+		cerr << "\tUpperHalfBinNumber: " << upperhalfBinNumber << endl;
 	}
 
 	set<string> chromos;
@@ -189,7 +187,6 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		chromos.insert(i.getChr1());
 	}//*/
 
-	cout << "\tChromos finished!" << endl;
 	double sumSquare = 0;
 	getSumSquare(sumSquare, chromos, interactions2);
 
@@ -199,9 +196,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	if (setupValues.getVerbose())
 	{
 		cerr.precision(15);
-		cerr << "\tSum of Squares:  " << sumSquare << "(R = 3409581821)" << endl;
-		cerr << "\tNumber of Cis:   " << cisBinNumber  << " (R = 1704663312)" << endl;
-		cerr << "\tNumber of Trans: " << transBinNumber << " (R = 30857963494)" << endl;
+		cerr << "\tSum of Squares:  " << sumSquare << endl;
+		cerr << "\tNumber of Cis:   " << cisBinNumber << endl;
+		cerr << "\tNumber of Trans: " << transBinNumber << endl;
 	}
 
 	/** all read pairs used in binomial **/
@@ -235,7 +232,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		{
 			//cout << f << endl << s << endl;
 			double prob = double(f.getFreq())/numberOfReadPairs1;
-			string str = string("prob: ") + to_string(f.getFreq()) + " / " + to_string(numberOfReadPairs1) + " = " + to_string(prob) + "\n";
+			//string str = string("prob: ") + to_string(f.getFreq()) + " / " + to_string(numberOfReadPairs1) + " = " + to_string(prob) + "\n";
 			//cout << str << prob << endl;
 
 			BinomDataComp I = BinomDataComp(s);
@@ -248,34 +245,78 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose())
 	{
-		cout << "\tBinomial Vector Size: " << binFiltered.size() << " (R = 126)" << endl;
+		cout << "\tBinomial Vector Size: " << binFiltered.size() << endl;
 	}
 
 	//throw std::invalid_argument("");
-
-	//for (int i = 0; i < binFiltered.size(); i++)
-		//cout << i <<"\t"<< binFiltered[i].getFreq() <<"\t"<< numberOfReadPairs2 <<"\t"<< binFiltered[i].getProbability() << endl;
-
+	vector<array<double,3>> values;
+	values.resize(binFiltered.size());
 
 	cout << "\tcalculating P values" << endl;
-	parallel_for(size_t(0),size_t(binFiltered.size()),
-			[&] (size_t i) {
-		//for (int i = 0; i < binFiltered.size(); i++)
-		//{
+	//parallel_for(size_t(0),size_t(binFiltered.size()),
+		//	[&] (size_t i) {
+		for (int i = 0; i < binFiltered.size(); i++)
+		{
 			int F = binFiltered[i].getFreq();
 			double V = binFiltered[i].getProbability();
 			double P = binomTest(F, numberOfReadPairs2, V, "two.sided");
 			binFiltered[i].setPvalue(P);
-			cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
+			//cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
+
+			//binned_df_filtered2$logFoldChange <- log2((binned_df_filtered2$frequencies/numberOfReadPairs2)/(binned_df_filtered1$frequencies/numberOfReadPairs1))
+			double Fd = log2((double(binFiltered[i].getFreq())/numberOfReadPairs2)/(double(binFiltered[i].getExpected())/numberOfReadPairs1));
+			//cout << i << " " << binFiltered[i].getFreq() << " " << numberOfReadPairs2;
+			//cout << " " << binFiltered[i].getExpected() << " " << numberOfReadPairs1 << " " << Fd<< endl;
+			binFiltered[i].setLogObExp(Fd);
+
+			array<double,3> ls = {double(i), P, 0.5};
+			values[i] = ls;
 		//}
-	});
-	//cout << "\t" << flush;
+	}//);
+	cout << "\t" << flush;
 	completed();
 
-	for (auto e : binFiltered)
+
+	cout << "\tcalculating Q values" << endl;
+	switch(setupValues.getCisTrans())
 	{
-		cout << e << endl;
-	}
+	case ct_all :
+		if(setupValues.getRemoveDiagonal())
+		{
+			pBhAdjust(values, upperhalfBinNumber);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
+		}
+		else
+		{
+			pBhAdjust(values, upperhalfBinNumber+covS);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
+		}
+		break;
+	case ct_cis :
+		if(setupValues.getRemoveDiagonal())
+		{
+			pBhAdjust(values, cisBinNumber);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
+		}
+		else
+		{
+			pBhAdjust(values, cisBinNumber+covS);
+			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
+		}
+		break;
+	case ct_trans:
+		pBhAdjust(values, transBinNumber);
+		//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
+		break;
+	}//*/
+
+#pragma omp parallel for
+	for (int i = 0; i < binFiltered.size(); i++)
+	{
+		binFiltered[i].setQvalue(values[i][2]);
+	}//*/
+	cout << "\t" << flush;
+		completed();
 
 	completed();
 }

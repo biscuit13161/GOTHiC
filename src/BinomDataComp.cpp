@@ -9,17 +9,15 @@
 
 using namespace std;
 
-BinomDataComp::BinomDataComp(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomDataComp::BinomDataComp(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0),  mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
 BinomDataComp::BinomDataComp(std::string chr1, std::string chr2, int locus1, int locus2, \
-		int frequency, double relCoverage1, double relCoverage2, \
-		double probability, double expected, int readCount, \
+		int frequency, double probability, double expected, int readCount, \
 		double pvalue, double qvalue, double logObservedOverExpected)\
 				: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), \
 				  mFrequency(frequency), \
-				  mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), \
 				  mProbability(probability), mExpected(expected), \
 				  mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), \
 				  mLogObservedOverExpected(logObservedOverExpected) {
@@ -31,8 +29,6 @@ BinomDataComp::BinomDataComp(const BinomDataComp & other){
 	mLocus1 = other.mLocus1;
 	mLocus2 = other.mLocus2;
 	mFrequency = other.mFrequency;
-	mRelCoverage1 = other.mRelCoverage1;
-	mRelCoverage2 = other.mRelCoverage2;
 	mProbability = other.mProbability;
 	mExpected = other.mExpected;
 	mReadCount = other.mReadCount;
@@ -41,7 +37,7 @@ BinomDataComp::BinomDataComp(const BinomDataComp & other){
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
 }
 
-BinomDataComp::BinomDataComp(const Interaction & other){
+BinomDataComp::BinomDataComp(const Interaction & other): mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0){
 	mChr1 = other.getChr1();
 	mChr2 = other.getChr2();
 	mLocus1 = other.getLocus1();
@@ -89,8 +85,6 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 	//out.precision(15);
 	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
 		<< in.mChr2 << "\t" << in.mLocus2 \
-			<< "\t" << in.mRelCoverage1 \
-			<< "\t" << in.mRelCoverage2 \
 			<< "\t" << in.mProbability \
 			<< "\t" << in.mExpected \
 			<< "\t" << in.mFrequency \
