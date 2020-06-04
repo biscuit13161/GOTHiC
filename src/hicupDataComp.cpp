@@ -221,10 +221,10 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	cout << v << " : " << interactions2[v] ;//*/
 	//throw std::invalid_argument("");
 
-	//parallel_for(size_t(0),size_t(interactions2.size()),
-	//		[&] (size_t i) {
-	for (int i = 0; i < interactions2.size(); i++)
-		{
+	parallel_for(size_t(0),size_t(interactions2.size()),
+			[&] (size_t i) {
+	//for (int i = 0; i < interactions2.size(); i++)
+		//{
 		Interaction f = interactions1[i];
 		Interaction s = interactions2[i];
 		if ( f != s )
@@ -238,14 +238,13 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 			string str = string("prob: ") + to_string(f.getFreq()) + " / " + to_string(numberOfReadPairs1) + " = " + to_string(prob) + "\n";
 			//cout << str << prob << endl;
 
-
 			BinomDataComp I = BinomDataComp(s);
 			I.setProbability(prob);
 			I.setExpected(f.getFreq());
 
 			binFiltered.push_back(I);
 		}
-	}//);
+	});
 
 	if (setupValues.getVerbose())
 	{
@@ -261,17 +260,16 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	cout << "\tcalculating P values" << endl;
 	parallel_for(size_t(0),size_t(binFiltered.size()),
 			[&] (size_t i) {
-		for (int i = 0; i < binFiltered.size(); i++)
-		{
+		//for (int i = 0; i < binFiltered.size(); i++)
+		//{
 			int F = binFiltered[i].getFreq();
 			double V = binFiltered[i].getProbability();
-			//cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << flush;
 			double P = binomTest(F, numberOfReadPairs2, V, "two.sided");
 			binFiltered[i].setPvalue(P);
-			//cout << " " << P << flush;
-		}
+			cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
+		//}
 	});
-	cout << "\t" << flush;
+	//cout << "\t" << flush;
 	completed();
 
 	for (auto e : binFiltered)
