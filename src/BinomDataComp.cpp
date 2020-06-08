@@ -48,7 +48,7 @@ BinomDataComp::BinomDataComp(const Interaction & other): mProbability(0), mExpec
 	this->setFreq(other.getFreq());
 }
 
-void BinomDataComp::print()
+/*void BinomDataComp::print()
 {	std::ostringstream streamObj;
 string L = 	this->getChr1() + ":" + std::to_string(this->getLocus1()) + " " + this->getChr2() + ":" + std::to_string(this->getLocus2());
 streamObj << this->getFreq();
@@ -64,7 +64,7 @@ streamObj << this->getFreq();
 	//double mQvalue; // binomial p-value corrected for multi-testing with Benjamini-Hochberg
 	//double mLogObservedOverExpected; ;
 	cout << L << endl;
-}
+}//*/
 
 bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 {
@@ -83,7 +83,7 @@ bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 	return a.getChr1() < b.getChr1();
 }
 
-ostream & operator<<(ostream & out, const BinomDataComp & in)
+/*ostream & operator<<(ostream & out, const BinomDataComp & in)
 {
 	//out.precision(15);
 	out << in.getChr1() << "\t" << in.getLocus1() << "\t" \
@@ -96,7 +96,7 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 			<< "\t" << in.mLogObservedOverExpected \
 			<< flush;
 	return out;
-}
+}//*/
 
 bool BinomDataComp::operator==(const BinomDataComp & other)
 {
