@@ -14,50 +14,53 @@
 
 using namespace std;
 
-BinomData::BinomData(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0), mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+//mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0),
+BinomData::BinomData():  mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
 BinomData::BinomData(std::string chr1, std::string chr2, int locus1, int locus2, \
 		int frequency, double relCoverage1, double relCoverage2, \
-		double probability, double expected, int readCount, \
+		double probability, double expected, \
 		double pvalue, double qvalue, double logObservedOverExpected)\
-				: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), \
-				  mFrequency(frequency), \
-				  mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), \
+				: mRelCoverage1(relCoverage1), mRelCoverage2(relCoverage2), \
 				  mProbability(probability), mExpected(expected), \
-				  mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), \
+				  mPvalue(pvalue), mQvalue(qvalue), \
 				  mLogObservedOverExpected(logObservedOverExpected) {
+	this->setChr1(chr1);
+	this->setChr2(chr2);
+	this->setLocus1(locus1);
+	this->setLocus2(locus2);
+	this->setFreq(frequency);
 }
 
 BinomData::BinomData(const BinomData & other){
-	mChr1 = other.mChr1;
-	mChr2 = other.mChr2;
-	mLocus1 = other.mLocus1;
-	mLocus2 = other.mLocus2;
-	mFrequency = other.mFrequency;
+	this->setChr1(other.getChr1());
+	this->setChr2(other.getChr2());
+	this->setLocus1(other.getLocus1());
+	this->setLocus2(other.getLocus2());
+	this->setFreq(other.getFreq());
 	mRelCoverage1 = other.mRelCoverage1;
 	mRelCoverage2 = other.mRelCoverage2;
 	mProbability = other.mProbability;
 	mExpected = other.mExpected;
-	mReadCount = other.mReadCount;
 	mPvalue = other.mPvalue;
 	mQvalue = other.mQvalue;
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
 }
 
 BinomData::BinomData(const Interaction & other){
-	mChr1 = other.getChr1();
-	mChr2 = other.getChr2();
-	mLocus1 = other.getLocus1();
-	mLocus2 = other.getLocus2();
-	mFrequency = other.getFreq();
+	this->setChr1(other.getChr1());
+	this->setChr2(other.getChr2());
+	this->setLocus1(other.getLocus1());
+	this->setLocus2(other.getLocus2());
+	this->setFreq(other.getFreq());
 }
 
 void BinomData::print()
 {	std::ostringstream streamObj;
-	string L = 	mChr1 + ":" + std::to_string(mLocus1) + " " + mChr2 + ":" + std::to_string(mLocus2);
-	streamObj << mFrequency;
+	string L = 	this->getChr1() + ":" + std::to_string(this->getLocus1()) + " " + this->getChr2() + ":" + std::to_string(this->getLocus2());
+	streamObj << this->getFreq();
 	string A = streamObj.str();
 			L = L + " " + A ; \
 //			+ " " + to_string(mRelCoverage1) \
@@ -74,31 +77,31 @@ void BinomData::print()
 
 bool bincomp(const BinomData & a, const BinomData & b)
 {
-	if (a.mChr1 == b.mChr1)
+	if (a.getChr1() == b.getChr1())
 	{
-		if (a.mLocus1 == b.mLocus1)
+		if (a.getLocus1() == b.getLocus1())
 		{
-			if (a.mChr2 == b.mChr2)
+			if (a.getChr2() == b.getChr2())
 			{
-				return a.mLocus2 < b.mLocus2;
+				return a.getLocus2() < b.getLocus2();
 			}
-			return a.mChr2 < b.mChr2;
+			return a.getChr2() < b.getChr2();
 		}
-		return a.mLocus1 < b.mLocus1;
+		return a.getLocus1() < b.getLocus1();
 	}
-	return a.mChr1 < b.mChr1;
+	return a.getChr1() < b.getChr1();
 }
 
 ostream & operator<<(ostream & out, const BinomData & in)
 {
 	//out.precision(15);
-	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
-		<< in.mChr2 << "\t" << in.mLocus2 \
+	out << in.getChr1() << "\t" << in.getLocus1() << "\t" \
+		<< in.getChr2() << "\t" << in.getLocus2() \
 			<< "\t" << in.mRelCoverage1 \
 			<< "\t" << in.mRelCoverage2 \
 			<< "\t" << in.mProbability \
 			<< "\t" << in.mExpected \
-			<< "\t" << in.mFrequency \
+			<< "\t" << in.getFreq() \
 			<< "\t" << in.mPvalue \
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \

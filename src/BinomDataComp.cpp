@@ -9,26 +9,29 @@
 
 using namespace std;
 
-BinomDataComp::BinomDataComp(): mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0),  mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomDataComp::BinomDataComp():  mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
 
 BinomDataComp::BinomDataComp(std::string chr1, std::string chr2, int locus1, int locus2, \
 		int frequency, double probability, double expected, int readCount, \
 		double pvalue, double qvalue, double logObservedOverExpected)\
-				: mChr1(chr1), mChr2(chr2), mLocus1(locus1), mLocus2(locus2), \
-				  mFrequency(frequency), \
-				  mProbability(probability), mExpected(expected), \
+				: mProbability(probability), mExpected(expected), \
 				  mReadCount(readCount), mPvalue(pvalue), mQvalue(qvalue), \
 				  mLogObservedOverExpected(logObservedOverExpected) {
+	this->setChr1(chr1);
+	this->setChr2(chr2);
+	this->setLocus1(locus1);
+	this->setLocus2(locus2);
+	this->setFreq(frequency);
 }
 
 BinomDataComp::BinomDataComp(const BinomDataComp & other){
-	mChr1 = other.mChr1;
-	mChr2 = other.mChr2;
-	mLocus1 = other.mLocus1;
-	mLocus2 = other.mLocus2;
-	mFrequency = other.mFrequency;
+	this->setChr1(other.getChr1());
+	this->setChr2(other.getChr2());
+	this->setLocus1(other.getLocus1());
+	this->setLocus2(other.getLocus2());
+	this->setFreq(other.getFreq());
 	mProbability = other.mProbability;
 	mExpected = other.mExpected;
 	mReadCount = other.mReadCount;
@@ -38,17 +41,17 @@ BinomDataComp::BinomDataComp(const BinomDataComp & other){
 }
 
 BinomDataComp::BinomDataComp(const Interaction & other): mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0){
-	mChr1 = other.getChr1();
-	mChr2 = other.getChr2();
-	mLocus1 = other.getLocus1();
-	mLocus2 = other.getLocus2();
-	mFrequency = other.getFreq();
+	this->setChr1(other.getChr1());
+	this->setChr2(other.getChr2());
+	this->setLocus1(other.getLocus1());
+	this->setLocus2(other.getLocus2());
+	this->setFreq(other.getFreq());
 }
 
 void BinomDataComp::print()
 {	std::ostringstream streamObj;
-	string L = 	mChr1 + ":" + std::to_string(mLocus1) + " " + mChr2 + ":" + std::to_string(mLocus2);
-	streamObj << mFrequency;
+string L = 	this->getChr1() + ":" + std::to_string(this->getLocus1()) + " " + this->getChr2() + ":" + std::to_string(this->getLocus2());
+streamObj << this->getFreq();
 	string A = streamObj.str();
 			L = L + " " + A ; \
 //			+ " " + to_string(mRelCoverage1) \
@@ -65,29 +68,29 @@ void BinomDataComp::print()
 
 bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 {
-	if (a.mChr1 == b.mChr1)
+	if (a.getChr1() == b.getChr1())
 	{
-		if (a.mLocus1 == b.mLocus1)
+		if (a.getLocus1() == b.getLocus1())
 		{
-			if (a.mChr2 == b.mChr2)
+			if (a.getChr2() == b.getChr2())
 			{
-				return a.mLocus2 < b.mLocus2;
+				return a.getLocus2() < b.getLocus2();
 			}
-			return a.mChr2 < b.mChr2;
+			return a.getChr2() < b.getChr2();
 		}
-		return a.mLocus1 < b.mLocus1;
+		return a.getLocus1() < b.getLocus1();
 	}
-	return a.mChr1 < b.mChr1;
+	return a.getChr1() < b.getChr1();
 }
 
 ostream & operator<<(ostream & out, const BinomDataComp & in)
 {
 	//out.precision(15);
-	out << in.mChr1 << "\t" << in.mLocus1 << "\t" \
-		<< in.mChr2 << "\t" << in.mLocus2 \
+	out << in.getChr1() << "\t" << in.getLocus1() << "\t" \
+		<< in.getChr2() << "\t" << in.getLocus2() \
 			<< "\t" << in.mProbability \
 			<< "\t" << in.mExpected \
-			<< "\t" << in.mFrequency \
+			<< "\t" << in.getFreq()
 			<< "\t" << in.mPvalue \
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \
@@ -97,8 +100,8 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 
 bool BinomDataComp::operator==(const BinomDataComp & other)
 {
-	return (mChr1 == other.getChr1()) &&
-			(mLocus1 == other.getLocus1()) &&
-			(mChr2 == other.getChr2()) &&
-			(mLocus2 == other.getLocus2());//*/
+	return (this->getChr1() == other.getChr1()) &&
+			(this->getLocus1() == other.getLocus1()) &&
+			(this->getChr2() == other.getChr2()) &&
+			(this->getLocus2() == other.getLocus2());//*/
 }

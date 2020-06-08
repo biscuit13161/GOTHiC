@@ -63,8 +63,11 @@ public:
 	inline std::string getInt2() const {return mChr2 + ":" + std::to_string(mLocus2);}
 	inline int getFreq() const {return mFrequency;}
 
+	inline void setChr1(std::string L) {mChr1 = L;}
+	inline void setChr2(std::string L) {mChr2 = L;}
 	inline void setLocus1(int L) {mLocus1 = L;}
 	inline void setLocus2(int L) {mLocus2 = L;}
+	inline void setFreq(int L) {mFrequency = L;}
 	void print();
 
 	friend bool operator==(const Interaction & first, const Interaction & other);

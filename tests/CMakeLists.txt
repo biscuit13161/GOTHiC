@@ -13,7 +13,7 @@ include_directories (${TEST_SOURCE_DIR}../src)
 
 set(LIBS hicupTest sysTests overlapTest importHicupTest binInterTest calcFreqTest pBhAdjustTest)
 set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest binomialTest binomTestTest)
-set(LIBS ${LIBS} findTransTest fixChromoTest halfInteractionTest hicupCompFreqTest hicupCompInterTest)
+set(LIBS ${LIBS} findTransTest fixChromoTest halfInteractionTest hicupCompInterTest)
 set(LIBS ${LIBS} sumSquareTest) # sumSquareCompTest)
 
 foreach(lib ${LIBS})
