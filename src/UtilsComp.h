@@ -60,5 +60,6 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, std::string 
 std::string fixChromosomeNames(std::string chr);
 void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const tbb::concurrent_vector<Interaction> & interactions);
 
+void checkInputFiles(std::string file);
 
 #endif /* SRC_UTILS_H_ */

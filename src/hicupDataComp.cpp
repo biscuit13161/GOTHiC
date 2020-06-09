@@ -253,10 +253,10 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	values.resize(binFiltered.size());
 
 	cout << "\tcalculating P values" << endl;
-	//parallel_for(size_t(0),size_t(binFiltered.size()),
-		//	[&] (size_t i) {
-		for (int i = 0; i < binFiltered.size(); i++)
-		{
+	parallel_for(size_t(0),size_t(binFiltered.size()),
+			[&] (size_t i) {
+		//for (int i = 0; i < binFiltered.size(); i++)
+		//{
 			int F = binFiltered[i].getFreq();
 			double V = binFiltered[i].getProbability();
 			double P = binomTest(F, numberOfReadPairs2, V, "two.sided");
@@ -272,7 +272,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 			array<double,3> ls = {double(i), P, 0.5};
 			values[i] = ls;
 		//}
-	}//);
+	});
 	cout << "\t" << flush;
 	completed();
 
@@ -310,11 +310,12 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		break;
 	}//*/
 
-#pragma omp parallel for
-	for (int i = 0; i < binFiltered.size(); i++)
-	{
+	parallel_for(size_t(0),size_t(binFiltered.size()),
+				[&] (size_t i) {
+		//for (int i = 0; i < binFiltered.size(); i++)
+	//{
 		binFiltered[i].setQvalue(values[i][2]);
-	}//*/
+	});//*/
 	cout << "\t" << flush;
 		completed();
 

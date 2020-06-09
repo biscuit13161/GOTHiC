@@ -357,3 +357,12 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 
 	completed();
 }
+
+void checkInputFiles(std::string file)
+{
+	if (file.find("inter.bin",file.length()-9) == string::npos )
+		{
+		string str = string("Incorrect input file: ") + file + "\nInput files should be GOTHiC output files for comparative analysis\n";
+		throw std::invalid_argument(str);
+		}
+}
