@@ -24,7 +24,7 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 In order to compile GOTHiC++, the authors advise creating a build folder within the root:
 
 ```bash
-mkdir build && cd build
+mkdir build && cd $_
 ```
 
 Compiling GOTHiC++ follows a typical cmake pipeline:
@@ -34,7 +34,7 @@ cmake ..
 make
 ```
 
-it is possible that cmake will not use the correct compilers if you have multiple installes, or if it is not installed in a default location. The correct compiler can be passed to cmake using:
+it is possible that cmake will not use the correct compilers if you have multiple installed, or if it is not installed in a default location. The correct compiler can be passed to cmake using:
 
 ```bash
 cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ ..
@@ -55,26 +55,34 @@ GOTHiC++, currently, only accepts Bam files from HiCUP converted to txt files as
 ```bash
 src/hicupToTable.sh <input.bam>
 ```
-N.B. please ensurethe configuration file lists the correct file - <input.bam.txt> rather than <input.bam>.
+N.B. please ensure the configuration file lists the correct file - `<input.bam.txt>` rather than <input.bam>.
 
 ```bash
-<path/to>/gothic <path/to>gothic.conf
+<path/to>/gothic <path/to/gothic.conf>
 ```
 
-###Running Comparative GOTHiC++ 
+###Running Comparative GOTHiC++
 
-In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file. These files are then used as input for gothicomp.
+In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file (`<SampleName>.inter.bin`). These files are then used as input for gothicomp.
 
 ```bash
-<path/to>/gothicomp <path/to>gothicomp.conf
+<path/to>/gothicomp <path/to/gothicomp.conf>
 ```
 
 ###Notes on config files
 
+<ul>
+<li>GOTHiC and GOTHiCOMP can carry out analysis using only 
+	<ul>
+	<li> cis (defined as both on the same chromosome)</li> 
+  <li>trans (defined as between chromosomes)</li>
+  <li>all</li>
+  </ul> 
+The config default is to analyse all interactions, but can be changed by altering the "CisTrans" option
+</li>
 
-+ GOTHiC and GOTHiCOMP can carry out analysis using only cis (defined as on the same chromosome) or trans (defined as between chromosomes) or all. The config default is to analyse all interactions, but can be changed by altering the "CisTrans" option
-
-+ By default, GOTHiC and GOTHiComp will remove diagnals. if this is not required, please uncomment the "#RemoveDiagonals: false" line
+<li>By default, GOTHiC and GOTHiComp will remove diagnals; if this is not required, please uncomment the "#RemoveDiagonals: false" line</li>
+</ul>
 
 ###Installing googletest
 
@@ -98,7 +106,7 @@ Google test uses c++11 standard; if make fails to compile googletest, try adding
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ```
-###intel tbb
+###Sourcing Intel TBB
 
 ```bash
 git clone https://github.com/oneapi-src/oneTBB.git
@@ -106,6 +114,7 @@ cd oneTBB
 gmake
 ```
 
-cmake -DTBB_DIR=~/apps/oneTBB -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ .. 2>&1 | tee cmake.log
+In order to locate TBB, Cmake utilises a `FindTBB.cmake` from [https://github.com/justusc/FindTBB](https://github.com/justusc/FindTBB).
+Please note, it may be necessary to add the `-DTBB_DIR=<path/to>/oneTBB` option to the cmake command.
 
  

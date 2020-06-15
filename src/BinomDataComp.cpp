@@ -2,7 +2,7 @@
  * BinomDataComp.cpp
  *
  *  Created on: 27 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "BinomDataComp.h"
@@ -48,24 +48,6 @@ BinomDataComp::BinomDataComp(const Interaction & other): mProbability(0), mExpec
 	this->setFreq(other.getFreq());
 }
 
-/*void BinomDataComp::print()
-{	std::ostringstream streamObj;
-string L = 	this->getChr1() + ":" + std::to_string(this->getLocus1()) + " " + this->getChr2() + ":" + std::to_string(this->getLocus2());
-streamObj << this->getFreq();
-	string A = streamObj.str();
-			L = L + " " + A ; \
-//			+ " " + to_string(mRelCoverage1) \
-//			+ " " + to_string(mRelCoverage2) \
-//			+ " " + to_string(mProbability) \
-//			+ " " + to_string(mExpected) \
-//			+ " " + to_string(mReadCount) \
-//			+ " " + to_string(mPvalue) \
-//			+ "\n";
-	//double mQvalue; // binomial p-value corrected for multi-testing with Benjamini-Hochberg
-	//double mLogObservedOverExpected; ;
-	cout << L << endl;
-}//*/
-
 bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 {
 	if (a.getChr1() == b.getChr1())
@@ -83,7 +65,7 @@ bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b)
 	return a.getChr1() < b.getChr1();
 }
 
-/*ostream & operator<<(ostream & out, const BinomDataComp & in)
+ostream & operator<<(ostream & out, const BinomDataComp & in)
 {
 	//out.precision(15);
 	out << in.getChr1() << "\t" << in.getLocus1() << "\t" \

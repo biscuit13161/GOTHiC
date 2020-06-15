@@ -2,7 +2,7 @@
  * overlapTests.cpp
  *
  *  Created on: 12 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "hicupData.h"

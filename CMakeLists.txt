@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.4)
-project (GOTHiC VERSION 0.0.7 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
+project (GOTHiC VERSION 0.0.8 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
 
 include(CTest) # note: this adds a BUILD_TESTING which defaults to ON
 

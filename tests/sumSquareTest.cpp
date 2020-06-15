@@ -2,7 +2,7 @@
  * sumSquareTest.cpp
  *
  *  Created on: 28 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "Interactions.h"

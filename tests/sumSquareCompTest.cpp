@@ -2,7 +2,7 @@
  * sumSquareCompTest.cpp
  *
  *  Created on: 1 Jun 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "UtilsComp.h"

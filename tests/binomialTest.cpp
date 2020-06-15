@@ -2,12 +2,9 @@
  * binomialTest.cpp
  *
  *  Created on: 17 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-//#include "BinomData.h"
-//#include "hicupData.h"
-//#include "Utils.h"
 #include "pbinom.h"
 #include <gtest/gtest.h>
 #include <vector>

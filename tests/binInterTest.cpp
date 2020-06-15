@@ -2,7 +2,7 @@
  * binInterTests.cpp
  *
  *  Created on: 13 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "BinomData.h"
@@ -42,14 +42,6 @@ TEST(binInterTests, constructor)
 	EXPECT_TRUE(list2[interactions[0].getInt1()] == 1);
 	EXPECT_FALSE(list[interactions[2].getInt2()] == 1);
 	EXPECT_TRUE(list2[interactions[1].getInt2()] == 1);
-
-//	for (auto i : interactions)
-//	{
-//		EXPECT_FALSE(list[i.getInt1()] == 1);
-//		EXPECT_TRUE(list2[i.getInt1()] == 1);
-//		EXPECT_FALSE(list[i.getInt2()] == 1);
-//		EXPECT_TRUE(list2[i.getInt2()] == 1);
-//	}
 
 }
 

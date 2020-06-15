@@ -2,7 +2,7 @@
  * UtilsComp.cpp
  *
  *  Created on: 11 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "UtilsComp.h"
@@ -134,9 +134,6 @@ int getRealValue(){ //Note: this value is in KB!
 
 void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	//int pos = 0;
-	//for (auto it = interactions.begin(); it != interactions.end(); it++)
-	//{
 	parallel_for(
 			blocked_range<concurrent_vector<Interaction>::iterator>(interactions.begin(),	interactions.end()),
 			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
@@ -145,7 +142,6 @@ void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_
 		if (T.getInt1() != T.getInt2())
 		{
 			binned_df_filtered.push_back(T);
-			//pos++;
 		}
 	}
 });
@@ -170,22 +166,19 @@ void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cis
 	{
 		binned_df_filtered.swap(interactions);
 	}
-	//cout << "size " << binned_df_filtered.size() << endl;
 
 	if (cistrans == ct_cis)
 	{
 		cerr << "\tFinding Cis interactions!";
 		findCis(interactions, binned_df_filtered);
-		//interactions.resize(pos);
-		cerr << "|\t";
+		cerr << "\t";
 		completed();
 	}
 	else if (cistrans == ct_trans)
 	{
 		cerr << "\tFinding Trans interactions!";
 		findTrans(interactions, binned_df_filtered);
-		//interactions.resize(pos);
-		cerr << "|\t";
+		cerr << "\t";
 		completed();
 	}
 	else
@@ -238,20 +231,14 @@ void getSumSquare(double & sumSquare, const set<string> & chromos, const concurr
 
 void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	//int pos = 0;
-	//int i = 0; i< binned_df_filtered.size(); i++)
 	parallel_for(
 			blocked_range<concurrent_vector<Interaction>::iterator>(binned_df_filtered.begin(),	binned_df_filtered.end()),
 			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
 		for (auto T : inter)
 		{
-			//auto it = binned_df_filtered.begin();
-			//advance(it, i);
-			//Interaction T = *it;
 			if (T.getChr1() == T.getChr2())
 			{
 				interactions.push_back(T);
-				//pos++;
 			}
 		}
 	});
@@ -259,10 +246,6 @@ void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<In
 
 void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
-	//int pos = 0;
-//#pragma omp parallel for
-	//for (int i = 0; i< binned_df_filtered.size(); i++)
-
 	parallel_for(
 			blocked_range<concurrent_vector<Interaction>::iterator>(binned_df_filtered.begin(),	binned_df_filtered.end()),
 			[&] (blocked_range<concurrent_vector<Interaction>::iterator> inter) {
@@ -271,7 +254,6 @@ void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<
 			if (T.getChr1() != T.getChr2())
 			{
 				interactions.push_back(T);
-				//pos++;
 			}
 		}
 	});
@@ -324,7 +306,6 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 		{
 			string Int1;
 			Int1.resize(32);
-			//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
 			binInFile.read(& Int1[0], 32);
 			Int1.resize(Int1.find('\0'));
 			if (!Int1.empty())
@@ -335,7 +316,6 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 
 				string Int2;
 				Int2.resize(32);
-				//binInFile.read(reinterpret_cast<char*>(& chr), 32); // need to cast the pointer
 				binInFile.read(& Int2[0], 32);
 				Int2.resize(Int2.find('\0'));
 				pos = Int2.find(":");
@@ -352,7 +332,8 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 	}
 	else
 	{
-		cout << "Unable to read binary file: " + binInFileName << endl;
+		string str = string("Unable to read binary file: ") + binInFileName;
+		throw std::invalid_argument(str);
 	}
 
 	completed();

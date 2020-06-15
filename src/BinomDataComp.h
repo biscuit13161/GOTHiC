@@ -45,7 +45,7 @@ public:
 	//inline std::string getInt1() const {return mChr1 + ":" + std::to_string(mLocus1);}
 	//inline std::string getInt2() const {return mChr2 + ":" + std::to_string(mLocus2);}
 	//inline int getFreq() const {return mFrequency;}
-	/*inline double getProbability() {return mProbability;}
+	inline double getProbability() {return mProbability;}
 	inline double getExpected() {return mExpected;} //
 	inline double getPvalue() {return mPvalue;}
 	inline double getQvalue() {return mQvalue;}
@@ -60,14 +60,14 @@ public:
 	inline void setQvalue(double L) {mQvalue = L;}
 	inline void setLogObExp(double L) {mLogObservedOverExpected = L;}
 
-	void print();
+	void print();//*/
 
-	friend std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);*/
+	friend std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);//*/
 	bool operator==(const BinomDataComp & other);
 	friend bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b);
 };
 
-//std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);
+std::ostream & operator<<(std::ostream & out, const BinomDataComp & in);
 bool bincompcomp(const BinomDataComp & a, const BinomDataComp & b);
 
 

@@ -2,7 +2,7 @@
  * Site.cpp
  *
  *  Created on: 18 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "Site.h"

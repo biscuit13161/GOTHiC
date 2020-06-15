@@ -2,7 +2,7 @@
  * findCisTest.cpp
  *
  *  Created on: 15 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "BinomData.h"

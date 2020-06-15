@@ -2,7 +2,7 @@
  * hicupDataComp.cpp
  *
  *  Created on: 26 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "hicupDataComp.h"
@@ -19,13 +19,10 @@
 #include "tbb/concurrent_unordered_map.h"
 #include "tbb/parallel_reduce.h"
 #include "tbb/parallel_sort.h"
-#include "tbb/queuing_mutex.h"
 
 
 using namespace std;
 using namespace tbb;
-
-typedef queuing_mutex Mutex;
 
 void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concurrent_vector<Interaction> & interactions2, SetupComp & setupValues, concurrent_vector<BinomDataComp> & binFiltered)
 {
@@ -43,8 +40,6 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cerr << "\tControl: " << interactions1.size() << " interactions" <<endl;
 		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
 	}
-
-
 
 	cerr << "\tGetting Pairs" << endl;
 	concurrent_unordered_set<string> Int1; // Ints from Control
@@ -168,10 +163,8 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	}
 
 	float covS = AllInt.size(); // === length(all.bins)
-	// numberOfAllInteractions <- length(all.bins)^2
-	double numberOfAllInteractions = pow(covS,2);
-	// upperhalfBinNumber <- (length(all.bins)^2-length(all.bins))/2
-	double upperhalfBinNumber = (numberOfAllInteractions - covS)/2;
+	double numberOfAllInteractions = pow(covS,2); // === length(all.bins)^2
+	double upperhalfBinNumber = (numberOfAllInteractions - covS)/2; // === (length(all.bins)^2-length(all.bins))/2
 
 	if (setupValues.getVerbose())
 	{
@@ -202,26 +195,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	}
 
 	/** all read pairs used in binomial **/
-	// numberOfReadPairs1 used for computing expected and numberOfReadPairs2 as total number
-
-	/*cout << interactions1[4] ;
-	cout << interactions2[4] ;
-	cout << interactions1[1000] ;
-	cout << interactions2[1000] ;
-	cout << interactions1[5500] ;
-	cout << interactions2[5500] ;
-	int v = interactions1.size() - 10;
-	int y = v / 2;
-	cout << y << " : " << interactions1[y] ;
-	cout << y << " : " << interactions2[y] ;
-	cout << v << " : " << interactions1[v] ;
-	cout << v << " : " << interactions2[v] ;//*/
-	//throw std::invalid_argument("");
 
 	parallel_for(size_t(0),size_t(interactions2.size()),
 			[&] (size_t i) {
-	//for (int i = 0; i < interactions2.size(); i++)
-		//{
 		Interaction f = interactions1[i];
 		Interaction s = interactions2[i];
 		if ( f != s )
@@ -230,10 +206,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		}
 		else if (f.getFreq() > 1 && s.getFreq() > 1)
 		{
-			//cout << f << endl << s << endl;
 			double prob = double(f.getFreq())/numberOfReadPairs1;
-			//string str = string("prob: ") + to_string(f.getFreq()) + " / " + to_string(numberOfReadPairs1) + " = " + to_string(prob) + "\n";
-			//cout << str << prob << endl;
 
 			BinomDataComp I = BinomDataComp(s);
 			I.setProbability(prob);
@@ -248,30 +221,24 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cout << "\tBinomial Vector Size: " << binFiltered.size() << endl;
 	}
 
-	//throw std::invalid_argument("");
 	vector<array<double,3>> values;
 	values.resize(binFiltered.size());
 
 	cout << "\tcalculating P values" << endl;
 	parallel_for(size_t(0),size_t(binFiltered.size()),
 			[&] (size_t i) {
-		//for (int i = 0; i < binFiltered.size(); i++)
-		//{
+		string str = "";
 			int F = binFiltered[i].getFreq();
 			double V = binFiltered[i].getProbability();
-			double P = binomTest(F, numberOfReadPairs2, V, "two.sided");
+			double P = binomTest(F, numberOfReadPairs2, V, "two.sided", str);
 			binFiltered[i].setPvalue(P);
-			//cout << i << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
+			//cout << str << binFiltered[i].getExpected() << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
 
-			//binned_df_filtered2$logFoldChange <- log2((binned_df_filtered2$frequencies/numberOfReadPairs2)/(binned_df_filtered1$frequencies/numberOfReadPairs1))
 			double Fd = log2((double(binFiltered[i].getFreq())/numberOfReadPairs2)/(double(binFiltered[i].getExpected())/numberOfReadPairs1));
-			//cout << i << " " << binFiltered[i].getFreq() << " " << numberOfReadPairs2;
-			//cout << " " << binFiltered[i].getExpected() << " " << numberOfReadPairs1 << " " << Fd<< endl;
 			binFiltered[i].setLogObExp(Fd);
 
 			array<double,3> ls = {double(i), P, 0.5};
 			values[i] = ls;
-		//}
 	});
 	cout << "\t" << flush;
 	completed();
@@ -308,113 +275,18 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		pBhAdjust(values, transBinNumber);
 		//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
 		break;
-	}//*/
+	}
 
 	parallel_for(size_t(0),size_t(binFiltered.size()),
 				[&] (size_t i) {
-		//for (int i = 0; i < binFiltered.size(); i++)
-	//{
+
 		binFiltered[i].setQvalue(values[i][2]);
-	});//*/
+	});
 	cout << "\t" << flush;
 		completed();
 
 	completed();
 }
-
-/*
- * .binomialHiChicupComp=function(hicupinteraction1,hicupinteraction2, restrictionFile, sampleName, cistrans='all', parallel=FALSE, cores=8, removeDiagonal=TRUE,baits=NULL,res=NULL)
-	{
-
-
-#all read pairs used in binomial: numberOfReadPairs1 used for computing expected and numberOfReadPairs2 as total number
-
-
-
-
-
-
-					 binned_df_filtered2$pvalue <- apply(binned_df_filtered2, 1, function(x)
-														{
-														binom.test(as.numeric(x[["frequencies"]])-1, numberOfReadPairs2, as.numeric(x[["probabilityOfInteraction"]]), alternative = "two.sided")$p.value
-														}
-														)
-
-#observed over expected log ratio
-		binned_df_filtered2$logFoldChange <- log2((binned_df_filtered2$frequencies/numberOfReadPairs2)/(binned_df_filtered1$frequencies/numberOfReadPairs1))
-#multiple testing correction separately for matrices with all interactions/only cis/only transs
-
-		if(cistrans=='all'){
-			binned_df_filtered2$qvalue <- if(removeDiagonal){p.adjust(binned_df_filtered2$pvalue, method = "BH", n=upperhalfBinNumber)}else{p.adjust(binned_df_filtered2$pvalue, method = "BH", n=upperhalfBinNumber+length(all.bins))}
-		}
-		if(cistrans=='cis'){
-			binned_df_filtered2$qvalue <- if(removeDiagonal){p.adjust(binned_df_filtered2$pvalue, method = "BH", n=cisBinNumber)}else{p.adjust(binned_df_filtered2$pvalue, method = "BH", n=cisBinNumber+length(all.bins))}
-		}
-		if(cistrans=='trans'){
-			binned_df_filtered2$qvalue <- p.adjust(binned_df_filtered2$pvalue, method = "BH", n=transBinNumber)
-		}
-
-		test <- as.data.frame(binned_df_filtered2)
-
-		test[,"pvalue"] <- test$pvalue
-
-			pval.plot <- ggplot(test,aes(x=pvalue))
-			tryCatch(
-			{
-			dev.new()
-			print(pval.plot + geom_density())
-			},
-			error=function(cond) {
-			message("No interactive plot, try saving image")
-			message(cond)
-			return(tryCatch(
-				{
-				pdf(file=paste(sampleName,"pvalue_distribution.pdf",sep="_"))
-				print(pval.plot + geom_density())
-				dev.off()
-				},
-				error=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				},
-				warning=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-						}
-					))
-				},
-				warning=function(cond) {
-				message("No interactive plot, try saving image")
-				message(cond)
-				return(tryCatch(
-				{
-				pdf(file=paste(sampleName,"pvalue_distribution.pdf",sep="_"))
-				print(pval.plot + geom_density())
-				dev.off()
-				},
-				error=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				},
-				warning=function(cond2) {
-				message("No pdf output, quality assesment plot is not produced")
-				message(cond2)
-				return(NA)
-				}
-			))
-		})
-
-	binned_df_filtered=binned_df_filtered2[,c('chr1','locus1','chr2','locus2','probabilityOfInteraction', 'frequencies','predicted', 'pvalue','qvalue','logFoldChange','bait1','bait2')]
-	colnames(binned_df_filtered)=c('chr1','locus1','chr2','locus2','probability','readCount','expected' ,'pvalue','qvalue','logObservedOverExpected','bait1','bait2')
-
-
-return(binned_df_filtered)
-}
- *
- */
 
 Interaction splitPair(string & e)
 {

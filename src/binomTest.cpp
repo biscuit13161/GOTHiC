@@ -2,7 +2,7 @@
  * binomTest.cpp
  *
  *  Created on: 25 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #include "binomTest.h"
@@ -15,6 +15,16 @@ using namespace std;
 
 double binomTest(int x, int n, double p, string alternative)
 {
+	string str = "";
+	double val = binomTest( x, n, p, alternative, str);
+	return val;
+}
+
+double binomTest(int x, int n, double p, string alternative, string& str)
+{
+	// x = frequency
+	// n = number of pairs
+	// p = expected probabilityOfInteraction
     if ( x < 0)
     	throw std::invalid_argument("binomTest: 'x' must be nonnegative and integer");
 
@@ -37,8 +47,6 @@ double binomTest(int x, int n, double p, string alternative)
     	pval = pbinom(x - 1, n, p, 0, 0);
     	break;
     case ao_two_sided:
-    	/** needs work **/
-    	//cerr << "*** BEWARE: tow.sided binomTest incomplete ***" << endl;
     	if (p == 0)
         	{
         	pval = (x == 0);
@@ -54,22 +62,25 @@ double binomTest(int x, int n, double p, string alternative)
             double m = n * p;
             if (x == m)
             {
+            	str = "equals";
             	pval = 1;
             }
             else if (x < m)
             {
+            	str = "less\t";
             	//i <- int(from = ceiling(m), to = n)
             	int y = 0;
-            	for (int i = m; i < n; i++)
+            	for (int i = ceil(m); i <= n; i++)
             		if (dbinom(i, n, p, 0) <= d * relErr)
             			y++;
             	pval = pbinom(x, n, p, 1, 0) + pbinom(n - y, n, p, 0, 0);
             }
             else
             {
+            	str = "more\t";
             	//i <- seq.int(from = 0, to = floor(m))
             	int y = 0;
-            	for (int i = 0; i < m; i++)
+            	for (int i = 0; i <= floor(m); i++)
             		if (dbinom(i, n, p, 0) <= d * relErr)
             			{
             			y++;
