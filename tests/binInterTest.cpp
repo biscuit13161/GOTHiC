@@ -7,6 +7,7 @@
 
 #include "BinomData.h"
 #include "hicupData.h"
+#include "SetupData.h"
 #include "Utils.h"
 #include <gtest/gtest.h>
 #include <vector>
@@ -16,7 +17,8 @@
 TEST(binInterTests, constructor)
 {
 	std::vector<Interaction> interactions;
-	int res = 1000;
+	SetupData setupValues;
+	setupValues.setRes(1000);
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));
 	interactions.push_back(Interaction("chr1","chr1",17753,15273));
 	interactions.push_back(Interaction("chrX","chr7",1255,1020));
@@ -35,7 +37,7 @@ TEST(binInterTests, constructor)
 	list2["chrX:1000"] = 1;
 	list2["chr7:1000"] = 1;
 
-	binInteractions(interactions, res);
+	binInteractions(interactions, setupValues);
 
 
 	EXPECT_FALSE(list[interactions[0].getInt1()] == 1);

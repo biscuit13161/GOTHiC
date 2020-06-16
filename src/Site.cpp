@@ -42,6 +42,7 @@ void Site::print(){
 	cout << mChr << "\t"<< mStart  << "\t"<< mEnd << endl;
 }
 
+
 bool sitecomp(const Site & a, const Site & b)
 {
 	if (a.mChr == b.mChr)

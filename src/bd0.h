@@ -2,7 +2,7 @@
  * bd0.h
  *
  *  Created on: 2 Jun 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #ifndef SRC_BD0_H_

@@ -2,7 +2,7 @@
  * SetupComp.h
  *
  *  Created on: 27 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #ifndef SRC_SETUPCOMP_H_
@@ -17,6 +17,7 @@ class SetupComp
 private:
 	std::string mOutDir;
 	std::string mEnzyme;
+	std::string mBaits;
 	std::string mCondition1;
 	std::string mCondition2;
 	std::string mSname;
@@ -36,6 +37,7 @@ public:
 	inline int getThreads() const {return mThreads;}
 	inline int getRes() const {return mRes;}
 	inline std::string getEnzyme() const {return mEnzyme;}
+	inline std::string getBaits() const {return mBaits;}
 	inline std::string getOutDir() const {return mOutDir;}
 	inline std::string getCondition1() const {return mCondition1;}
 	inline std::string getCondition2() const {return mCondition2;}
@@ -49,6 +51,7 @@ public:
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
 	inline void setEnzyme(std::string enzyme) {mEnzyme = enzyme;}
+	inline void setBaits(std::string baits) {mBaits = baits;}
 	inline void setSname(std::string name) {mSname = name;}
 	inline void setCliName(std::string name) {mCliName = name;}
 	inline void setOutDir(std::string outDir) {mOutDir = outDir;}
@@ -68,6 +71,7 @@ enum SC_Options {
 	sc_Cond2,
 	sc_Sname,
 	sc_Digest,
+	sc_Baits,
 	sc_Threads,
 	sc_Res,
 	sc_Output,

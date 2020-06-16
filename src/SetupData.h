@@ -2,11 +2,11 @@
  * Utils.h
  *
  *  Created on: 11 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#ifndef SRC_SETUP_H_
-#define SRC_SETUP_H_
+#ifndef SRC_SETUPDATA_H_
+#define SRC_SETUPDATA_H_
 
 #include "Utils.h"
 #include <string>
@@ -17,7 +17,7 @@ enum AnalysisOptions {
 	ao_comparative
 };
 
-class Setup
+class SetupData
 {
 private:
 	std::string mOutDir;
@@ -34,8 +34,8 @@ private:
 	AnalysisOptions mAnalysisType;
 	bool mVerbose;
 public:
-	Setup();
-	Setup(std::string outDir, std::string enzyme, std::string input, int threads);
+	SetupData();
+	SetupData(std::string outDir, std::string enzyme, std::string input, int threads);
 
 	void print();
 
@@ -67,7 +67,7 @@ public:
 
 };
 
-Setup loadConfig(std::string & fileName);
+SetupData loadConfig(std::string & fileName);
 
 enum Options {
 	Input = 0,
@@ -86,4 +86,4 @@ enum Options {
 
 
 
-#endif /* SRC_SETUP_H_ */
+#endif /* SRC_SETUPDATA_H_ */

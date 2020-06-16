@@ -43,10 +43,6 @@ struct RetrieveKey
 
 void importHicup(string fileName, vector<Interaction> & interactions, bool checkConsistency)
 {
-	//fileType=ifelse(grepl("\\.bam$", fileName)|grepl("\\.sam$", fileName), "bam", "table")
-
-	//seqan3::alignment_file_input fin_from_filename{filename};
-
 	cerr << "Importing HiCUP file: " << fileName << endl;
 
 	//the output of hicup is a sam file, that looks like uniques_ORIGINALFILE_trunc.sam
@@ -60,7 +56,6 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 		system(cmd);
 		fileName = fileName + ".txt";
 		//throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
-		// samtools view -h CD34-2_S1_L007_R1_2_001.hicup.bam | grep -v "^@" | cut -f -4 > CD34-2_S1_L007_R1_2_001.hicup.bam.txt
 	}
 	if (fileName.find("sam",fileName.length()-3)!=string::npos)
 	{
@@ -201,7 +196,6 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 		getline(inFile,start2,'\n');
 		int locus2 = stoi(start2,nullptr,10);
 
-
 		Interaction a = Interaction(chr1, chr2, locus1, locus2);
 
 		interactions.push_back(a);
@@ -211,7 +205,6 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 			break;
 		}
 	}
-	//throw std::invalid_argument("finished");
 
 }//*/
 
@@ -253,11 +246,6 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, multimap<
 	int iSize = interactions.size();
 	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
-	//string binOutFileName = "Digest.bin";
-	//writeBinary(fragments, binOutFileName);
-
-
-
 	vector<halfInteraction> sources;
 	vector<halfInteraction> targets;
 
@@ -276,8 +264,6 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, multimap<
 	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
 
 	fragments.clear();
-	//multimap<string,array<int,2>> ().swap(fragments);
-	//sort positions into order
 
 	sortPositions(interactions, iSize, sources, targets);
 
@@ -318,7 +304,7 @@ void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInt
 	}
 }
 
-void binInteractions(vector<Interaction> & interactions, int res)
+void binInteractions(vector<Interaction> & interactions, SetupData & setupValues)
 {
 	cerr << "Calculating Interaction Bins ("  <<interactions.size() << ")" << endl;
 
@@ -328,13 +314,13 @@ void binInteractions(vector<Interaction> & interactions, int res)
 	for (int i = 0; i < interactions.size(); i++)
 	{
 		// if resolution is given, bins will be calculated from interactions using the resolution
-		int V = floor(interactions[i].getLocus1() / res) * res;
+		int V = floor(interactions[i].getLocus1() / setupValues.getRes()) * setupValues.getRes();
 		if (V == 0)
 		{
 			V = 1;
 		}
 		interactions[i].setLocus1(V);
-		V = floor(interactions[i].getLocus2() / res) * res;
+		V = floor(interactions[i].getLocus2() / setupValues.getRes()) * setupValues.getRes();
 		if (V == 0)
 		{
 			V = 1;
@@ -344,9 +330,9 @@ void binInteractions(vector<Interaction> & interactions, int res)
 
 
 	// --------- count the number of interactions between bins -------
-#ifdef DEBUG_FLAG
-	cout << "Singles: " << interactions.size()  << endl;
-#endif
+	if (setupValues.getVerbose())
+		cout << "Singles: " << interactions.size()  << endl;
+
 	countDuplicates(interactions);
 
 	completed();
@@ -418,8 +404,6 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 		throw std::invalid_argument("getHindIIIsitesFromHicup: unable to open Restriction List file!");
 	}
 	int rows = 1;
-
-	//array<int,2> pos{0,0};
 	string chr;
 	while (inFile)
 	{
@@ -434,13 +418,10 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 			}
 			string start;
 			getline(inFile,start,'\t');
-			//pos[0] = stoi(start,nullptr,10);
+
 			string end;
 			getline(inFile,end,'\t');
-			//pos[1] = stoi(end,nullptr,10);
 
-			//sites[chr] = pos;
-			//sites.emplace(chr,pos);
 			sites.insert(it++, pair(chr,array{stoi(start,nullptr,10),stoi(end,nullptr,10)}));
 			if (!inFile) // corrects for last blank line
 			{
@@ -461,16 +442,11 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 
 
 
-void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, vector<BinomData> & binFiltered)
+void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValues, vector<BinomData> & binFiltered)
 {
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
 	removeDiagonals(interactions, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
-
-	// all read pairs used in binomial
-	//int numberOfReadPairs = interactions.size(); // before binning!!
-	//cout << "Read Pairs " << numberOfReadPairs << endl;
-
 
 	// calculate coverage
     map<string,int> cov;
@@ -485,10 +461,11 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
 
     cout << "Read Pairs " << numberOfReadPairs << endl;
 
-//#ifdef DEBUG_FLAG
-    cerr << "Total Coverage: " << tCoverage  << " (57358/172074)"<< endl;
-    cerr << "Max Individual Coverage: " << max << endl;
-//    #endif
+    if (setupValues.getVerbose())
+    {
+    	cerr << "Total Coverage: " << tCoverage  << " (57358/172074)"<< endl;
+    	cerr << "Max Individual Coverage: " << max << endl;
+    }
 
     if (tCoverage == 0)
     {
@@ -530,12 +507,13 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     uint32_t numberOfAllInteractions = pow(covS,2);
     int upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2;
 
-//#ifdef DEBUG_FLAG
-    cout << "Chromosomes Size: " << chromos.size() << endl;
-    cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")" << endl;
-    cout << "upperhalfBinNumber: " << upperhalfBinNumber << endl;
-    cout << "diagonalProb: " << diagonalProb << endl;
-//#endif
+    if (setupValues.getVerbose())
+    {
+    	cout << "Chromosomes Size: " << chromos.size() << endl;
+    	cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")" << endl;
+    	cout << "upperhalfBinNumber: " << upperhalfBinNumber << endl;
+    	cout << "diagonalProb: " << diagonalProb << endl;
+    }
 
     double cisBinNumber = 0;
     double transBinNumber = 0;
@@ -549,8 +527,6 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     	transBinNumber = upperhalfBinNumber - cisBinNumber;
     }
 
-
-		//diagonalProb <- sum(relative_coverage^2)
     double probabilityCorrection = 0;
     switch(setupValues.getCisTrans())
     {
@@ -564,9 +540,10 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     	probabilityCorrection = double(upperhalfBinNumber)/transBinNumber;
     	break;
     }
-//#ifdef DEBUG_FLAG
-    printf("Probability Correction: %.10f \n", probabilityCorrection);
-//#endif
+
+    if (setupValues.getVerbose())
+    	printf("Probability Correction: %.10f \n", probabilityCorrection);
+
 
     vector<array<double,3>> values;
     values.resize(binFiltered.size());
@@ -576,19 +553,15 @@ void binomialHiChicup(vector<Interaction> & interactions, Setup & setupValues, v
     for (int i = 0; i < binFiltered.size(); i++)
     {
     	/** Calculate expected read counts, probabilities **/
-    	//double P = binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection;
     	binFiltered[i].setProbability(binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection);
     	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
 
     	/** Calculate pvalues **/
-    	// /* input Freq -1 as test is greater than! -- binomTest corrects for this! */
     	double P = binomTest(binFiltered[i].getFreq(), numberOfReadPairs, binFiltered[i].getProbability(), "greater");
-    	//double P = pbinom(double(binFiltered[i].getFreq()-1), double(numberOfReadPairs), binFiltered[i].getProbability(), false, false);
     	binFiltered[i].setPvalue(P);
 
     	/** observed over expected log ratio **/
-    	// binned_df_filtered$logFoldChange <- log2(binned_df_filtered$frequencies/binned_df_filtered$predicted)
-		binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/double(binFiltered[i].getExpected())));
+    	binFiltered[i].setLogObExp(log2(binFiltered[i].getFreq()/double(binFiltered[i].getExpected())));
 
 		array<double,3> ls = {double(i), binFiltered[i].getPvalue(), 0.5};
 		values[i] = ls;
@@ -671,32 +644,6 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 		}
 	}//*/
 
-/*#pragma omp parallel for
-	for (i = 0; i < query.size(); i++)
-	{
-		auto result = equal_range(fragments.begin(),fragments.end(),query[i].getChr(), Comp{});
-
-		int m = 0;
-		int l = result.first - fragments.begin();
-		int r = result.second - fragments.begin();
-		while (r - l > 1)
-		{
-			m =  l + (r-1) / 2;
-			if ((query[i].getLocus() >= fragments[m].getStart()) && (fragments[m].getEnd() >= query[i].getLocus()) )
-			{
-				query[i] = halfInteraction(fragments[m].getChr(), fragments[m].getStart());
-				//cout << "found: " << i << endl;
-				l=m;
-				r=m;
-			}
-			else if (query[i].getLocus() <= fragments[m].getEnd())
-				l = m;
-			else
-				r = m;
-		}
-		string str = string("found: ") + to_string(i) + " - " + fragments[m].getChr() + " : " + to_string(fragments[m].getStart()) + "\n";
-		cout << str;
-	}//*/
 	completed();
 }//*/
 
@@ -804,35 +751,16 @@ void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, i
 	// WILL NOT PARALLELISE!!! ...?
 	for (int i = 0; i < interactions.size(); i ++ )
 	{
-		/*if (cov.find(interactions[i].getInt1()) == cov.end())
-		{
-			//cout << "CovA " << interactions[i].getInt1() << endl;
-			cov[interactions[i].getInt1()] = interactions[i].getFreq();
-			tCoverage += interactions[i].getFreq();
-		}
-		else
-		{//*/
-			//cout << "CovA2 " << interactions[i].getInt1() << endl;
-			cov[interactions[i].getInt1()] += interactions[i].getFreq();
-			tCoverage += interactions[i].getFreq();
-			numberOfReadPairs += interactions[i].getFreq();
-		/*}
-		if (cov.find(interactions[i].getInt2()) == cov.end())
-		{
-			//cout << "CovB " << interactions[i].getInt1() << endl;
-			cov[interactions[i].getInt2()] = interactions[i].getFreq();
-			tCoverage += interactions[i].getFreq();
-		}
-		else
-		{//*/
-			//cout << "CovB2 " << interactions[i].getInt1() << endl;
-			cov[interactions[i].getInt2()] += interactions[i].getFreq();
-			tCoverage += interactions[i].getFreq();
-		//}
+		cov[interactions[i].getInt1()] += interactions[i].getFreq();
+		tCoverage += interactions[i].getFreq();
+
+		numberOfReadPairs += interactions[i].getFreq();
+		cov[interactions[i].getInt2()] += interactions[i].getFreq();
+		tCoverage += interactions[i].getFreq();
+
 		max = (cov[interactions[i].getInt1()]> max )? cov[interactions[i].getInt1()]: max;
 		max = (cov[interactions[i].getInt2()]> max )? cov[interactions[i].getInt2()]: max;
 	}
-
 }
 
 

@@ -27,8 +27,8 @@ foreach(lib ${CLIBS})
 endforeach(lib)
 
 list (APPEND LIBS Site padjust binomTest Utils UtilsComp)
-list (APPEND LIBS Interactions Setup SetupComp hicupData hicupDataComp)
-list (APPEND LIBS BinomData BinomDataComp binTest )
+list (APPEND LIBS Interactions SetupData SetupComp hicupData hicupDataComp)
+list (APPEND LIBS BinomData BinomDataComp binTest Baits )
 
 foreach(lib ${LIBS})
   ## copy list (zero-based, -1 refers to end) ##

@@ -25,6 +25,7 @@ void SetupComp::print()
 	cerr << "#" << endl;
 	cerr << "# Output Directory: " << mOutDir << endl;
 	cerr << "# Restriction File: " << mEnzyme << endl;
+	cerr << "# Baits File:       " << mBaits << endl;
 	cerr << "# Sample Name:      " << mSname << endl;
 	cerr << "# Control File:     " << mCondition1 << endl;
 	cerr << "# Sample File:      " << mCondition2 << endl;
@@ -68,6 +69,7 @@ SetupComp loadConfigComp(string & fileName)
 			optionValues["Sample"] = sc_Cond2;
 			optionValues["SampleName"] = sc_Sname;
 			optionValues["Digest"] = sc_Digest;
+			optionValues["Baits"] = sc_Baits;
 			optionValues["Threads"] = sc_Threads;
 			optionValues["Res"] = sc_Res;
 			optionValues["Output"] = sc_Output;
@@ -94,6 +96,9 @@ SetupComp loadConfigComp(string & fileName)
 				break;
 			case sc_Digest:
 				setupValues.setEnzyme(value);
+				break;
+			case sc_Baits:
+				setupValues.setBaits(value);
 				break;
 			case sc_Threads:
 				setupValues.setThreads(atoi(value.c_str()));

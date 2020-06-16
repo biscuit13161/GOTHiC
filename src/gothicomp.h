@@ -2,7 +2,7 @@
  * gothicomp.h
  *
  *  Created on: 26 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #ifndef SRC_GOTHICOMP_H_

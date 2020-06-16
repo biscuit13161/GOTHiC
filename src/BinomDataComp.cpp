@@ -9,7 +9,9 @@
 
 using namespace std;
 
-BinomDataComp::BinomDataComp():  mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
+BinomDataComp::BinomDataComp():  mProbability(0), mExpected(0), mReadCount(0),
+		mPvalue(0), mQvalue(0), mLogObservedOverExpected(0),
+		mBaits1(""), mBaits2(""){
 
 	}
 
@@ -38,6 +40,8 @@ BinomDataComp::BinomDataComp(const BinomDataComp & other){
 	mPvalue = other.mPvalue;
 	mQvalue = other.mQvalue;
 	mLogObservedOverExpected = other.mLogObservedOverExpected;
+	mBaits1 = other.mBaits1;
+	mBaits2 = other.mBaits2;
 }
 
 BinomDataComp::BinomDataComp(const Interaction & other): mProbability(0), mExpected(0), mReadCount(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0){
@@ -76,6 +80,8 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 			<< "\t" << in.mPvalue \
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \
+			<< "\t" << in.mBaits1 \
+			<< "\t" << in.mBaits2 \
 			<< flush;
 	return out;
 }//*/

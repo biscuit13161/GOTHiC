@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	}
 
 	vector<string> allArgs(argv, argv + argc);
-	Setup setupValues = loadConfig(allArgs[1]);
+	SetupData setupValues = loadConfig(allArgs[1]);
 
 	setupValues.print();
 
@@ -118,7 +118,7 @@ gothic(string fileName1, string fileName2, string sampleName, res, string genome
 
 // GOTHiC main tool based on hicup alignment
 
-void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
+void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 {
 	/*
 	 * fileName
@@ -169,7 +169,7 @@ void gothicHicup(Setup & setupValues, vector<BinomData> & binom)
 
     mapHicupToRestrictionFragment(interactions, fragments);
 
-	binInteractions(interactions, setupValues.getRes());
+	binInteractions(interactions, setupValues);
 
 	switch (setupValues.getAnalysisType())
 	{

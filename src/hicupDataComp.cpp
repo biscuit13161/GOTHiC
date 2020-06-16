@@ -10,6 +10,7 @@
 #include "UtilsComp.h"
 #include "binomTest.h"
 #include "padjust.h"
+#include "Baits.h"
 #include <algorithm>
 #include <math.h> //pow
 #include <stdint.h> // uint32_t
@@ -20,9 +21,9 @@
 #include "tbb/parallel_reduce.h"
 #include "tbb/parallel_sort.h"
 
-
 using namespace std;
 using namespace tbb;
+
 
 void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concurrent_vector<Interaction> & interactions2, SetupComp & setupValues, concurrent_vector<BinomDataComp> & binFiltered)
 {
@@ -196,6 +197,15 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	/** all read pairs used in binomial **/
 
+	vector<Bait> Baits;
+
+	if (setupValues.getBaits() != "")
+	{
+		readBaits(Baits, setupValues.getBaits());
+		if (setupValues.getVerbose())
+			cerr << "\tLoaded " << Baits.size() << " baits" << endl;;
+	}//*/
+
 	parallel_for(size_t(0),size_t(interactions2.size()),
 			[&] (size_t i) {
 		Interaction f = interactions1[i];
@@ -212,7 +222,28 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 			I.setProbability(prob);
 			I.setExpected(f.getFreq());
 
-			binFiltered.push_back(I);
+			if (!Baits.empty())
+			{
+				Locus L1 = Locus(I.getChr1(), I.getLocus1());
+				Locus L2 = Locus(I.getChr2(), I.getLocus2());
+
+				string str =  findOverlaps(Baits, L1, setupValues.getRes());
+				I.setBaits1(str);
+				string st = str;
+				str =  findOverlaps(Baits, L2, setupValues.getRes());
+				I.setBaits2(str);
+				st += "\t" + str + "\n";
+				cout << st;
+
+				if (I.getBaits1() != "" || I.getBaits2() != "")
+				{
+					binFiltered.push_back(I);
+				}
+			}//*/
+			else
+			{
+				binFiltered.push_back(I);
+			}
 		}
 	});
 

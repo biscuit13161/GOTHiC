@@ -2,7 +2,7 @@
  * Interactions.h
  *
  *  Created on: 27 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #ifndef SRC_INTERACTIONS_H_

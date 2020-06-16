@@ -2,7 +2,7 @@
  * hicupDataComp.h
  *
  *  Created on: 26 May 2020
- *      Author: rich
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
 #ifndef TESTS_HICUPDATACOMP_H_

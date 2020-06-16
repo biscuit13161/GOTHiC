@@ -10,11 +10,11 @@
 
 #include "BinomData.h"
 #include "Site.h"
-#include "Setup.h"
 #include <vector>
 #include <string>
 #include <math.h>
 #include <streambuf>
+#include "SetupData.h"
 
 
 template<typename CharT, typename TraitsT = std::char_traits<CharT> >
@@ -31,8 +31,8 @@ void importHicupGz(std::string fileName, std::vector<Interaction> & interactions
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
 void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
-void binInteractions(std::vector<Interaction> & interactions, int res);
-void binomialHiChicup(std::vector<Interaction> & interactions, Setup & setupValues, std::vector<BinomData> & binFiltered);
+void binInteractions(std::vector<Interaction> & interactions, SetupData & setupValues);
+void binomialHiChicup(std::vector<Interaction> & interactions, SetupData & setupValues, std::vector<BinomData> & binFiltered);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);

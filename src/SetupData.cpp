@@ -5,7 +5,8 @@
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#include "Setup.h"
+#include "SetupData.h"
+
 #include "version.h"
 #include <ctime>
 #include <iostream>
@@ -14,17 +15,17 @@
 
 using namespace std;
 
-Setup::Setup(): mOutDir(""), mEnzyme(""), mInput(""), mThreads(0), mRes(10000), mRemoveDiagonal(true)
+SetupData::SetupData(): mOutDir(""), mEnzyme(""), mInput(""), mThreads(0), mRes(10000), mRemoveDiagonal(true)
 {
 
 }
 
-Setup::Setup(string outDir, string enzyme, string input, int threads): mOutDir(outDir), mEnzyme(enzyme), mInput(input), mThreads(threads)
+SetupData::SetupData(string outDir, string enzyme, string input, int threads): mOutDir(outDir), mEnzyme(enzyme), mInput(input), mThreads(threads)
 {
 
 }
 
-void Setup::print()
+void SetupData::print()
 {
 	cerr << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
 	cerr << "#" << endl;
@@ -39,7 +40,7 @@ void Setup::print()
 	cerr << "#" << endl << endl;
 }
 
-Setup loadConfig(string & fileName)
+SetupData loadConfig(string & fileName)
 {
 	ifstream inFile;
 	inFile.open(fileName);
@@ -49,7 +50,7 @@ Setup loadConfig(string & fileName)
 		throw std::invalid_argument("Could not load Config file!");
 	}
 
-	Setup setupValues;
+	SetupData setupValues;
 	setupValues.setCliName(fileName);
 
 	while (inFile)
