@@ -36,6 +36,10 @@
  *         -- but is not the case at all when called e.g., from df() or dbeta() !
  *     (3) Also does not check for 0 <= p <= 1 and 0 <= q <= 1 or NaN's.
  *         Do this in the calling function.
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "dbinom.h"

@@ -1,9 +1,28 @@
 /*
- * hicupDataComp.cpp
+ *  hicupDataComp.cpp
  *
- *  Created on: 26 May 2020
- *  Author: Richard Thompson (ithompson@hbku.edu.qa)
+ *  AUTHOR
+ *	Richard Thompson, ithompson@hbku.edu.qa
+ *	26 May 2020.
+ *
+ *	Copyright (C) 2020 Richard Thompson, Qatar Biomedical Research Institute
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, a copy is available at
+ *  https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ *
  */
+
 
 #include "hicupDataComp.h"
 #include "Interactions.h"
@@ -229,11 +248,11 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 				string str =  findOverlaps(Baits, L1, setupValues.getRes());
 				I.setBaits1(str);
-				string st = str;
+				//string st = str;
 				str =  findOverlaps(Baits, L2, setupValues.getRes());
 				I.setBaits2(str);
-				st += "\t" + str + "\n";
-				cout << st;
+				//st += "\t" + str + "\n";
+				//cout << st;
 
 				if (I.getBaits1() != "" || I.getBaits2() != "")
 				{

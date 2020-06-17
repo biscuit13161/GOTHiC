@@ -21,11 +21,14 @@
  *  DESCRIPTION
  *
  *    The distribution function of the binomial distribution.
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "pbinom.h"
 #include <math.h>
-//#include "nmath.h"
 #include "dpq.h"
 
 #define ML_NEGINF	((-1.0) / 0.0)

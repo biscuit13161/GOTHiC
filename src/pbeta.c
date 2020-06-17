@@ -32,6 +32,10 @@
  *
  *      As from R 2.3.0, a wrapper for TOMS708
  *      as from R 2.6.0, 'log_p' partially improved over log(p..)
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "nmath.h"

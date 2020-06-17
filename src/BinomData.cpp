@@ -1,20 +1,37 @@
 /*
- * BinomData.cpp
+ *  BinomData.cpp
  *
- *  Created on: 5 May 2020
- *  Author: Richard Thompson (ithompson@hbku.edu.qa)
+ *  AUTHOR
+ *	Richard Thompson, ithompson@hbku.edu.qa
+ *	May 5, 2020.
+ *
+ *	Copyright (C) 2020 Richard Thompson, Qatar Biomedical Research Institute
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, a copy is available at
+ *  https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ *
  */
+ 
 
 #include "BinomData.h"
 #include "pbinom.h"
-//#include <regex>
 #include <iostream>
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
 
-//mChr1(""), mChr2(""), mLocus1(0), mLocus2(0), mFrequency(0),
 BinomData::BinomData():  mRelCoverage1(0), mRelCoverage2(0), mProbability(0), mExpected(0), mPvalue(0), mQvalue(0), mLogObservedOverExpected(0) {
 
 	}
@@ -63,15 +80,6 @@ void BinomData::print()
 	streamObj << this->getFreq();
 	string A = streamObj.str();
 			L = L + " " + A ; \
-//			+ " " + to_string(mRelCoverage1) \
-//			+ " " + to_string(mRelCoverage2) \
-//			+ " " + to_string(mProbability) \
-//			+ " " + to_string(mExpected) \
-//			+ " " + to_string(mReadCount) \
-//			+ " " + to_string(mPvalue) \
-//			+ "\n";
-	//double mQvalue; // binomial p-value corrected for multi-testing with Benjamini-Hochberg
-	//double mLogObservedOverExpected; ;
 	cout << L << endl;
 }
 

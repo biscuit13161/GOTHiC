@@ -37,6 +37,10 @@
  *    The accuracy of this routine compares (very) favourably
  *    with those of the Sun Microsystems portable mathematical
  *    library.
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "lgamma.h"

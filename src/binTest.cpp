@@ -1,33 +1,41 @@
 /*
- * binTest.cpp
+ *  binTest.cpp
  *
- *  Created on: 17 May 2020
- *  Author: Richard Thompson (ithompson@hbku.edu.qa)
+ *  AUTHOR
+ *	Richard Thompson, ithompson@hbku.edu.qa
+ *	17 May 2020
+ *
+ *	Copyright (C) 2020 Richard Thompson, Qatar Biomedical Research Institute
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program; if not, a copy is available at
+ *  https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
+ *
  */
+ 
 
 #include "binTest.h"
 #include "padjust.h"
 #include "Interactions.h"
 #include "BinomData.h"
-//#include "hicupData.h"
 #include "Utils.h"
 #include "pbinom.h"
 #include <ctime>
 #include <chrono>
 #include <thread>
-//#include <set>
 #include <iostream>
 #include <string>
-//#include <stdio.h>
-//#include <omp.h>
-//#include <istream>
-//#include <fstream>
 #include <map>
-//#include <cmath>
-//#include <regex>
-//#include <zlib.h>
-//#include <algorithm>
-//#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace std::this_thread;     // sleep_for, sleep_until

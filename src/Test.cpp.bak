@@ -1,9 +1,7 @@
 /*
- *  Utils.cpp
- *
  *  AUTHOR
  *	Richard Thompson, ithompson@hbku.edu.qa
- *	11 May 2020
+ *	October 23, 2020.
  *
  *	Copyright (C) 2020 Richard Thompson, Qatar Biomedical Research Institute
  *
@@ -21,8 +19,12 @@
  *  along with this program; if not, a copy is available at
  *  https://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
  *
+ *//*
+ * Utils.cpp
+ *
+ *  Created on: 11 May 2020
+ *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
- 
 
 #include "Utils.h"
 #include "Site.h"

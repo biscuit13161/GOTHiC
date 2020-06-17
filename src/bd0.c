@@ -2,7 +2,7 @@
  *  AUTHOR
  *	Catherine Loader, catherine@research.bell-labs.com.
  *	October 23, 2000.
- *
+ * 
  *  Merge in to R:
  *	Copyright (C) 2000-2014 The R Core Team
  *
@@ -31,6 +31,10 @@
  *	for all x and M=np. In particular for x/np close to 1, direct
  *	evaluation fails, and evaluation is based on the Taylor series
  *	of log((1+v)/(1-v)) with v = (x-M)/(x+M) = (x-np)/(x+np).
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 #include "bd0.h"
 #include "math.h"

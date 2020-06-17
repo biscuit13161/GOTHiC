@@ -32,12 +32,15 @@
  * Merge in to R:
  * Copyright (C) 2000, The R Core Team
  * R has lgammafn, and lgamma is not part of ISO C
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "stirlerr.h"
 #include "lgamma.h"
 #include <math.h>
-//#include "nmath.h"
 #include "dpq.h"
 
 /* stirlerr(n) = log(n!) - log( sqrt(2*pi*n)*(n/e)^n )

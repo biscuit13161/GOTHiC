@@ -38,6 +38,10 @@
  *    library.
  *
  *    MM specialized the case of  n!  for n < 50 - for even better precision
+ *
+ *  MODIFIED
+ *  	Richard Thompson, ithompson@hbku.edu.qa
+ *  	June 2, 2020
  */
 
 #include "gamma.h"
