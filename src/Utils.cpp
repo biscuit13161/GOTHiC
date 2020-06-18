@@ -474,3 +474,13 @@ int binarySearch2(int arr[], int l, int r, int x)
 	else
 		return -1;
 }
+
+bool file_exists (const std::string& name)
+{
+    if (FILE *file = fopen(name.c_str(), "r")) {
+        fclose(file);
+        return true;
+    } else {
+        return false;
+    }
+}

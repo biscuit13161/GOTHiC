@@ -166,8 +166,6 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
     importHicup(setupValues.getInput(), interactions);
 
-    //cout << "fast value" << setupValues.getFast() << endl;
-
     const bool fast = false; // set true to use map version and false to use Vector version
 
     typedef conditional< (fast == true),
@@ -178,6 +176,7 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
     fragType fragments;
     getHindIIIsitesFromHicup(fragments, setupValues.getEnzyme());
+    //throw std::invalid_argument("");
 
     mapHicupToRestrictionFragment(interactions, fragments);
 

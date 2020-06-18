@@ -53,3 +53,7 @@ endforeach(exe)
 add_custom_command(TARGET gothic POST_BUILD
                    COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/hicupToTable.sh ${CMAKE_CURRENT_BINARY_DIR}/. )
                    
+install(TARGETS ${EXE}
+    DESTINATION ${INSTALL_BIN_DIR}
+    )
+                   

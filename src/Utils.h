@@ -63,4 +63,6 @@ void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,cons
 int binarySearch(int arr[], int l, int r, int x);
 int binarySearch2(int arr[], int l, int r, int x);
 
+bool file_exists (const std::string& name);
+
 #endif /* SRC_UTILS_H_ */

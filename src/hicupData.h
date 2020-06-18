@@ -27,6 +27,7 @@ public:
 
 void importHicup(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupTxt(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
+void importHicupSam(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupGz(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency);
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
 void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);

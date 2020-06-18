@@ -17,7 +17,7 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 + C99 and C++17-compatible compiler
 + googletest
 + tbb
-+ SamTools (for Bam to txt conversion by hicupToTable.sh)
++ SamTools (for Bam to txt conversion)
 
 ###Building and Installing
 
@@ -50,12 +50,12 @@ make test
 
 ###Running Single Sample GOTHiC++
 
-GOTHiC++, currently, only accepts Bam files from HiCUP converted to txt files as input; this can be acheived using the hicupToTable.sh script found in the same src directory with the gothic and gothicomp binaries.
+GOTHiC++ does not, currently, readin HiCUP bam/sam files directly. Bam/sam files from HiCUP can be converted to txt files using the hicupToTable.sh script found in the src subdirectory where gothic is built.
 
 ```bash
 src/hicupToTable.sh <input.bam>
 ```
-N.B. please ensure the configuration file lists the correct file - `<input.bam.txt>` rather than <input.bam>.
+Specifying bam/sam files in the config file, will result in gothic automatically converting `<input.bam>` to `<input.bam.txt>` if it does not exist. This file is then loaded by gothic.
 
 ```bash
 <path/to>/gothic <path/to/gothic.conf>

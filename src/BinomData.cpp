@@ -114,7 +114,6 @@ ostream & operator<<(ostream & out, const BinomData & in)
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \
 			<< flush;
-	cerr << "print file" << endl;
 	return out;
 }
 

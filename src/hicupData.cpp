@@ -69,22 +69,28 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 
 	if (fileName.find("bam",fileName.length()-3)!=string::npos)
 	{
-		string str = string("samtools view -h ") + fileName + " | grep -v \"^@\" | cut -f -4 > " + fileName +".txt";
-		const char *cmd = str.c_str();
-		system(cmd);
-		fileName = fileName + ".txt";
-		//throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
+		string f2 = fileName + ".txt";
+		if (file_exists (f2))
+		{
+			cerr << "\tbam.txt file already exists" << endl;
+		}
+		else
+		{
+			cerr << "\tconverting Bam file" << endl;
+			string str = string("samtools view -h --no-PG ") + fileName + " | grep -v \"^@\" | cut -f -4 > " + f2;
+			const char *cmd = str.c_str();
+			system(cmd);
+			//throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
+			cerr << "\t";
+			completed();
+		}
+		fileName = f2;
 	}
 	if (fileName.find("sam",fileName.length()-3)!=string::npos)
 	{
-		string str = string("grep -v \"^@\" ") + fileName + " | cut -f -4 > " + fileName +".txt";
-		const char *cmd = str.c_str();
-		system(cmd);
-
-		fileName = fileName + ".txt";
-		//throw std::invalid_argument("importHicup: doesn't function with sam files, input can be converted to appropriate text file using hicupToTable script");
+		importHicupSam(fileName, interactions, checkConsistency);
 	}
-	if (fileName.find("gz",fileName.length()-2)!=string::npos)
+	else if (fileName.find("gz",fileName.length()-2)!=string::npos)
 	{
 		//importHicupTxt(fileName, interactions, checkConsistency);
 
@@ -174,6 +180,86 @@ void importHicupGz(string fileName, vector<Interaction> & interactions, bool che
 //*/
 }
 
+void importHicupSam(string fileName, vector<Interaction> & interactions, bool checkConsistency)
+{
+	ifstream inFile;
+	inFile.open(fileName);
+
+	if (!inFile.is_open())
+	{
+		throw std::invalid_argument("importHicup: unable to open input file!");
+	}
+
+	char sub = '@';
+	string split = "\t";
+
+	int i = 1;
+	while(!inFile.bad())
+	{
+		//string str = string("grep -v \"^@\" ") + fileName + " | cut -f -4 > " + fileName +".txt";
+		string str = "";
+		string waste = "";
+		getline(inFile,str,'\n');
+
+		//cout  << i << "\t";
+		if (str.length() > 0 && str.find(sub) != 0)
+		{
+			string id1 = str.substr(0, str.find(split));
+			str.erase(0, str.find(split) + split.length());
+			//cout   << id1 << "|\t";
+
+			string flag1 = str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+
+			string chr1 = str.substr(0,str.find(split));
+			//cout << chr1 << "|\t";
+			str.erase(0, str.find(split) + split.length());
+
+			string start1 =str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+			//cout << start1 << "\t";
+
+			int locus1 = stoi(start1,nullptr,10);
+
+
+			getline(inFile,str,'\n');
+
+			string id2 = str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+			if (checkConsistency && (id2.length() == 0 | id1 != id2))
+			{
+				throw std::invalid_argument("importHicup: reads must be paired in consecutive rows!");
+			}
+			string flag2 = str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+
+			string chr2 = str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+			//cout << chr2 << "\t";
+
+			string start2 = str.substr(0,str.find(split));
+			str.erase(0, str.find(split) + split.length());
+			//cout << "|" << start2 << "|";
+			int locus2  = stoi(start2,nullptr,10);
+
+			Interaction a = Interaction(chr1, chr2, locus1, locus2);
+			//a.print();
+
+			interactions.push_back(a);
+		}
+
+		i++;
+		//cout  << endl;
+
+		if (inFile.eof()) // corrects for last blank line
+		{
+			break;
+		}
+	}
+
+}//*/
+
+
 void importHicupTxt(string fileName, vector<Interaction> & interactions, bool checkConsistency)
 {
 	ifstream inFile;
@@ -231,8 +317,8 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	int iSize = interactions.size();
 	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
-	string binOutFileName = "Digest.bin";
-	writeBinary(fragments, binOutFileName);
+	//string binOutFileName = "Digest.bin";
+	//writeBinary(fragments, binOutFileName);
 
 	vector<halfInteraction> sources;
 	vector<halfInteraction> targets;
