@@ -435,7 +435,7 @@ void binInteractions(vector<Interaction> & interactions, SetupData & setupValues
 
 	// --------- count the number of interactions between bins -------
 	if (setupValues.getVerbose())
-		cout << "Singles: " << interactions.size()  << endl;
+		cout << "Singles: " << interactions.size() << " (8058150)"  << endl;
 
 	countDuplicates(interactions);
 
@@ -550,7 +550,13 @@ void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValue
 {
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
+	if (setupValues.getVerbose())
+		cout << "Interactions size: " << interactions.size() << " (5530314)" << endl;
+
 	removeDiagonals(interactions, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
+
+	if (setupValues.getVerbose())
+		cout << "Removed size: " << interactions.size() << " (5526538)" << endl;
 
 	// calculate coverage
     map<string,int> cov;
@@ -563,11 +569,11 @@ void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValue
 
     calcFreq(interactions, cov, numberOfReadPairs, tCoverage, max);
 
-    cout << "Read Pairs " << numberOfReadPairs << endl;
+    cout << "Read Pairs " << numberOfReadPairs << " (7972645)" << endl;
 
     if (setupValues.getVerbose())
     {
-    	cerr << "Total Coverage: " << tCoverage  << " (57358/172074)"<< endl;
+    	cerr << "Total Coverage: " << tCoverage  << " ()"<< endl;
     	cerr << "Max Individual Coverage: " << max << endl;
     }
 
@@ -607,17 +613,18 @@ void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValue
     }
 
     //probability correction assuming on average equal probabilities for all interactions
-    int covS = cov.size(); // === length(all_bins)
-    uint32_t numberOfAllInteractions = pow(covS,2);
-    int upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2;
+    float covS = cov.size(); // === length(all_bins)
+    double numberOfAllInteractions = pow(covS,2);
+    double upperhalfBinNumber = (numberOfAllInteractions - cov.size())/2;
 
     if (setupValues.getVerbose())
     {
     	cout << "Chromosomes Size: " << chromos.size() << endl;
-    	cout << "numberOfAllInteractions: " << numberOfAllInteractions << " (" << covS << ")" << endl;
-    	cout << "upperhalfBinNumber: " << upperhalfBinNumber << endl;
-    	cout << "diagonalProb: " << diagonalProb << endl;
+    	printf("numberOfAllInteractions: %.0f (%.0f, 64858846276)\n", numberOfAllInteractions, covS);
+    	printf("upperhalfBinNumber: %.0f (32429295801)\n", upperhalfBinNumber);
+    	printf("diagonalProb: %.10f (0.0003485705)\n", diagonalProb);
     }
+
 
     double cisBinNumber = 0;
     double transBinNumber = 0;
@@ -629,6 +636,12 @@ void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValue
 
     	cisBinNumber = (sumSquare - cov.size())/2;
     	transBinNumber = upperhalfBinNumber - cisBinNumber;
+    }
+
+    if (setupValues.getVerbose())
+    {
+    	printf("cisBinNumber: %.0f (835950970)\n", cisBinNumber);
+    	printf("transBinNumber: %.0f (31593344831)\n", transBinNumber);
     }
 
     double probabilityCorrection = 0;
@@ -646,7 +659,7 @@ void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValue
     }
 
     if (setupValues.getVerbose())
-    	printf("Probability Correction: %.10f \n", probabilityCorrection);
+    	printf("Probability Correction: %.10f (1.000349) \n", probabilityCorrection);
 
 
     vector<array<double,3>> values;

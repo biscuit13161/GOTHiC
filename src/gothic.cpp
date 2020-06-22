@@ -182,6 +182,10 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
 	binInteractions(interactions, setupValues);
 
+	if (setupValues.getVerbose())
+	cout << "Interactions size: " << interactions.size() << " (5530314)" << endl;
+
+
 	switch (setupValues.getAnalysisType())
 	{
 	case ao_single :
