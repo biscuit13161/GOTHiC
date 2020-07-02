@@ -28,6 +28,9 @@ private:
 	int mRes;
 	bool mRemoveDiagonal;
 	bool mVerbose;
+	std::string mAlpha;
+	QV_Options mQvalue;
+
 public:
 	SetupComp();
 	SetupComp(std::string outDir, std::string enzyme, std::string input, int threads);
@@ -47,6 +50,8 @@ public:
 	inline CisTrans getCisTrans() const {return mCisTrans;}
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
 	inline bool getVerbose() const {return mVerbose;}
+	inline std::string getAlpha() const {return mAlpha;}
+	inline QV_Options getQvalue() const {return mQvalue;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -61,6 +66,8 @@ public:
 	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
 	inline void setVerbose(bool L) {mVerbose = L;}
+	inline void setAlpha(std::string L) {mAlpha = L;}
+	inline void setQvalue(QV_Options L) {mQvalue = L;}
 
 };
 
@@ -79,6 +86,8 @@ enum SC_Options {
 	sc_RemDiag,
 	sc_Logfile,
 	sc_Verbose,
+	sc_Alpha,
+	sc_Qvalues
 };
 
 #endif /* SRC_SETUPCOMP_H_ */

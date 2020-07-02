@@ -42,16 +42,23 @@ void SetupComp::print()
 {
 	cerr << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
 	cerr << "#" << endl;
-	cerr << "# Output Directory: " << mOutDir << endl;
-	cerr << "# Restriction File: " << mEnzyme << endl;
-	cerr << "# Baits File:       " << mBaits << endl;
-	cerr << "# Sample Name:      " << mSname << endl;
-	cerr << "# Control File:     " << mCondition1 << endl;
-	cerr << "# Sample File:      " << mCondition2 << endl;
-	cerr << "# Threads:          " << mThreads << endl;
-	cerr << "# Resolution:       " << mRes << endl;
-	cerr << "# Config File:      " << mCliName << endl;
-	cerr << "# Verbose:          " << mVerbose << endl;
+	cerr << "# Output Directory:  " << mOutDir << endl;
+	cerr << "# Restriction File:  " << mEnzyme << endl;
+	cerr << "# Baits File:        " << mBaits << endl;
+	cerr << "# Sample Name:       " << mSname << endl;
+	cerr << "# Control File:      " << mCondition1 << endl;
+	cerr << "# Sample File:       " << mCondition2 << endl;
+	cerr << "# Threads:           " << mThreads << endl;
+	cerr << "# Resolution:        " << mRes << endl;
+	cerr << "# Config File:       " << mCliName << endl;
+	cerr << "# Verbose:           " << mVerbose << endl;
+	if (mQvalue == qv_ihw)
+		cerr << "# Pvalue Correction: Independent Hypothesis Weighting" <<endl;
+	else if (mQvalue == qv_bh)
+		cerr << "# Pvalue Correction: Benjamini Hochberg" <<endl;
+	else
+		cerr << "# Pvalue Correction: Not Specfied!" <<endl;
+	cerr << "# Alpha:             " << mAlpha << endl;
 	cerr << "#" << endl << endl;
 }
 
@@ -95,11 +102,19 @@ SetupComp loadConfigComp(string & fileName)
 			optionValues["CisTrans"] = sc_Cistrans;
 			optionValues["RemoveDiagonals"] = sc_RemDiag;
 			optionValues["Verbose"] = sc_Verbose;
+			optionValues["Alpha"] = sc_Alpha;
+			optionValues["Algorithm"] = sc_Qvalues;
 
 			std::map<std::string,CisTrans> CToptionValues;
 			CToptionValues["all"] = ct_all;
 			CToptionValues["cis"] = ct_cis;
 			CToptionValues["trans"] = ct_trans;
+
+			std::map<std::string,QV_Options> QVoptionValues;
+			QVoptionValues["ihw"] = qv_ihw;
+			QVoptionValues["bh"] = qv_bh;
+			QVoptionValues["IHW"] = qv_ihw;
+			QVoptionValues["BH"] = qv_bh;
 
 
 			switch(optionValues[id])
@@ -156,6 +171,18 @@ SetupComp loadConfigComp(string & fileName)
 						[](unsigned char c){ return std::tolower(c); });
 				if (value == "true")
 					setupValues.setVerbose(true);
+				break;
+			case sc_Alpha:
+				if (value.empty())
+					setupValues.setAlpha(string("0.1"));
+				else
+					setupValues.setAlpha(value);
+				break;
+			case sc_Qvalues:
+				if (value.empty())
+					setupValues.setQvalue(qv_ihw);
+				else
+					setupValues.setQvalue(QVoptionValues[value]);
 				break;
 			}//*/
 		}

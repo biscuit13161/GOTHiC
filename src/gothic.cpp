@@ -45,6 +45,12 @@ int main(int argc, char *argv[])
 		printUsage();
 		return 0;
 	}
+	else if ((strcmp(argv[1], "--help")==0) || (strcmp(argv[1], "-h")==0))
+	{
+		cout<<"usage: "<< argv[0] <<" <filename>\n";
+		printUsage();
+		return 0;
+	}
 
 	vector<string> allArgs(argv, argv + argc);
 	SetupData setupValues = loadConfig(allArgs[1]);

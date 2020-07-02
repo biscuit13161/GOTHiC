@@ -30,6 +30,11 @@ enum CisTrans
 	ct_trans,
 };
 
+enum QV_Options {
+	qv_ihw = 0,
+	qv_bh
+};
+
 void showTime();
 void completed(int n = 0);
 void printUsageComp();

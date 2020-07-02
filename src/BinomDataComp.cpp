@@ -99,8 +99,6 @@ ostream & operator<<(ostream & out, const BinomDataComp & in)
 			<< "\t" << in.mPvalue \
 			<< "\t" << in.mQvalue \
 			<< "\t" << in.mLogObservedOverExpected \
-			<< "\t" << in.mBaits1 \
-			<< "\t" << in.mBaits2 \
 			<< flush;
 	return out;
 }//*/

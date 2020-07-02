@@ -8,18 +8,20 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 
 **GOTHiC Citation**: Mifsud B, Sugar R (2020). GOTHiC: Binomial test for Hi-C data analysis. R package version 1.24.0.
 
-**GITHiC++ Authors**: Richard Thompson and Borbala Mifsud
+**GOTHiC++ Authors**: Richard Thompson and Borbala Mifsud
 
 **Contact Email**: ithompson[at]hbku.edu.qa
 
-###Requirements
+### Requirements
 + Cmake 3.4
 + C99 and C++17-compatible compiler
 + googletest
 + tbb
 + SamTools (for Bam to txt conversion)
++ Rscript (for independent hypothesis weighting)
++ IHW BioConductor package (for independent hypothesis weighting)
 
-###Building and Installing
+### Building and Installing
 
 In order to compile GOTHiC++, the authors advise creating a build folder within the root:
 
@@ -40,7 +42,7 @@ it is possible that cmake will not use the correct compilers if you have multipl
 cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ ..
 ```
 
-###Testing
+### Testing
 
 Once compiled, the compilation can be tested using:
 
@@ -48,7 +50,7 @@ Once compiled, the compilation can be tested using:
 make test
 ```
 
-###Running Single Sample GOTHiC++
+### Running Single Sample GOTHiC++
 
 GOTHiC++ does not, currently, readin HiCUP bam/sam files directly. Bam/sam files from HiCUP can be converted to txt files using the hicupToTable.sh script found in the src subdirectory where gothic is built.
 
@@ -61,7 +63,7 @@ Specifying bam/sam files in the config file, will result in gothic automatically
 <path/to>/gothic <path/to/gothic.conf>
 ```
 
-###Running Comparative GOTHiC++
+### Running Comparative GOTHiC++
 
 In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file (`<SampleName>.inter.bin`). These files are then used as input for gothicomp.
 
@@ -69,7 +71,7 @@ In order to carry a comparative analysis, Samples must be individually run as de
 <path/to>/gothicomp <path/to/gothicomp.conf>
 ```
 
-###Notes on config files
+### Notes on config files
 
 <ul>
 <li>GOTHiC and GOTHiCOMP can carry out analysis using only 
@@ -84,7 +86,7 @@ The config default is to analyse all interactions, but can be changed by alterin
 <li>By default, GOTHiC and GOTHiComp will remove diagnals; if this is not required, please uncomment the "#RemoveDiagonals: false" line</li>
 </ul>
 
-###Installing googletest
+### Installing googletest
 
 GOTHiC++ uses the googletest framework, this can be acquired using
 
@@ -106,7 +108,8 @@ Google test uses c++11 standard; if make fails to compile googletest, try adding
 set (CMAKE_CXX_STANDARD 11)
 set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 ```
-###Sourcing Intel TBB
+
+### Sourcing Intel TBB
 
 ```bash
 git clone https://github.com/oneapi-src/oneTBB.git
@@ -117,4 +120,14 @@ gmake
 In order to locate TBB, Cmake utilises a `FindTBB.cmake` from [https://github.com/justusc/FindTBB](https://github.com/justusc/FindTBB).
 Please note, it may be necessary to add the `-DTBB_DIR=<path/to>/oneTBB` option to the cmake command.
 
+### Independent Hypothesis Weighting for Comparative Analyses
  
+GOTHiC++ carries out Pvalue correction using either Benjamini Hochberg (BH) or Independent Hypothesis Weighting (IHW) \[Ignatiadis *et al*, 2016\], which is specified in the config file. Independent hypothesis weighting utilises the BioConductor IHW package, described from [https://bioconductor.org/packages/release/bioc/html/IHW.html](https://bioconductor.org/packages/release/bioc/html/IHW.html).
+
+GOTHiC++ defaults to using ihw, if not specified. However, if the IHW package is not installed, GOTHiC++ will revert to BH correction.
+
+**N.B.** if the "`Only 1 bin; IHW reduces to Benjamini Hochberg (uniform weights)`" error is produced, GOTHiC++ should be re-run with the `Algorithm: bh` option. BH correction relys on the dimensions of the input data, however IHW does not have access to this when it runs the BH calculation and these corrections are therefore inaccurate. 
+
+### References
+
+Ignatiadis, N., Klaus, B., Zaugg, J. *et al*. Data-driven hypothesis weighting increases detection power in genome-scale multiple testing. Nat Methods 13, 577–580 (2016). https://doi.org/10.1038/nmeth.3885

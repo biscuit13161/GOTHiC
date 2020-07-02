@@ -28,6 +28,7 @@
 #include "Interactions.h"
 #include "hicupDataComp.h"
 #include "binTest.h"
+#include "IHW.h"
 #include <iostream>
 #include <stdio.h>
 #include "tbb/concurrent_vector.h"
@@ -43,6 +44,12 @@ int main(int argc, char *argv[])
 	{
 		// We print argv[0] assuming it is the program name
 		cerr<<"usage: "<< argv[0] <<" <filename>\n";
+		printUsageComp();
+		return 0;
+	}
+	else if ((strcmp(argv[1], "--help")==0) || (strcmp(argv[1], "-h")==0))
+	{
+		cout<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
@@ -71,6 +78,8 @@ int main(int argc, char *argv[])
 
 	string fileName = setupValues.getSname()+".binom.txt";
 	ofstream binomFile(fileName);
+	if (setupValues.getBaits() == "")
+	{
 	binomFile << "chr1" << "\t" << "locus1" \
 			<< "\t" << "chr2" << "\t" << "locus2" \
 			<< "\t" << "probability" \
@@ -80,6 +89,28 @@ int main(int argc, char *argv[])
 			<< "\t" << "qvalue" \
 			<< "\t" << "logObservedOverExpected" << endl;
 	for (const auto &e : binom) binomFile << e << endl;
+	}
+	else
+	{
+		binomFile << "chr1" << "\t" << "locus1" \
+				<< "\t" << "chr2" << "\t" << "locus2" \
+				<< "\t" << "probability" \
+				<< "\t" << "expected" \
+				<< "\t" << "readCount" \
+				<< "\t" << "pvalue" \
+				<< "\t" << "qvalue" \
+				<< "\t" << "logObservedOverExpected" \
+				<< "\t" << "Baits1" \
+				<< "\t" << "Baits2"<< endl;
+		for (const auto &e : binom) binomFile << e \
+				<< "\t" << e.getBaits1() \
+				<< "\t" << e.getBaits2() \
+				<< endl;
+	}
+
+
+	if (setupValues.getQvalue() == qv_ihw)
+		ihw(fileName, setupValues);
 
 	return 0;
 }
