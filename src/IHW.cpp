@@ -34,4 +34,6 @@ void ihw(string fileName, SetupComp SetupValues)
 		cout << "\nRscript call:\n" << cmd << endl << endl;
 	int sys = system(cmd.c_str());
 	//cout << "system: " << sys <<endl;
+	cerr << "\t" << flush;
+	completed();
 }

@@ -295,9 +295,12 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getQvalue() == qv_ihw)
 	{
-		string cmd = string ("Rscript --vanilla -e 'require(IHW) ' ");
+		string cmd = string ("Rscript --vanilla -e 'if (!require(IHW)) {quit(status = 11)} ' ");
 
 		int sys = system(cmd.c_str());
+
+		if (setupValues.getVerbose())
+			cerr << "sys value: " << sys << endl;
 
 		if (sys != 0)
 		{
