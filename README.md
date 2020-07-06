@@ -2,7 +2,7 @@
 
 GOTHiC++ is a C++ implementation of the Bioconductor R package [GOTHiC](https://doi.org/doi:10.18129/B9.bioc.GOTHiC "GOTHiC on Bioconductor")
 
-This is Hi-C analysis software which uses a cumulative binomial test to detect interactions between distal genomic loci that have significantly more reads than expected by chance in Hi-C experiments. It takes mapped paired NGS reads as input and gives back the list of significant interactions for a given bin size in the genome.
+This is Hi-C analysis software which uses a cumulative binomial test to detect interactions between distal genomic loci that have significantly more reads than expected by chance in Hi-C experiments \[Mifsud *et al*,2017\]. It takes mapped paired NGS reads as input and gives back the list of significant interactions for a given bin size in the genome.
 
 **GOTHiC Authors**: Borbala Mifsud and Robert Sugar
 
@@ -130,4 +130,5 @@ GOTHiC++ defaults to using ihw, if not specified. However, if the IHW package is
 
 ### References
 
-Ignatiadis, N., Klaus, B., Zaugg, J. *et al*. Data-driven hypothesis weighting increases detection power in genome-scale multiple testing. Nat Methods 13, 577–580 (2016). https://doi.org/10.1038/nmeth.3885
++ Ignatiadis, N., Klaus, B., Zaugg, J. *et al* (2016). Data-driven hypothesis weighting increases detection power in genome-scale multiple testing. Nat Methods 13, 577–580. [https://doi.org/10.1038/nmeth.3885](https://doi.org/10.1038/nmeth.3885)
++ Mifsud B, Martincorena I, Darbo E, Sugar R, Schoenfelder S, Fraser P, *et al* (2017). GOTHiC, a probabilistic model to resolve complex biases and to identify real interactions in Hi-C data. PLoS ONE 12(4): e0174744 [https://doi.org/10.1371/journal.pone.0174744](https://doi.org/10.1371/journal.pone.0174744)
