@@ -8,13 +8,14 @@
 #include "hicupData.h"
 #include "BinomData.h"
 #include "Utils.h"
-#include <gtest/gtest.h>
 #include <vector>
 #include <map>
+#define BOOST_TEST_MODULE overlapTests
+#include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(overlapTests)
 
-TEST(overlapTests, findOverlapTestVec)
-{
+BOOST_AUTO_TEST_CASE(findOverlapTestVec) {
 	std::vector<halfInteraction> query;
 	query.push_back(halfInteraction("chr1",12345));
 	query.push_back(halfInteraction("chr2",54321));
@@ -27,14 +28,13 @@ TEST(overlapTests, findOverlapTestVec)
 
 	findOverlaps(query,fragments, "test");
 
-	ASSERT_TRUE(query[0].getChr() == "chr1");
-	EXPECT_TRUE(query[1].getChr() == "chr2");
-	EXPECT_TRUE(query[0].getLocus() == 10000);
-	EXPECT_TRUE(query[1].getLocus() == 50000);
+	BOOST_CHECK_EQUAL(query[0].getChr(), "chr1");
+	BOOST_CHECK(query[1].getChr() == "chr2");
+	BOOST_CHECK_EQUAL(query[0].getLocus(), 10000);
+	BOOST_CHECK_EQUAL(query[1].getLocus(), 50000);
 }
 
-TEST(overlapTests, findOverlapTestMap)
-{
+BOOST_AUTO_TEST_CASE(findOverlapTestMap) {
 	std::vector<halfInteraction> query;
 	query.push_back(halfInteraction("chr1",12345));
 	query.push_back(halfInteraction("chr2",54321));
@@ -48,10 +48,11 @@ TEST(overlapTests, findOverlapTestMap)
 
 	findOverlaps(query,fragments, "test");
 
-	ASSERT_TRUE(query[0].getChr() == "chr1");
-	EXPECT_TRUE(query[1].getChr() == "chr2");
-	EXPECT_TRUE(query[0].getLocus() == 10000);
-	EXPECT_TRUE(query[1].getLocus() == 50000);
+	BOOST_CHECK_EQUAL(query[0].getChr(), "chr1");
+	BOOST_CHECK(query[1].getChr() == "chr2");
+	BOOST_CHECK_EQUAL(query[0].getLocus(), 10000);
+	BOOST_CHECK_EQUAL(query[1].getLocus(), 50000);
 }
 
+BOOST_AUTO_TEST_SUITE_END()
 

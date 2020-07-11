@@ -6,15 +6,20 @@
  */
 
 #include "padjust.h"
-#include <gtest/gtest.h>
+#define BOOST_TEST_MODULE pBhAdjustTest
+#include <boost/test/unit_test.hpp>
 
-TEST(pBhAdjust, first)
-{
+BOOST_AUTO_TEST_SUITE(pBhAdjustTest)
+
+BOOST_AUTO_TEST_CASE(first) {
+
 	double P = 6.079281e-10;
 	double n = 28679;
 	double o = pBhAdjust(P, n);
 
-	ASSERT_NEAR(1.743477e-05, o, 5e-14);
+	BOOST_CHECK_CLOSE(1.743477e-05, o, 5e-7 ); // tolerance is a PERCENTAGE
 }
+
+BOOST_AUTO_TEST_SUITE_END()
 
 

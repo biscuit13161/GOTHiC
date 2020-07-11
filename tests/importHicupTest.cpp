@@ -8,21 +8,23 @@
 #include "../src/hicupData.h"
 #include "../src/BinomData.h"
 #include "../src/Utils.h"
-#include <gtest/gtest.h>
 #include <vector>
 #include <fstream>
+#define BOOST_TEST_MODULE importHicupTests
+#include <boost/test/unit_test.hpp>
 
-TEST(importHicupTests, constructor)
-{
+BOOST_AUTO_TEST_SUITE(importHicupTests)
+
+BOOST_AUTO_TEST_CASE(constructor) {
 	std::vector<Interaction> interactions;
 
 	importHicupTxt("../../example_data/example_Test_Data.txt", interactions);
 
-	ASSERT_TRUE(interactions.size() == 2);
-	ASSERT_TRUE(interactions[0].getInt1() == "chr17_gl000204_random:51677");
-	ASSERT_TRUE(interactions[0].getInt2() == "chr2:155678032");
-	ASSERT_TRUE(interactions[1].getInt1() == "chr3:101663949");
-	ASSERT_TRUE(interactions[1].getInt2() == "chr2:230303040");
+	BOOST_CHECK_EQUAL(interactions.size(), 2);
+	BOOST_CHECK_EQUAL(interactions[0].getInt1(), "chr17_gl000204_random:51677");
+	BOOST_CHECK_EQUAL(interactions[0].getInt2(), "chr2:155678032");
+	BOOST_CHECK_EQUAL(interactions[1].getInt1(), "chr3:101663949");
+	BOOST_CHECK_EQUAL(interactions[1].getInt2(), "chr2:230303040");
 }
 
-
+BOOST_AUTO_TEST_SUITE_END()

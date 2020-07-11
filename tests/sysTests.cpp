@@ -5,14 +5,18 @@
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#include "gtest/gtest.h"
+#define BOOST_TEST_MODULE SystemCheck
+#include <boost/test/unit_test.hpp>
 
-TEST(SystemCheck, systemCheck) {
+BOOST_AUTO_TEST_SUITE(SystemCheck)
+
+BOOST_AUTO_TEST_CASE(systemCheck) {
 	int count = 3;
 	int query = 4;
 
-	ASSERT_FALSE(count == query);
-	ASSERT_EQ(count, 3);
+	BOOST_CHECK_NE(count, query);
+	BOOST_CHECK_EQUAL(count, 3);
 
 }
 
+BOOST_AUTO_TEST_SUITE_END()

@@ -8,13 +8,15 @@
 #include "hicupData.h"
 #include "BinomData.h"
 #include "Utils.h"
-#include <gtest/gtest.h>
 #include <vector>
 #include <string>
 #include <map>
+#define BOOST_TEST_MODULE countDupsTests
+#include <boost/test/unit_test.hpp>
 
-TEST(countDupsTests, testCountDuplicates)
-{
+BOOST_AUTO_TEST_SUITE(countDupsTests)
+
+BOOST_AUTO_TEST_CASE(testCountDuplicates) {
 	std::vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr1","chr2",12553,15273));
 	interactions.push_back(Interaction("chr1","chr2",12553,15273));
@@ -34,14 +36,15 @@ TEST(countDupsTests, testCountDuplicates)
 
 	countDuplicates(interactions);
 
-	ASSERT_TRUE(interactions.size() == 3);
+	BOOST_CHECK_EQUAL(interactions.size(), 3);
 
 	for (auto i : interactions)
 	{
-		EXPECT_TRUE( i.getFreq() == list[i.getInt1()]);
-		EXPECT_TRUE( i.getFreq() == list[i.getInt2()]);
+		BOOST_CHECK( i.getFreq() == list[i.getInt1()]);
+		BOOST_TEST( i.getFreq() == list[i.getInt2()]);
 	}
 
 }//*/
 
+BOOST_AUTO_TEST_SUITE_END()
 

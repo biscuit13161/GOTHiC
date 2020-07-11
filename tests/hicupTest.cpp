@@ -8,16 +8,19 @@
 #include "hicupData.h"
 #include "BinomData.h"
 #include "Utils.h"
-#include <gtest/gtest.h>
 #include <vector>
 #include <string>
+#define BOOST_TEST_MODULE HiCUPTests
+#include <boost/test/unit_test.hpp>
 
-TEST(HiCUPTests, constructor)
-{
+BOOST_AUTO_TEST_SUITE(HiCUPTests)
+
+BOOST_AUTO_TEST_CASE(constructor) {
 	Interaction A = Interaction("chr1","chr2",12553,15273,3);
 
-	ASSERT_EQ(A.getFreq(), 3);
-	EXPECT_TRUE(A.getInt1() == "chr1:12553");
-	EXPECT_TRUE(A.getInt2() == "chr2:15273");
+	BOOST_CHECK_EQUAL(A.getFreq(), 3);
+	BOOST_TEST(A.getInt1() == "chr1:12553");
+	BOOST_TEST(A.getInt2() == "chr2:15273");
 }
 
+BOOST_AUTO_TEST_SUITE_END()

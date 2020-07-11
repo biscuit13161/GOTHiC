@@ -7,11 +7,14 @@
 
 #include "BinomData.h"
 #include "hicupData.h"
-#include <gtest/gtest.h>
 #include <vector>
+#define BOOST_TEST_MODULE calcFreqTest
+#include <boost/test/unit_test.hpp>
 
-TEST(calcFreqTest, first)
-{
+BOOST_AUTO_TEST_SUITE(calcFreqTest)
+
+BOOST_AUTO_TEST_CASE(first) {
+
 	std::vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr2","chr1",12553,15273,6));
 	interactions.push_back(Interaction("chr1","chr1",17753,15273,2));
@@ -25,14 +28,15 @@ TEST(calcFreqTest, first)
     calcFreq(interactions, cov, numberOfReadPairs, coverage, max);
 
     //ASSERT_TRUE(true);
-    ASSERT_TRUE(coverage == 18);
-    EXPECT_TRUE(max == 8);
+    BOOST_CHECK_EQUAL(coverage,18);
+    BOOST_CHECK_EQUAL(max, 8);
     //EXPECT_TRUE(numberOfReadPairs == 7);
-    EXPECT_TRUE(cov["chr1:17753"] == 2);
-    EXPECT_TRUE(cov["chr2:12553"] == 6);
-    EXPECT_TRUE(cov["chr1:15273"] == 8);
-    EXPECT_TRUE(cov["chrX:1255"] == 1);
-	EXPECT_TRUE(cov["chr7:1020"] == 1);
+    BOOST_CHECK_EQUAL(cov["chr1:17753"], 2);
+    BOOST_CHECK_EQUAL(cov["chr2:12553"], 6);
+    BOOST_CHECK_EQUAL(cov["chr1:15273"], 8);
+    BOOST_CHECK_EQUAL(cov["chrX:1255"], 1);
+    BOOST_CHECK_EQUAL(cov["chr7:1020"], 1);
 
 }
 
+BOOST_AUTO_TEST_SUITE_END()

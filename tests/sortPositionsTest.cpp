@@ -1,19 +1,20 @@
 /*
- * sortPositionsTest.cpp
+ * sysTests.cpp
  *
- *  Created on: 13 May 2020
+ *  Created on: 12 May 2020
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-
 #include "BinomData.h"
 #include "hicupData.h"
-#include <gtest/gtest.h>
 #include <vector>
+#define BOOST_TEST_MODULE sortPositionsTest
+#include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(sortPositionsTest)
 
-TEST(sortPositionsTest, first)
-{
+BOOST_AUTO_TEST_CASE(first) {
+
 	std::vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));
 	interactions.push_back(Interaction("chr1","chr1",17753,15273));
@@ -30,7 +31,10 @@ TEST(sortPositionsTest, first)
 
 	sortPositions(interactions, iSize, sources, targets);
 
-	ASSERT_TRUE(interactions[0].getInt2() == "chr2:12553");
-	EXPECT_TRUE(interactions[1].getInt1() == "chr1:15273");
-	EXPECT_TRUE(interactions[2].getInt2() == "chrX:1255");
+	BOOST_CHECK_EQUAL(interactions[0].getInt2(), "chr2:12553");
+	BOOST_CHECK_EQUAL(interactions[1].getInt1(), "chr1:15273");
+	BOOST_CHECK_EQUAL(interactions[2].getInt2(), "chrX:1255");
+
 }
+
+BOOST_AUTO_TEST_SUITE_END()

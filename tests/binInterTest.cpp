@@ -9,13 +9,15 @@
 #include "hicupData.h"
 #include "SetupData.h"
 #include "Utils.h"
-#include <gtest/gtest.h>
 #include <vector>
 #include <map>
+#define BOOST_TEST_MODULE binInterTests
+#include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(binInterTests)
 
-TEST(binInterTests, constructor)
-{
+BOOST_AUTO_TEST_CASE(constructor) {
+
 	std::vector<Interaction> interactions;
 	SetupData setupValues;
 	setupValues.setRes(1000);
@@ -40,12 +42,12 @@ TEST(binInterTests, constructor)
 	binInteractions(interactions, setupValues);
 
 
-	EXPECT_FALSE(list[interactions[0].getInt1()] == 1);
-	EXPECT_TRUE(list2[interactions[0].getInt1()] == 1);
-	EXPECT_FALSE(list[interactions[2].getInt2()] == 1);
-	EXPECT_TRUE(list2[interactions[1].getInt2()] == 1);
+	BOOST_CHECK_NE(list[interactions[0].getInt1()], 1);
+	BOOST_CHECK_EQUAL(list2[interactions[0].getInt1()], 1);
+	BOOST_CHECK_NE(list[interactions[2].getInt2()], 1);
+	BOOST_CHECK_EQUAL(list2[interactions[1].getInt2()], 1);
 
 }
 
-
+BOOST_AUTO_TEST_SUITE_END()
 

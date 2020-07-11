@@ -6,12 +6,14 @@
  */
 
 #include "pbinom.h"
-#include <gtest/gtest.h>
 #include <vector>
+#define BOOST_TEST_MODULE binInterTests
+#include <boost/test/unit_test.hpp>
 
+BOOST_AUTO_TEST_SUITE(binInterTests)
 
-TEST(binInterTests, constructor)
-{
+BOOST_AUTO_TEST_CASE(constructor) {
+
 	/*
 	 * freq = vector of quantiles
 	 * num = number of trials
@@ -32,8 +34,10 @@ TEST(binInterTests, constructor)
 	double P3 = pbinom(freq, num, prob, 0, 1);
 	double P4 = pbinom(1, 28679, 6.079281e-10, 0, 0);
 
-    ASSERT_DOUBLE_EQ(0.216, P); // P == 1.743462e-05
-    EXPECT_DOUBLE_EQ(0.784, P2);
-    EXPECT_NEAR(-1.53248, P3, 0.00005); //-1.532477
-    EXPECT_NEAR(1.519785e-10, P4, 5e-15); //1.51979e-10
+	BOOST_CHECK_CLOSE(0.216, P, 0.00005); // P == 1.743462e-05
+	BOOST_CHECK_EQUAL(0.784, P2);
+	BOOST_CHECK_CLOSE(-1.53248, P3, 0.0005); //-1.532477
+	BOOST_CHECK_CLOSE(1.519785e-10, P4, 0.00005); //1.51979e-10
 }
+
+BOOST_AUTO_TEST_SUITE_END()

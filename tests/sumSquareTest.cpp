@@ -8,9 +8,12 @@
 #include "Interactions.h"
 #include <set>
 #include <string>
-#include "gtest/gtest.h"
+#define BOOST_TEST_MODULE sortPositionsTest
+#include <boost/test/unit_test.hpp>
 
-TEST(sortPositionsTest, first)
+BOOST_AUTO_TEST_SUITE(sortPositionsTest)
+
+BOOST_AUTO_TEST_CASE(first)
 {
 	std::vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));
@@ -32,6 +35,8 @@ TEST(sortPositionsTest, first)
 	getSumSquare(sumSquare, chromos, interactions);
 
 
-	ASSERT_FALSE(sumSquare == 0);
-	EXPECT_TRUE(sumSquare == 15);
+	BOOST_CHECK(sumSquare != 0);
+	BOOST_CHECK_EQUAL(sumSquare, 15);
 }
+
+BOOST_AUTO_TEST_SUITE_END()
