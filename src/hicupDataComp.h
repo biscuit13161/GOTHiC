@@ -22,4 +22,6 @@ void binomialHiChicupComp(tbb::concurrent_vector<Interaction> & interactions1, t
 Interaction splitPair(std::string & e );
 void splitPair(std::string & e, std::string & chr1, std::string & chr2,int & locus1, int & locus2);
 
+void BHCorrection(tbb::concurrent_vector<BinomDataComp> & binFiltered, std::vector<std::array<double,3>> values, SetupComp & setupValues);
+
 #endif /* TESTS_HICUPDATACOMP_H_ */

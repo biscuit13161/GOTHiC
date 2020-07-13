@@ -182,16 +182,16 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cerr << "\tSample:  " << interactions2.size() << " interactions" << endl;
 	}
 
-	float covS = AllInt.size(); // === length(all.bins)
-	double numberOfAllInteractions = pow(covS,2); // === length(all.bins)^2
-	double upperhalfBinNumber = (numberOfAllInteractions - covS)/2; // === (length(all.bins)^2-length(all.bins))/2
+	setupValues.setCovS(AllInt.size()); // === length(all.bins)
+	double numberOfAllInteractions = pow(setupValues.getCovS(),2); // === length(all.bins)^2
+	setupValues.setUpperhalfBinNumber( (numberOfAllInteractions - setupValues.getCovS())/2 ); // === (length(all.bins)^2-length(all.bins))/2
 
 	if (setupValues.getVerbose())
 	{
 		cerr.precision(15);
-		cerr << "\tNumber of All Int:  " << covS << endl;
+		cerr << "\tNumber of All Int:  " << setupValues.getCovS() << endl;
 		cerr << "\tTotal Interactions: " << numberOfAllInteractions  << endl;
-		cerr << "\tUpperHalfBinNumber: " << upperhalfBinNumber << endl;
+		cerr << "\tUpperHalfBinNumber: " << setupValues.getUpperhalfBinNumber() << endl;
 	}
 
 	set<string> chromos;
@@ -203,15 +203,15 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	double sumSquare = 0;
 	getSumSquare(sumSquare, chromos, interactions2);
 
-	double cisBinNumber = (sumSquare - covS)/2;
-	double transBinNumber = upperhalfBinNumber - cisBinNumber;
+	setupValues.setCisBinNumber( (sumSquare - setupValues.getCovS())/2 );
+	setupValues.setTransBinNumber( setupValues.getUpperhalfBinNumber() - setupValues.getCisBinNumber() );
 
 	if (setupValues.getVerbose())
 	{
 		cerr.precision(15);
 		cerr << "\tSum of Squares:  " << sumSquare << endl;
-		cerr << "\tNumber of Cis:   " << cisBinNumber << endl;
-		cerr << "\tNumber of Trans: " << transBinNumber << endl;
+		cerr << "\tNumber of Cis:   " << setupValues.getCisBinNumber() << endl;
+		cerr << "\tNumber of Trans: " << setupValues.getTransBinNumber() << endl;
 	}
 
 	/** all read pairs used in binomial **/
@@ -313,43 +313,44 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	if (setupValues.getQvalue() == qv_bh)
 	{
 		cout << "\tcalculating Q values using Benjamini Hochberg" << endl;
-		switch(setupValues.getCisTrans())
-		{
-		case ct_all :
-			if(setupValues.getRemoveDiagonal())
-			{
-				pBhAdjust(values, upperhalfBinNumber);
-				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
-			}
-			else
-			{
-				pBhAdjust(values, upperhalfBinNumber+covS);
-				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
-			}
-			break;
-		case ct_cis :
-			if(setupValues.getRemoveDiagonal())
-			{
-				pBhAdjust(values, cisBinNumber);
-				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
-			}
-			else
-			{
-				pBhAdjust(values, cisBinNumber+covS);
-				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
-			}
-			break;
-		case ct_trans:
-			pBhAdjust(values, transBinNumber);
-			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
-			break;
-		}
-
-		parallel_for(size_t(0),size_t(binFiltered.size()),
-				[&] (size_t i) {
-
-			binFiltered[i].setQvalue(values[i][2]);
-		});
+		BHCorrection(binFiltered, values, setupValues);
+//		switch(setupValues.getCisTrans())
+//		{
+//		case ct_all :
+//			if(setupValues.getRemoveDiagonal())
+//			{
+//				pBhAdjust(values, upperhalfBinNumber);
+//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
+//			}
+//			else
+//			{
+//				pBhAdjust(values, upperhalfBinNumber+covS);
+//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
+//			}
+//			break;
+//		case ct_cis :
+//			if(setupValues.getRemoveDiagonal())
+//			{
+//				pBhAdjust(values, cisBinNumber);
+//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
+//			}
+//			else
+//			{
+//				pBhAdjust(values, cisBinNumber+covS);
+//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
+//			}
+//			break;
+//		case ct_trans:
+//			pBhAdjust(values, transBinNumber);
+//			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
+//			break;
+//		}
+//
+//		parallel_for(size_t(0),size_t(binFiltered.size()),
+//				[&] (size_t i) {
+//
+//			binFiltered[i].setQvalue(values[i][2]);
+//		});
 		cout << "\t" << flush;
 		completed();
 	}
@@ -373,4 +374,45 @@ Interaction splitPair(string & e)
 
 	Interaction I = Interaction(chr1,chr2,locus1,locus2,1);
 	return I;
+}
+
+void BHCorrection(concurrent_vector<BinomDataComp> & binFiltered, vector<array<double,3>> values, SetupComp & setupValues)
+{
+	switch(setupValues.getCisTrans())
+			{
+			case ct_all :
+				if(setupValues.getRemoveDiagonal())
+				{
+					pBhAdjust(values, setupValues.getUpperhalfBinNumber());
+					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
+				}
+				else
+				{
+					pBhAdjust(values, setupValues.getUpperhalfBinNumber()+setupValues.getCovS());
+					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
+				}
+				break;
+			case ct_cis :
+				if(setupValues.getRemoveDiagonal())
+				{
+					pBhAdjust(values, setupValues.getCisBinNumber());
+					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
+				}
+				else
+				{
+					pBhAdjust(values, setupValues.getCisBinNumber()+setupValues.getCovS());
+					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
+				}
+				break;
+			case ct_trans:
+				pBhAdjust(values, setupValues.getTransBinNumber());
+				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
+				break;
+			}
+
+			parallel_for(size_t(0),size_t(binFiltered.size()),
+					[&] (size_t i) {
+
+				binFiltered[i].setQvalue(values[i][2]);
+			});
 }

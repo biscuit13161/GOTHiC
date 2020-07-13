@@ -30,6 +30,10 @@ private:
 	bool mVerbose;
 	std::string mAlpha;
 	QV_Options mQvalue;
+	double mUpperhalfBinNumber;
+	double mCovS;
+	double mCisBinNumber;
+	double mTransBinNumber;
 
 public:
 	SetupComp();
@@ -52,6 +56,10 @@ public:
 	inline bool getVerbose() const {return mVerbose;}
 	inline std::string getAlpha() const {return mAlpha;}
 	inline QV_Options getQvalue() const {return mQvalue;}
+	inline double getUpperhalfBinNumber() {return mUpperhalfBinNumber;}
+	inline double getCovS() {return mCovS;}
+	inline double getCisBinNumber() {return mCisBinNumber;}
+	inline double getTransBinNumber() {return mTransBinNumber;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -68,6 +76,10 @@ public:
 	inline void setVerbose(bool L) {mVerbose = L;}
 	inline void setAlpha(std::string L) {mAlpha = L;}
 	inline void setQvalue(QV_Options L) {mQvalue = L;}
+	inline void setUpperhalfBinNumber(double L) {mUpperhalfBinNumber = L;}
+	inline void setCovS(double L) {mCovS = L;}
+	inline void setCisBinNumber(double L) {mCisBinNumber = L;}
+	inline void setTransBinNumber(double L) {mTransBinNumber = L;}
 
 };
 

@@ -17,6 +17,7 @@ include_directories(${Boost_INCLUDE_DIRS})
 
 add_subdirectory (src) 
 if(BUILD_TESTING)
+  #message(STATUS "testing")
   add_subdirectory(tests)
 endif()
 

@@ -76,6 +76,36 @@ int main(int argc, char *argv[])
 		cerr << "Error: " << e.what() << endl;
 	}
 
+	outputfile(binom, setupValues);
+
+
+	if (setupValues.getQvalue() == qv_ihw)
+		ihw(setupValues.getSname()+".binom.txt", setupValues);
+
+	return 0;
+}
+
+void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> & binom)
+{
+	/** load data from GOTHiC++ **/
+	concurrent_vector<Interaction> interactions1;
+	readBinary(interactions1, setupValues.getCondition1());
+
+	concurrent_vector<Interaction> interactions2;
+	readBinary(interactions2, setupValues.getCondition2());
+
+	if (setupValues.getVerbose())
+	{
+		cerr << "\tControl: " << interactions1.size() << " interactions" <<endl;
+		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
+	}
+
+	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);
+
+}
+
+void outputfile(tbb::concurrent_vector<BinomDataComp> & binom, SetupComp & setupValues)
+{
 	string fileName = setupValues.getSname()+".binom.txt";
 	ofstream binomFile(fileName);
 	if (setupValues.getBaits() == "")
@@ -107,30 +137,4 @@ int main(int argc, char *argv[])
 				<< "\t" << e.getBaits2() \
 				<< endl;
 	}
-
-
-	if (setupValues.getQvalue() == qv_ihw)
-		ihw(fileName, setupValues);
-
-	return 0;
 }
-
-void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> & binom)
-{
-	/** load data from GOTHiC++ **/
-	concurrent_vector<Interaction> interactions1;
-	readBinary(interactions1, setupValues.getCondition1());
-
-	concurrent_vector<Interaction> interactions2;
-	readBinary(interactions2, setupValues.getCondition2());
-
-	if (setupValues.getVerbose())
-	{
-		cerr << "\tControl: " << interactions1.size() << " interactions" <<endl;
-		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
-	}
-
-	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);
-
-}
-

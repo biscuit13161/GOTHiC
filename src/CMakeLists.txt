@@ -1,6 +1,5 @@
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/modules")
-#find_package (SeqAn3 3.0.0 REQUIRED HINTS "${CMAKE_SOURCE_DIR}/../seqan3/build_system")
-find_package(Boost 1.36.0 COMPONENTS iostreams)
+#find_package(Boost 1.71.0 COMPONENTS iostreams)
 #find_package (gzstream 1.5 REQUIRED "${CMAKE_SOURCE_DIR}/../gzstream")
 find_package(TBB REQUIRED)
 

@@ -15,7 +15,7 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 ### Requirements
 + Cmake 3.4
 + C99 and C++17-compatible compiler
-+ googletest
++ Boost C++ libraries (for unit testing)
 + tbb
 + SamTools (for Bam to txt conversion)
 + Rscript (for independent hypothesis weighting)
@@ -86,28 +86,9 @@ The config default is to analyse all interactions, but can be changed by alterin
 <li>By default, GOTHiC and GOTHiComp will remove diagnals; if this is not required, please uncomment the "#RemoveDiagonals: false" line</li>
 </ul>
 
-### Installing googletest
+### Installing Boost
 
-GOTHiC++ uses the googletest framework, this can be acquired using
-
-```bash
-git clone https://github.com/google/googletest.git
-```
-then compiled by... 
-
-```bash
-mkdir googletest/build && cd googletest/build
-cmake ..
-make
-[sudo] make install
-```
-
-Google test uses c++11 standard; if make fails to compile googletest, try adding one of these commands before the target in googletest/CMakeLists.txt and re-running the cmake.
-
-```
-set (CMAKE_CXX_STANDARD 11)
-set (CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
-```
+If the Boost C++ libraries are not installed, please find the details at [boost.org][https://www.boost.org/]
 
 ### Sourcing Intel TBB
 

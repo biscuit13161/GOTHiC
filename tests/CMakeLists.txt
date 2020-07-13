@@ -1,4 +1,4 @@
-find_package(Boost COMPONENTS system filesystem unit_test_framework REQUIRED)                      
+find_package(Boost 1.71.0 COMPONENTS system filesystem unit_test_framework REQUIRED)                      
                       
 # Gather the header and source files
 file(GLOB UNIT_TESTS_INC_FILES ${PROJECT_SOURCE_DIR}/test/*.hpp)

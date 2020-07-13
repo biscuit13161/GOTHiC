@@ -15,4 +15,6 @@
 
 void gothicHicupComp(SetupComp & setupValues, tbb::concurrent_vector<BinomDataComp> & binom);
 
+void outputfile(tbb::concurrent_vector<BinomDataComp> & binom, SetupComp & setupValues);
+
 #endif /* SRC_GOTHICOMP_H_ */
