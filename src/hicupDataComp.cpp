@@ -305,7 +305,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		if (sys != 0)
 		{
 			cout << "R library IHW not found!\n\tPvalue correction switched to Benjamini Hochberg" << endl;
-			setupValues.setQvalue(qv_bh);
+			setupValues.setQvalue("bh");
 		}
 	}
 

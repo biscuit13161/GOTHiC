@@ -26,6 +26,7 @@
 
 #include "SetupComp.h"
 #include "version.h"
+#include <getopt.h>
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -33,7 +34,7 @@
 
 using namespace std;
 
-SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mRemoveDiagonal(true), mVerbose(false)
+SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mRemoveDiagonal(true), mVerbose(false)
 {
 
 }
@@ -110,12 +111,6 @@ SetupComp loadConfigComp(string & fileName)
 			CToptionValues["cis"] = ct_cis;
 			CToptionValues["trans"] = ct_trans;
 
-			std::map<std::string,QV_Options> QVoptionValues;
-			QVoptionValues["ihw"] = qv_ihw;
-			QVoptionValues["bh"] = qv_bh;
-			QVoptionValues["IHW"] = qv_ihw;
-			QVoptionValues["BH"] = qv_bh;
-
 
 			switch(optionValues[id])
 			{
@@ -153,9 +148,9 @@ SetupComp loadConfigComp(string & fileName)
 				break;
 			case sc_Cistrans:
 				if (value.empty())
-					setupValues.setCisTrans(ct_all);
+					setupValues.setCisTrans("all");
 				else
-					setupValues.setCisTrans(CToptionValues[value]);
+					setupValues.setCisTrans(value);
 				break;
 			case sc_RemDiag:
 				std::transform(value.begin(), value.end(), value.begin(),
@@ -179,10 +174,7 @@ SetupComp loadConfigComp(string & fileName)
 					setupValues.setAlpha(value);
 				break;
 			case sc_Qvalues:
-				if (value.empty())
-					setupValues.setQvalue(qv_ihw);
-				else
-					setupValues.setQvalue(QVoptionValues[value]);
+				setupValues.setQvalue(value);
 				break;
 			}//*/
 		}
@@ -190,4 +182,110 @@ SetupComp loadConfigComp(string & fileName)
 	inFile.close();
 
 	return setupValues;
+}
+
+SetupComp setConfigComp(int argc, char * argv[])
+{
+	SetupComp setupValues;
+
+	static int verbose_flag;
+	static int remdiag_flag;
+
+	static struct option long_options[] =
+	{
+			/* These options set a flag. */
+			{"verbose", no_argument,       &verbose_flag, 1},
+			/* These options don’t set a flag.
+			             We distinguish them by their indices. */
+			{"sample",     required_argument,       0, 's'},
+			{"control",     required_argument,       0, 'c'},
+			{"samplename",  required_argument,       0, 'n'},
+			{"digest",  required_argument, 0, 'd'},
+			{"baits",  required_argument, 0, 'b'},
+			{"threads",  required_argument, 0, 't'},
+			{"res",    required_argument, 0, 'r'},
+			{"output",     no_argument,       0, 'o'},
+			{"cistrans",  no_argument,       0, 'C'},
+			{"algorithm",  required_argument, 0, 'A'},
+			{"alpha",  required_argument, 0, 'a'},
+			{"log",    required_argument, 0, 'l'},
+
+			{0, 0, 0, 0}
+	};
+
+	int option_index = 0;
+	int opt;
+
+	while ((opt = getopt_long(argc, argv, "s:c:n:d:b:t:r:o:C:A:a:l:", long_options, &option_index)) != -1)
+	{
+
+		switch(opt)
+		{
+		case 'c':
+			setupValues.setCondition1(optarg);
+			break;
+		case 's':
+			setupValues.setCondition2(optarg);
+			break;
+		case 'n':
+			setupValues.setSname(optarg);
+			break;
+		case 'd':
+			setupValues.setEnzyme(optarg);
+			break;
+		case 'b':
+			setupValues.setBaits(optarg);
+			break;
+		case 't':
+			setupValues.setThreads(atoi(optarg));
+			break;
+		case 'r':
+			setupValues.setRes(atoi(optarg));
+			break;
+		case 'o':
+			setupValues.setOutDir(optarg);
+			break;
+		case 'C':
+			setupValues.setCisTrans(optarg);
+			break;
+		case 'A':
+			setupValues.setQvalue(optarg);
+			break;
+		case 'a':
+			setupValues.setAlpha(optarg);
+			break;
+		case 'l':
+			setupValues.setLogFile(optarg);
+			break;
+		}//*/
+	}
+
+	if (verbose_flag)
+		setupValues.setVerbose(true);
+
+	return setupValues;
+}
+
+void SetupComp::setQvalue(string L)
+{
+	std::map<std::string,QV_Options> QVoptionValues;
+	QVoptionValues["ihw"] = qv_ihw;
+	QVoptionValues["bh"] = qv_bh;
+	QVoptionValues["IHW"] = qv_ihw;
+	QVoptionValues["BH"] = qv_bh;
+
+	if (L.empty())
+		mQvalue = qv_ihw;
+	else
+		mQvalue = QVoptionValues[L];
+}
+
+void SetupComp::setCisTrans(string input)
+{
+	std::map<std::string,CisTrans> CToptionValues;
+	CToptionValues["all"] = ct_all;
+	CToptionValues["cis"] = ct_cis;
+	CToptionValues["trans"] = ct_trans;
+
+	mCisTrans = CToptionValues[input];
 }

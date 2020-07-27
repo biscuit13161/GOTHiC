@@ -68,9 +68,40 @@ void completed(int n)
 
 void printUsageComp()
 {
-	cerr << "GOTHiC++ usage:" << endl << endl;
-	cerr << "    gothic <path/to/config/file>"  << endl << endl;
-	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl;
+
+	cerr << "GOTHiC++ usage:" << endl;
+	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cerr << "    gothicomp <path/to/config/file>" << endl;
+	cerr << "OR" << endl;
+	cerr << "    gothicomp " << endl << endl;
+	cerr << "options:" << endl;
+	cerr <<
+			"    -c <filename>         Control input filename\n"
+			"      --control <filename>\n"
+			"    -s <filename>         Sample input filename\n"
+			"      --sample <filename>\n"
+			"    -n <name>             Sample name\n"
+			"      --sample <name>\n"
+			"    -d <filename>         Digest of Restriction Enzyme, as used by HiCUP\n"
+			"      --digest <filename>\n"
+			"    -b <filename>         Baits file for analysis, as used by HiCUP\n"
+			"      --baits <filename>\n"
+			"    -t #                  Num of threads to run, deafults to 1\n"
+			"      --threads #\n"
+			"    -r #                  Resolution in bases for bining interactions, defaults to 10000\n"
+	        "      --res #\n"
+			"    -o <dir>              Output directory, defaults to './'\n"
+			"      --output <dir>\n"
+			"    -c [all|trans|cis]    Filter for Cis or Trans interactions,defaults to 'all'\n"
+			"      --cistrans [all|trans|cis]\n"
+			"    -A <option>           Algorithm for p-value correction, either 'bh' or 'ihw'\n"
+			"      --analysis <option>\n"
+			"    -a #                  Alpha cutoff for p-value correction, defaults to '0.1'\n"
+			"      --alpha #\n"
+			"    -l <filename>         Log file\n"
+			"      --log <filename>\n"
+			"    --verbose             Print verbose output during run\n";
+	cerr << endl;
 
 }
 

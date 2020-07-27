@@ -38,7 +38,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if ( argc != 2 ) // argc should be 2 for correct execution
+	SetupData setupValues;
+
+	if ( argc < 2 ) // argc should be 2 for correct execution
 	{
 		// We print argv[0] assuming it is the program name
 		cout<<"usage: "<< argv[0] <<" <filename>\n";
@@ -51,9 +53,15 @@ int main(int argc, char *argv[])
 		printUsage();
 		return 0;
 	}
-
-	vector<string> allArgs(argv, argv + argc);
-	SetupData setupValues = loadConfig(allArgs[1]);
+	else if ( argc == 2)
+	{
+		vector<string> allArgs(argv, argv + argc);
+		setupValues = loadConfig(allArgs[1]);
+	}
+	else
+	{
+		setupValues = setConfig(argc, argv);
+	}
 
 	setupValues.print();
 

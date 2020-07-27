@@ -27,6 +27,7 @@
 #include "SetupData.h"
 
 #include "version.h"
+#include <getopt.h>
 #include <ctime>
 #include <iostream>
 #include <fstream>
@@ -34,7 +35,7 @@
 
 using namespace std;
 
-SetupData::SetupData(): mOutDir(""), mEnzyme(""), mInput(""), mThreads(0), mRes(10000), mRemoveDiagonal(true)
+SetupData::SetupData(): mOutDir("./"), mEnzyme(""), mInput(""), mThreads(1), mRes(10000), mRemoveDiagonal(true)
 {
 
 }
@@ -56,6 +57,11 @@ void SetupData::print()
 	cerr << "# Resolution:       " << mRes << endl;
 	cerr << "# Config File:      " << mCliName << endl;
 	cerr << "# Verbose:          " << mVerbose << endl;
+	cerr << "# Analysis type:    ";
+	if (mAnalysisType)
+		cerr << "Comparative" << endl;
+	else
+		cerr << "Single" << endl;
 	cerr << "#" << endl << endl;
 }
 
@@ -105,9 +111,6 @@ SetupData loadConfig(string & fileName)
 			CToptionValues["cis"] = ct_cis;
 			CToptionValues["trans"] = ct_trans;
 
-			std::map<std::string,AnalysisOptions> AOoptionValues;
-			AOoptionValues["single"] = ao_single;
-			AOoptionValues["comparative"] = ao_comparative;
 
 
 			switch(optionValues[id])
@@ -139,10 +142,10 @@ SetupData loadConfig(string & fileName)
 				}
 				break;
 			case Cistrans:
-				setupValues.setCisTrans(CToptionValues[value]);
+				setupValues.setCisTrans(value);
 				break;
 			case Analysis:
-				setupValues.setAnalysisType(AOoptionValues[value]);
+				setupValues.setAnalysisType(value);
 				break;
 			case RemDiag:
 				std::transform(value.begin(), value.end(), value.begin(),
@@ -169,3 +172,96 @@ SetupData loadConfig(string & fileName)
 	return setupValues;
 }
 
+SetupData setConfig(int argc, char * argv[])
+{
+	SetupData setupValues;
+
+	static int verbose_flag;
+	static int remdiag_flag;
+
+	static struct option long_options[] =
+	{
+			/* These options set a flag. */
+			{"verbose", no_argument,       &verbose_flag, 1},
+			{"no_rem_diag",   no_argument,       &remdiag_flag, 1},
+			/* These options don’t set a flag.
+			             We distinguish them by their indices. */
+			{"input",     required_argument,       0, 'i'},
+			{"sample",  required_argument,       0, 's'},
+			{"digest",  required_argument, 0, 'd'},
+			{"threads",  required_argument, 0, 't'},
+			{"res",    required_argument, 0, 'r'},
+			{"output",     no_argument,       0, 'o'},
+			{"cistrans",  no_argument,       0, 'c'},
+			{"analysis",  required_argument, 0, 'A'},
+			{"log",    required_argument, 0, 'l'},
+			{0, 0, 0, 0}
+	};
+
+	int option_index = 0;
+	int opt;
+
+	while ((opt = getopt_long(argc, argv, "i:s:d:t:r:o:c:A:l:", long_options, &option_index)) != -1)
+	{
+
+		switch(opt)
+		{
+		case 'i':
+			setupValues.setInput(optarg);
+			break;
+		case 's':
+			setupValues.setSname(optarg);
+			break;
+		case 'd':
+			setupValues.setEnzyme(optarg);
+			break;
+		case 't':
+			setupValues.setThreads(atoi(optarg));
+			break;
+		case 'r':
+			setupValues.setRes(atoi(optarg));
+			break;
+		case 'o':
+			setupValues.setOutDir(optarg);
+			break;
+		case 'c':
+			setupValues.setCisTrans(optarg);
+			break;
+		case 'A':
+			setupValues.setAnalysisType(optarg);
+			break;
+		case 'l':
+			setupValues.setLogFile(optarg);
+			break;
+		}//*/
+	}
+
+	if (verbose_flag)
+		setupValues.setVerbose(true);
+
+	if (remdiag_flag)
+		setupValues.setRemoveDiagonal(true);
+	else
+		setupValues.setRemoveDiagonal(false);
+
+	return setupValues;
+}
+
+void SetupData::setAnalysisType(string L)
+{
+	std::map<std::string,AnalysisOptions> AOoptionValues;
+	AOoptionValues["single"] = ao_single;
+	AOoptionValues["comparative"] = ao_comparative;
+
+	mAnalysisType = AOoptionValues[L];
+}
+
+void SetupData::setCisTrans(string input)
+{
+	std::map<std::string,CisTrans> CToptionValues;
+	CToptionValues["all"] = ct_all;
+	CToptionValues["cis"] = ct_cis;
+	CToptionValues["trans"] = ct_trans;
+
+	mCisTrans = CToptionValues[input];
+}

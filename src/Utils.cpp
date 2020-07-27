@@ -65,9 +65,35 @@ void completed(int n)
 
 void printUsage()
 {
-	cerr << "GOTHiC++ usage:" << endl << endl;
-	cerr << "    gothic <path/to/config/file>"  << endl << endl;
-	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl;
+	cerr << "GOTHiC++ usage:" << endl;
+	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cerr << "    gothic <path/to/config/file>" << endl;
+	cerr << "OR" << endl;
+	cerr << "    gothic " << endl << endl;
+	cerr << "options:" << endl;
+	cerr <<
+			"    -i <filename>         Input filename\n"
+			"      --input <filename>\n"
+			"    -s <name>             Sample name\n"
+			"      --sample <name>\n"
+			"    -d <filename>         Digest of Restriction Enzyme, as used by HiCUP\n"
+			"      --digest <filename>\n"
+			"    -t #                  Num of threads to run, deafults to 1\n"
+			"      --threads #\n"
+			"    -r #                  Resolution in bases for bining interactions, defaults to 10000\n"
+	        "      --res #\n"
+			"    -o <dir>              Output directory, defaults to './'\n"
+			"      --output <dir>\n"
+			"    -c [all|trans|cis]    Filter for Cis or Trans interactions,defaults to 'all'\n"
+			"      --cistrans [all|trans|cis]\n"
+			"    -A <option>           Analysis type, either 'single' or 'comparative'\n"
+			"      --analysis <option>\n"
+			"    -l <filename>         Log file\n"
+			"      --log <filename>\n"
+			"    --verbose             Print verbose output during run\n"
+			"    --no_rem_diag         Flag to stop removal of diagonals during analysis\n";
+	cerr << endl;
+
 
 }
 

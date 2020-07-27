@@ -40,10 +40,12 @@ using namespace tbb;
 
 int main(int argc, char *argv[])
 {
-	if ( argc != 2 ) // argc should be 2 for correct execution
+	SetupComp setupValues;
+
+	if ( argc < 2 ) // argc should be 2 for correct execution
 	{
 		// We print argv[0] assuming it is the program name
-		cerr<<"usage: "<< argv[0] <<" <filename>\n";
+		cout<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
@@ -53,9 +55,15 @@ int main(int argc, char *argv[])
 		printUsageComp();
 		return 0;
 	}
-
-	vector<string> allArgs(argv, argv + argc);
-	SetupComp setupValues = loadConfigComp(allArgs[1]);
+	else if ( argc == 2)
+	{
+		vector<string> allArgs(argv, argv + argc);
+		setupValues = loadConfigComp(allArgs[1]);
+	}
+	else
+	{
+		setupValues = setConfigComp(argc, argv);
+	}
 
 	setupValues.print();
 

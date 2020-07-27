@@ -71,11 +71,13 @@ public:
 	inline void setCondition1(std::string input) {mCondition1 = input;}
 	inline void setCondition2(std::string input) {mCondition2 = input;}
 	inline void setLogFile(std::string L) {mLogFile = L;}
-	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
+	void setCisTrans(std::string input);
+	//{mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
 	inline void setVerbose(bool L) {mVerbose = L;}
 	inline void setAlpha(std::string L) {mAlpha = L;}
-	inline void setQvalue(QV_Options L) {mQvalue = L;}
+	void setQvalue(std::string L);
+	//{mQvalue = L;}
 	inline void setUpperhalfBinNumber(double L) {mUpperhalfBinNumber = L;}
 	inline void setCovS(double L) {mCovS = L;}
 	inline void setCisBinNumber(double L) {mCisBinNumber = L;}
@@ -84,6 +86,7 @@ public:
 };
 
 SetupComp loadConfigComp(std::string & fileName);
+SetupComp setConfigComp(int argc, char * argv[]);
 
 enum SC_Options {
 	sc_Cond1 = 0,

@@ -60,14 +60,17 @@ public:
 	inline void setOutDir(std::string outDir) {mOutDir = outDir;}
 	inline void setInput(std::string input) {mInput = input;}
 	inline void setLogFile(std::string L) {mLogFile = L;}
-	inline void setCisTrans(CisTrans input) {mCisTrans = input;}
+	void setCisTrans(std::string input);
+	//{mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
-	inline void setAnalysisType(AnalysisOptions L) {mAnalysisType = L;}
+	void setAnalysisType(std::string L);
+	//{mAnalysisType = L;}
 	inline void setVerbose(bool L) {mVerbose = L;}
 
 };
 
 SetupData loadConfig(std::string & fileName);
+SetupData setConfig(int argc, char * argv[]);
 
 enum Options {
 	Input = 0,
@@ -82,6 +85,7 @@ enum Options {
 	Logfile,
 	Verbose,
 };
+
 
 
 
