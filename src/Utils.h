@@ -18,6 +18,7 @@
 #include "stdlib.h"
 #include "sys/types.h"
 #include "sys/sysinfo.h"
+#include "tbb/concurrent_vector.h"
 
 class Interaction;
 class Site;
@@ -47,18 +48,18 @@ int getRealValue();
 int getVirtValue();
 int parseLine(char* line);
 
-void removeDuplicates(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
-void removeDiagonals(std::vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal);
+void removeDuplicates(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
+void removeDiagonals(tbb::concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal);
 
-void findTrans(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
-void findCis(std::vector<Interaction> & interactions, std::vector<Interaction> & binned_df_filtered);
+void findTrans(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
+void findCis(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
 
-void writeBinary(std::vector<Interaction> & interactions, std::string binOutFileName);
-void readBinary(std::vector<Interaction> & interactions, std::string binInFileName);
+void writeBinary(tbb::concurrent_vector<Interaction> & interactions, std::string binOutFileName);
+void readBinary(tbb::concurrent_vector<Interaction> & interactions, std::string binInFileName);
 
 
 std::string fixChromosomeNames(std::string chr);
-void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const std::vector<Interaction> & interactions);
+void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const tbb::concurrent_vector<Interaction> & interactions);
 
 int binarySearch(int arr[], int l, int r, int x);
 int binarySearch2(int arr[], int l, int r, int x);

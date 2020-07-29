@@ -13,11 +13,12 @@
 #include <map>
 #define BOOST_TEST_MODULE countDupsTests
 #include <boost/test/unit_test.hpp>
+#include "tbb/concurrent_vector.h"
 
 BOOST_AUTO_TEST_SUITE(countDupsTests)
 
 BOOST_AUTO_TEST_CASE(testCountDuplicates) {
-	std::vector<Interaction> interactions;
+	tbb::concurrent_vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr1","chr2",12553,15273));
 	interactions.push_back(Interaction("chr1","chr2",12553,15273));
 	interactions.push_back(Interaction("chr1","chr2",12553,15273));
