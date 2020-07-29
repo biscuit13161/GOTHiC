@@ -10,6 +10,7 @@
 #include "SetupData.h"
 #include "Utils.h"
 #include <vector>
+#include "tbb/concurrent_vector.h"
 #include <map>
 #define BOOST_TEST_MODULE binInterTests
 #include <boost/test/unit_test.hpp>
@@ -18,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(binInterTests)
 
 BOOST_AUTO_TEST_CASE(constructor) {
 
-	std::vector<Interaction> interactions;
+	tbb::concurrent_vector<Interaction> interactions;
 	SetupData setupValues;
 	setupValues.setRes(1000);
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));

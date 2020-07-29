@@ -32,8 +32,10 @@
 #include <stdio.h>
 #include <omp.h>
 #include <string>
+#include "tbb/concurrent_vector.h"
 
 using namespace std;
+using namespace tbb;
 
 
 int main(int argc, char *argv[])
@@ -168,7 +170,7 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
 
 	// Get Hicup data
-    vector<Interaction> interactions;
+	concurrent_vector<Interaction> interactions;
 
     importHicup(setupValues.getInput(), interactions);
 

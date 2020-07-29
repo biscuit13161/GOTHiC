@@ -15,6 +15,7 @@
 #include <math.h>
 #include <streambuf>
 #include "SetupData.h"
+#include "tbb/concurrent_vector.h"
 
 
 template<typename CharT, typename TraitsT = std::char_traits<CharT> >
@@ -25,15 +26,15 @@ public:
     }
 };
 
-void importHicup(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
-void importHicupTxt(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
-void importHicupSam(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency=true);
-void importHicupGz(std::string fileName, std::vector<Interaction> & interactions, bool checkConsistency);
-void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::vector<Site> & fragments);
-void mapHicupToRestrictionFragment(std::vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
-void sortPositions(std::vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
-void binInteractions(std::vector<Interaction> & interactions, SetupData & setupValues);
-void binomialHiChicup(std::vector<Interaction> & interactions, SetupData & setupValues, std::vector<BinomData> & binFiltered);
+void importHicup(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
+void importHicupTxt(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
+void importHicupSam(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
+void importHicupGz(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency);
+void mapHicupToRestrictionFragment(tbb::concurrent_vector<Interaction> & interactions, std::vector<Site> & fragments);
+void mapHicupToRestrictionFragment(tbb::concurrent_vector<Interaction> & interactions, std::multimap<std::string,std::array<int,2>> & fragments);
+void sortPositions(tbb::concurrent_vector<Interaction> & interactions, int iSize, std::vector<halfInteraction> & sources, std::vector<halfInteraction> & targets);
+void binInteractions(tbb::concurrent_vector<Interaction> & interactions, SetupData & setupValues);
+void binomialHiChicup(tbb::concurrent_vector<Interaction> & interactions, SetupData & setupValues, std::vector<BinomData> & binFiltered);
 
 std::string fixChromosomeNames(std::string chrnames);
 void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
@@ -42,10 +43,10 @@ void getHindIIIsitesFromHicup(std::multimap<std::string,std::array<int,2>> & sit
 void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name);
 void findOverlaps(std::vector<halfInteraction>& query, std::multimap<std::string,std::array<int,2>> & subject, std::string name);
 
-void countDuplicates(std::vector<Interaction> & interactions);
+void countDuplicates(tbb::concurrent_vector<Interaction> & interactions);
 
 
-void calcFreq(const std::vector<Interaction> & interactions, std::map<std::string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max);
+void calcFreq(const tbb::concurrent_vector<Interaction> & interactions, std::map<std::string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max);
 //void completed();
 
 

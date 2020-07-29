@@ -25,9 +25,8 @@ foreach(lib ${CLIBS})
   target_link_libraries (${lib} ${xlibs} ${Boost_LIBRARIES})
 endforeach(lib)
 
-list (APPEND LIBS Site padjust binomTest Utils UtilsComp)
-list (APPEND LIBS Interactions SetupData SetupComp hicupData hicupDataComp)
-list (APPEND LIBS BinomData BinomDataComp binTest Baits IHW)
+## norm libs
+list (APPEND LIBS Site padjust binomTest Interactions binTest)
 
 foreach(lib ${LIBS})
   ## copy list (zero-based, -1 refers to end) ##
@@ -39,15 +38,48 @@ foreach(lib ${LIBS})
   target_link_libraries (${lib} ${CLIBS} ${xlibs} ${Boost_LIBRARIES})
 endforeach(lib)
 
+## norm libs
+list (APPEND GLIBS Utils SetupData hicupData BinomData )
+
+foreach(lib ${GLIBS})
+  ## copy list (zero-based, -1 refers to end) ##
+  list (SUBLIST GLIBS 0 -1 xlibs)
+  ##  remove current library from list ##
+  list (REMOVE_ITEM xlibs ${lib}) 
+  #message(STATUS "xlibs = ${xlibs}")
+  add_library(${lib} ${lib}.cpp)
+  target_link_libraries (${lib} ${CLIBS} ${LIBS} ${xlibs} ${Boost_LIBRARIES})
+endforeach(lib)
+
+## Comp libs
+list (APPEND PLIBS UtilsComp SetupComp hicupDataComp)
+list (APPEND PLIBS BinomDataComp Baits IHW)
+
+foreach(lib ${PLIBS})
+  ## copy list (zero-based, -1 refers to end) ##
+  list (SUBLIST PLIBS 0 -1 xlibs)
+  ##  remove current library from list ##
+  list (REMOVE_ITEM xlibs ${lib}) 
+  #message(STATUS "xlibs = ${xlibs}")
+  add_library(${lib} ${lib}.cpp)
+  target_link_libraries (${lib} ${CLIBS} BinomData ${LIBS} ${xlibs} ${Boost_LIBRARIES})
+endforeach(lib)
+
 list(APPEND EXE gothic gothicomp)
 
 # Set LD_PRELOAD so that loader loads release version of proxy
 set_property(GLOBAL PROPERTY ENVIRONMENT LD_PRELOAD=libtbbmalloc_proxy.so.2)
 
-foreach(exe ${EXE})
-  add_executable (${exe} ${exe}.cpp)
-  target_link_libraries (${exe} ${CLIBS} ${LIBS} ${Boost_LIBRARIES} -flifetime-dse=1 -ltbb ${TBB_IMPORTED_TARGETS})
-endforeach(exe)
+add_executable (gothic gothic.cpp)
+target_link_libraries (gothic ${CLIBS} ${LIBS} ${GLIBS} ${Boost_LIBRARIES} -flifetime-dse=1 -ltbb ${TBB_IMPORTED_TARGETS})
+
+add_executable (gothicomp gothicomp.cpp)
+target_link_libraries (gothicomp ${CLIBS} ${PLIBS} ${LIBS} ${Boost_LIBRARIES} -flifetime-dse=1 -ltbb ${TBB_IMPORTED_TARGETS})
+
+##foreach(exe ${EXE})
+##  add_executable (${exe} ${exe}.cpp)
+##  target_link_libraries (${exe} ${CLIBS} ${LIBS} ${Boost_LIBRARIES} -flifetime-dse=1 -ltbb ${TBB_IMPORTED_TARGETS})
+##endforeach(exe)
 
 add_custom_command(TARGET gothic POST_BUILD
                    COMMAND cp ${CMAKE_CURRENT_SOURCE_DIR}/hicupToTable.sh ${CMAKE_CURRENT_BINARY_DIR}/. )

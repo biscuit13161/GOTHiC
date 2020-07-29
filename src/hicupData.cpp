@@ -44,10 +44,12 @@
 #include <zlib.h>
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
+#include "tbb/parallel_for.h"
 
 #include <algorithm>
 
 using namespace std;
+using namespace tbb;
 
 struct RetrieveKey
 {
@@ -59,7 +61,7 @@ struct RetrieveKey
 };
 
 
-void importHicup(string fileName, vector<Interaction> & interactions, bool checkConsistency)
+void importHicup(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
 {
 	cerr << "Importing HiCUP file: " << fileName << endl;
 
@@ -105,7 +107,7 @@ void importHicup(string fileName, vector<Interaction> & interactions, bool check
 	completed();
 }
 
-void importHicupGz(string fileName, vector<Interaction> & interactions, bool checkConsistency)
+void importHicupGz(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
 {
 	/*	gzFile inFile = gzopen(fileName.c_str(), "rb");
 
@@ -180,7 +182,7 @@ void importHicupGz(string fileName, vector<Interaction> & interactions, bool che
 //*/
 }
 
-void importHicupSam(string fileName, vector<Interaction> & interactions, bool checkConsistency)
+void importHicupSam(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
 {
 	ifstream inFile;
 	inFile.open(fileName);
@@ -260,7 +262,7 @@ void importHicupSam(string fileName, vector<Interaction> & interactions, bool ch
 }//*/
 
 
-void importHicupTxt(string fileName, vector<Interaction> & interactions, bool checkConsistency)
+void importHicupTxt(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
 {
 	ifstream inFile;
 	inFile.open(fileName);
@@ -312,7 +314,7 @@ void importHicupTxt(string fileName, vector<Interaction> & interactions, bool ch
 
 }//*/
 
-void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Site> & fragments)
+void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions, vector<Site> & fragments)
 {
 	int iSize = interactions.size();
 	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
@@ -345,7 +347,7 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, vector<Si
 	completed();
 }
 
-void mapHicupToRestrictionFragment(vector<Interaction> & interactions, multimap<string,array<int,2>> & fragments)
+void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions, multimap<string,array<int,2>> & fragments)
 {
 	int iSize = interactions.size();
 	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
@@ -374,7 +376,7 @@ void mapHicupToRestrictionFragment(vector<Interaction> & interactions, multimap<
 	completed();
 }
 
-void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInteraction> & sources, vector<halfInteraction> & targets)
+void sortPositions(concurrent_vector<Interaction> & interactions, int iSize, vector<halfInteraction> & sources, vector<halfInteraction> & targets)
 {
 	//#pragma omp parallel for
 	for (int i = 0; i < iSize; i++)
@@ -408,15 +410,17 @@ void sortPositions(vector<Interaction> & interactions, int iSize, vector<halfInt
 	}
 }
 
-void binInteractions(vector<Interaction> & interactions, SetupData & setupValues)
+void binInteractions(concurrent_vector<Interaction> & interactions, SetupData & setupValues)
 {
 	cerr << "Calculating Interaction Bins ("  <<interactions.size() << ")" << endl;
 
 	vector<Interaction> interactions2;
 
-	#pragma omp parallel for
-	for (int i = 0; i < interactions.size(); i++)
-	{
+	//#pragma omp parallel for
+	//for (int i = 0; i < interactions.size(); i++)
+	parallel_for(size_t(0),size_t(interactions.size()),
+					[&] (size_t i) {
+	//{
 		// if resolution is given, bins will be calculated from interactions using the resolution
 		int V = floor(interactions[i].getLocus1() / setupValues.getRes()) * setupValues.getRes();
 		if (V == 0)
@@ -430,7 +434,7 @@ void binInteractions(vector<Interaction> & interactions, SetupData & setupValues
 			V = 1;
 		}
 		interactions[i].setLocus2(V);
-	}
+	});
 
 
 	// --------- count the number of interactions between bins -------
@@ -546,7 +550,7 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 
 
 
-void binomialHiChicup(vector<Interaction> & interactions, SetupData & setupValues, vector<BinomData> & binFiltered)
+void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData & setupValues, vector<BinomData> & binFiltered)
 {
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
@@ -809,7 +813,7 @@ void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> 
 	completed();
 }//*/
 
-void countDuplicates(vector<Interaction> & interactions)
+void countDuplicates(concurrent_vector<Interaction> & interactions)
 {
 	cerr << "\tCounting Duplicates" << endl;
 
@@ -863,7 +867,7 @@ void countDuplicates(vector<Interaction> & interactions)
 }
 
 
-void calcFreq(const vector<Interaction> & interactions, map<string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max)
+void calcFreq(const concurrent_vector<Interaction> & interactions, map<string,int> & cov, int & numberOfReadPairs, double & tCoverage, int & max)
 {
 	// WILL NOT PARALLELISE!!! ...?
 	for (int i = 0; i < interactions.size(); i ++ )

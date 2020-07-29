@@ -36,6 +36,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include "tbb/concurrent_vector.h"
 
 using namespace std;
 using namespace std::this_thread;     // sleep_for, sleep_until
@@ -278,7 +279,7 @@ void timeTest()
 
 void sumSquareTest()
 {
-	std::vector<Interaction> interactions;
+	tbb::concurrent_vector<Interaction> interactions;
 	interactions.push_back(Interaction("chr2","chr1",12553,15273));
 	interactions.push_back(Interaction("chr1","chr1",17753,150273));
 	interactions.push_back(Interaction("chrX","chr7",1255,1020));

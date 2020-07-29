@@ -216,7 +216,7 @@ int getRealValue(){ //Note: this value is in KB!
     return result;
 }
 
-void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
 	//for (auto it = interactions.begin(); it != interactions.end(); it++)
@@ -235,11 +235,11 @@ void removeDuplicates(vector<Interaction> & interactions, vector<Interaction> & 
 		}
 	}
 }
-void removeDiagonals(vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
+void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
 {
 	/** Remove Diagonals and Cis/Trans filter values **/
 
-	vector<Interaction> binned_df_filtered;
+	concurrent_vector<Interaction> binned_df_filtered;
 
 	if (removeDiagonal)
 	{
@@ -289,7 +289,7 @@ string fixChromosomeNames(string chr)
 	return chr;
 }
 
-void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
 #pragma omp parallel for
@@ -309,7 +309,7 @@ void findCis(vector<Interaction> & interactions, vector<Interaction> & binned_df
 	}
 }
 
-void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_df_filtered)
+void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
 #pragma omp parallel for
@@ -328,7 +328,7 @@ void findTrans(vector<Interaction> & interactions, vector<Interaction> & binned_
 	}
 }
 
-void getSumSquare(double & sumSquare, const set<string> & chromos, const vector<Interaction> & interactions)
+void getSumSquare(double & sumSquare, const set<string> & chromos, const concurrent_vector<Interaction> & interactions)
 {
 	/** counts unique interactions **/
 	double s2 = 0;
@@ -350,7 +350,7 @@ void getSumSquare(double & sumSquare, const set<string> & chromos, const vector<
 	}
 }
 
-void writeBinary(vector<Interaction> & interactions, string binOutFileName)
+void writeBinary(concurrent_vector<Interaction> & interactions, string binOutFileName)
 {
 	ofstream binOutFile;
 	binOutFile.open(binOutFileName, ios::binary);
@@ -385,7 +385,7 @@ void writeBinary(vector<Interaction> & interactions, string binOutFileName)
 
 }
 
-void readBinary(vector<Interaction> & interactions, string binInFileName)
+void readBinary(concurrent_vector<Interaction> & interactions, string binInFileName)
 {
 	cerr << "Reading Binary input file" << endl;
 	ifstream binInFile;
