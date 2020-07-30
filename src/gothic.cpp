@@ -30,9 +30,10 @@
 #include "BinomData.h"
 #include <iostream>
 #include <stdio.h>
-#include <omp.h>
+//#include <omp.h>
 #include <string>
 #include "tbb/concurrent_vector.h"
+#include "tbb/task_scheduler_init.h"
 
 using namespace std;
 using namespace tbb;
@@ -67,21 +68,13 @@ int main(int argc, char *argv[])
 
 	setupValues.print();
 
-	omp_set_num_threads(setupValues.getThreads());
+	//omp_set_num_threads(setupValues.getThreads());
+	task_scheduler_init init(setupValues.getThreads());
 
 	vector<BinomData> binom;
 
 	try {
 		gothicHicup(setupValues,binom);
-		//binom = gothicHicup(fileName, sampleName, res, restrictionFile, cistrans, parallel);
-		/*
-		 * vector<Site> fragments;
-		 * binaryWriteTest(fragments, restrictionFile);
-		 * binaryRead(fragments);
-		 */
-		//returnSizes();
-		//timeTest();
-
 	}
 	catch(const std::invalid_argument& e){
 		cerr << "Error: " << e.what() << endl;

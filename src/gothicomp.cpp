@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	checkInputFiles(setupValues.getCondition1());
 	checkInputFiles(setupValues.getCondition2());
 
-	tbb::task_scheduler_init init(setupValues.getThreads());
+	task_scheduler_init init(setupValues.getThreads());
 
 	concurrent_vector<BinomDataComp> binom;
 

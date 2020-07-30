@@ -34,7 +34,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-#include <omp.h>
+//#include <omp.h>
 #include <cstdlib>
 #include <istream>
 #include <fstream>
@@ -45,6 +45,7 @@
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include "tbb/parallel_for.h"
+#include "tbb/concurrent_unordered_map.h"
 
 #include <algorithm>
 
@@ -379,8 +380,10 @@ void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions
 void sortPositions(concurrent_vector<Interaction> & interactions, int iSize, vector<halfInteraction> & sources, vector<halfInteraction> & targets)
 {
 	//#pragma omp parallel for
-	for (int i = 0; i < iSize; i++)
-	{
+	//for (int i = 0; i < iSize; i++)
+	//{
+	parallel_for(size_t(0),size_t(interactions.size()),
+						[&] (size_t i) {
 		halfInteraction first = sources[i];
 		halfInteraction second = targets[i];
 		Interaction out;
@@ -404,10 +407,10 @@ void sortPositions(concurrent_vector<Interaction> & interactions, int iSize, vec
 		{
 			out = Interaction(second, first);
 		}
-#pragma omp critical (sp1)
+
 		//interactions.push_back(out);
 		interactions[i] = out;
-	}
+	});
 }
 
 void binInteractions(concurrent_vector<Interaction> & interactions, SetupData & setupValues)
@@ -669,10 +672,12 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
     vector<array<double,3>> values;
     values.resize(binFiltered.size());
 
-    // Calculate expected read counts, probabilities and pvalues
-    #pragma omp parallel for
-    for (int i = 0; i < binFiltered.size(); i++)
-    {
+    /* Calculate expected read counts, probabilities and pvalues */
+    //#pragma omp parallel for
+    //for (int i = 0; i < binFiltered.size(); i++)
+    //{
+    parallel_for(size_t(0),size_t(binFiltered.size()),
+    					[&] (size_t i) {
     	/** Calculate expected read counts, probabilities **/
     	binFiltered[i].setProbability(binFiltered[i].getRelCov1() * binFiltered[i].getRelCov2() * 2 * probabilityCorrection);
     	binFiltered[i].setExpected(binFiltered[i].getProbability() * numberOfReadPairs);
@@ -687,7 +692,7 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 		array<double,3> ls = {double(i), binFiltered[i].getPvalue(), 0.5};
 		values[i] = ls;
 
-    }//*/
+    });//*/
 
 
 
@@ -726,11 +731,13 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 		break;
 	}//*/
 
-#pragma omp parallel for
-	for (int i = 0; i < binFiltered.size(); i++)
-	{
+//#pragma omp parallel for
+	//for (int i = 0; i < binFiltered.size(); i++)
+	//{
+    parallel_for(size_t(0),size_t(binFiltered.size()),
+    					[&] (size_t i) {
 		binFiltered[i].setQvalue(values[i][2]);
-	}//*/
+	});//*/
 
 //#ifdef DEBUG_FLAG
     cout << "BinomialData Size: " << binFiltered.size() << endl;
@@ -747,9 +754,11 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 	cerr << "Finding Overlaps in " << name << endl;
 	int i;
 
-	#pragma omp parallel for
-	for (i = 0; i < query.size(); i++)
-	{
+	//#pragma omp parallel for
+	//for (i = 0; i < query.size(); i++)
+	//{
+	    parallel_for(size_t(0),size_t(query.size()),
+	    					[&] (size_t i) {
 		auto result = equal_range(fragments.begin(),fragments.end(),query[i].getChr(), Comp{});
 		for ( auto it = result.first; it != result.second; ++it )
 		{
@@ -763,7 +772,7 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 
 			}
 		}
-	}//*/
+	});//*/
 
 	completed();
 }//*/
@@ -796,9 +805,11 @@ void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> 
 	int i;
 
 	typedef multimap<string,array<int,2>>::iterator MMAPIterator;
-	#pragma omp parallel for
-	for (i = 0; i < query.size(); i++)
-	{
+	//#pragma omp parallel for
+	//for (i = 0; i < query.size(); i++)
+	//{
+		parallel_for(size_t(0),size_t(query.size()),
+			    					[&] (size_t i) {
 		pair<MMAPIterator, MMAPIterator> result = fragments.equal_range(query[i].getChr());
 		for (auto it = result.first; it != result.second; it++)
 		{
@@ -809,7 +820,7 @@ void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> 
 					break;
 				}
 		}
-	}
+	});
 	completed();
 }//*/
 
@@ -817,29 +828,33 @@ void countDuplicates(concurrent_vector<Interaction> & interactions)
 {
 	cerr << "\tCounting Duplicates" << endl;
 
-	map<string , map<string, int>> list;
+	concurrent_unordered_map<string , concurrent_unordered_map<string, int>> list;
 
 	int count = 0;
-#pragma omp parallel for
-	for (int i = 0; i < interactions.size(); i++)
-	{
+//#pragma omp parallel for
+	//for (int i = 0; i < interactions.size(); i++)
+	//{
+	parallel_for(size_t(0),size_t(interactions.size()),
+						[&] (size_t i) {
 		string int1 = interactions[i].getInt1();
 		string int2 = interactions[i].getInt2();
-#pragma omp critical (cd1)
+//#pragma omp critical (cd1)
 		list[int1][int2]++;
-	}
+	});
 	interactions.clear();
 
-	#pragma omp parallel for
-	for (int i = 0; i< list.size(); i++)
-	{
+	//#pragma omp parallel for
+	//for (int i = 0; i< list.size(); i++)
+	//{
+	parallel_for(size_t(0),size_t(list.size()),
+						[&] (size_t i) {
 		auto it = list.begin();
 		std::advance(it, i);
 		string int1 = it->first;
 		size_t pos = int1.find(":");
 		string chr1 = int1.substr(0,pos);
 		int locus1 = atoi(int1.substr(pos+1).c_str());
-		map<string, int> l2 = it->second;
+		concurrent_unordered_map<string, int> l2 = it->second;
 		for (auto ti = l2.begin(); ti != l2.end(); ti++)
 		{
 			int f = ti->second;
@@ -852,11 +867,11 @@ void countDuplicates(concurrent_vector<Interaction> & interactions)
 
 
 			Interaction I = Interaction(chr1, chr2, locus1, locus2, f);
-			#pragma omp critical (cd2)
+			//#pragma omp critical (cd2)
 			interactions.push_back(I);
 		}//*/
 
-	}
+	});
 
 
 	syslog(LOG_NOTICE, "Duplicates: %d", interactions.size());

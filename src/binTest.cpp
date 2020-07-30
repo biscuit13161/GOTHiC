@@ -74,7 +74,6 @@ void binaryWriteTest(vector<Site> & fragments, string restrictionFile)
 {
 	cerr << "Binary Write Test" << endl;
 
-	//getHindIIIsitesFromHicup(fragments, restrictionFile);
 	string binOutFileName = "Digest.bin";
 	writeBinary(fragments, binOutFileName);
 	completed();
@@ -86,20 +85,9 @@ void binaryRead(vector<Site> & fragments)
 	vector<Site> hindGR;
 	string binInFileName = "Digest.bin";
 	readBinary(hindGR,  binInFileName);
-	//getHindIIIsitesFromHicup(hindGR, restrictionFile);
-
 
 	cerr << "fragments: " << fragments.size() << endl;
 	cerr << "hindGR: " << hindGR.size() << endl;
-
-//	fragments[846223].print();
-//	fragments[846224].print();
-//	fragments[846225].print();
-//	fragments[846226].print();
-//	hindGR[846223].print();
-//	hindGR[846224].print();
-//	hindGR[846225].print();
-//	hindGR[846226].print();
 
 	int pos = 0;
 	for (int i= 0; i!= fragments.size(); i++)
@@ -146,53 +134,45 @@ void countDupsTest()
 	}
 	cout << endl;
 
-//	for (auto i = list.begin(); i != list.end(); i++)
-//		cout << i->first << " " << i->second << endl;
-
 }
 
 void binInterTest()
 {
-std::vector<Interaction> interactions;
-int res = 1000;
-interactions.push_back(Interaction("chr2","chr1",12553,15273));
-interactions.push_back(Interaction("chr1","chr1",17753,15273));
-interactions.push_back(Interaction("chrX","chr7",1255,1020));
+	std::vector<Interaction> interactions;
+	int res = 1000;
+	interactions.push_back(Interaction("chr2","chr1",12553,15273));
+	interactions.push_back(Interaction("chr1","chr1",17753,15273));
+	interactions.push_back(Interaction("chrX","chr7",1255,1020));
 
-for (auto i : interactions)
-{
-	i.print();
-}
+	for (auto i : interactions)
+	{
+		i.print();
+	}
 
-cout << endl;
-//binInteractions(interactions, res);
+	cout << endl;
 
-std::map<std::string,int> list;
-list["chr1:17753"] = 1;
-list["chr2:12553"] = 1;
-list["chr1:15273"] = 1;
-list["chrX:1255"] = 1;
-list["chr7:1020"] = 1;
+	std::map<std::string,int> list;
+	list["chr1:17753"] = 1;
+	list["chr2:12553"] = 1;
+	list["chr1:15273"] = 1;
+	list["chrX:1255"] = 1;
+	list["chr7:1020"] = 1;
 
-std::map<std::string,int> list2;
-list2["chr1:17000"] = 1;
-list2["chr2:12000"] = 1;
-list2["chr1:15000"] = 1;
-list2["chrX:1000"] = 1;
-list2["chr7:1000"] = 1;
+	std::map<std::string,int> list2;
+	list2["chr1:17000"] = 1;
+	list2["chr2:12000"] = 1;
+	list2["chr1:15000"] = 1;
+	list2["chrX:1000"] = 1;
+	list2["chr7:1000"] = 1;
 
 
-for (auto i : interactions)
-{
-	i.print();
-	cout << "list " << list[i.getInt1()] << " " << list[i.getInt2()] << endl;
-	cout << "list " << list2[i.getInt1()] << " " << list2[i.getInt2()] << endl;
-}
+	for (auto i : interactions)
+	{
+		i.print();
+		cout << "list " << list[i.getInt1()] << " " << list[i.getInt2()] << endl;
+		cout << "list " << list2[i.getInt1()] << " " << list2[i.getInt2()] << endl;
+	}
 
-//ASSERT_TRUE(interactions[1].getInt1() == "chr2:12000");
-//EXPECT_FALSE(interactions[0].getInt1() == "chr1:17753");
-//EXPECT_TRUE(interactions[0].getInt1() == "chr1:17000");
-//EXPECT_TRUE(interactions[2].getInt1() == "chrX:1000");
 }
 
 void pBhAdjustTest()

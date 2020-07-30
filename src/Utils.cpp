@@ -35,6 +35,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include "tbb/parallel_for.h"
 
 using namespace std;
 using namespace tbb;
@@ -247,19 +248,22 @@ void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_
 	int pos = 0;
 	//for (auto it = interactions.begin(); it != interactions.end(); it++)
 	//{
-#pragma omp parallel for
-	for (int i = 0; i< interactions.size(); i++)
-	{
-		auto it = interactions.begin();
-		std::advance(it, i);//*/
-		Interaction T = *it;
+//#pragma omp parallel for
+	//for (int i = 0; i< interactions.size(); i++)
+	//{
+	parallel_for(size_t(0),size_t(interactions.size()),
+						[&] (size_t i) {
+		//auto it = interactions.begin();
+		//std::advance(it, i);//*/
+		//Interaction T = *it;
+		Interaction T = interactions[i];
 		if (T.getInt1() != T.getInt2())
 		{
-#pragma omp critical (rd1)
+
 			binned_df_filtered.push_back(T);
 			pos++;
 		}
-	}
+	});
 }
 void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
 {
@@ -318,40 +322,43 @@ string fixChromosomeNames(string chr)
 void findCis(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		advance(it, i);
-		//	for (auto it = binned_df_filtered.begin(); it != binned_df_filtered.end(); it++)
-		//	{
-		Interaction T = *it;
+//#pragma omp parallel for
+	//for (int i = 0; i< binned_df_filtered.size(); i++)
+	//{
+	parallel_for(size_t(0),size_t(binned_df_filtered.size()),
+						[&] (size_t i) {
+		//auto it = binned_df_filtered.begin();
+		//advance(it, i);
+		//Interaction T = *it;
+		Interaction T = binned_df_filtered[i];
 		if (T.getChr1() == T.getChr2())
 		{
-#pragma omp critical (fc1)
+//#pragma omp critical (fc1)
 			interactions.push_back(T);
 			pos++;
 		}
-	}
+	});
 }
 
 void findTrans(concurrent_vector<Interaction> & interactions, concurrent_vector<Interaction> & binned_df_filtered)
 {
 	int pos = 0;
-#pragma omp parallel for
-	for (int i = 0; i< binned_df_filtered.size(); i++)
-	{
-		auto it = binned_df_filtered.begin();
-		std::advance(it, i);
-
-		Interaction T = *it;
+//#pragma omp parallel for
+	//for (int i = 0; i< binned_df_filtered.size(); i++)
+	//{
+		parallel_for(size_t(0),size_t(binned_df_filtered.size()),
+							[&] (size_t i) {
+		//auto it = binned_df_filtered.begin();
+		//std::advance(it, i);
+		//Interaction T = *it;
+		Interaction T = binned_df_filtered[i];
 		if (T.getChr1() != T.getChr2())
 		{
-#pragma omp critical (ft1)
+//#pragma omp critical (ft1)
 			interactions.push_back(T);
 			pos++;
 		}
-	}
+	});
 }
 
 void getSumSquare(double & sumSquare, const set<string> & chromos, const concurrent_vector<Interaction> & interactions)
