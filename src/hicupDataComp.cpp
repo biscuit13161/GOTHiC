@@ -278,17 +278,17 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	parallel_for(size_t(0),size_t(binFiltered.size()),
 			[&] (size_t i) {
 		string str = "";
-			int F = binFiltered[i].getFreq();
-			double V = binFiltered[i].getProbability();
-			double P = binomTest(F, numberOfReadPairs2, V, "two.sided", str);
-			binFiltered[i].setPvalue(P);
-			//cout << str << binFiltered[i].getExpected() << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
+		int F = binFiltered[i].getFreq();
+		double V = binFiltered[i].getProbability();
+		double P = binomTest(F, numberOfReadPairs2, V, "two.sided", str);
+		binFiltered[i].setPvalue(P);
+		//cout << str << binFiltered[i].getExpected() << " " << F << " " << numberOfReadPairs2 << " " << V << " " << P << endl;
 
-			double Fd = log2((double(binFiltered[i].getFreq())/numberOfReadPairs2)/(double(binFiltered[i].getExpected())/numberOfReadPairs1));
-			binFiltered[i].setLogObExp(Fd);
+		double Fd = log2((double(binFiltered[i].getFreq())/numberOfReadPairs2)/(double(binFiltered[i].getExpected())/numberOfReadPairs1));
+		binFiltered[i].setLogObExp(Fd);
 
-			array<double,3> ls = {double(i), P, 0.5};
-			values[i] = ls;
+		array<double,3> ls = {double(i), P, 0.5};
+		values[i] = ls;
 	});
 	cout << "\t" << flush;
 	completed();
