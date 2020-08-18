@@ -42,7 +42,7 @@ void ihw(string fileName, SetupComp SetupValues)
         result += buffer.data();
     }
     auto returnCode = pclose(pipe);
-    if ( result.find("Only 1 bin") == string::npos)
+    if ( result.find("Only 1 bin") != string::npos)
     	throw std::invalid_argument("\nIHW internal BH correction inaccurate!\nPlease re-run with BH option!");
 	cerr << "\t" << flush;
 	completed();

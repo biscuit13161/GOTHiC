@@ -274,9 +274,11 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	vector<array<double,3>> values;
 	values.resize(binFiltered.size());
 
+	int count = 0;
 	cout << "\tcalculating P values" << endl;
 	parallel_for(size_t(0),size_t(binFiltered.size()),
 			[&] (size_t i) {
+		count++;
 		string str = "";
 		int F = binFiltered[i].getFreq();
 		double V = binFiltered[i].getProbability();
@@ -290,6 +292,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		array<double,3> ls = {double(i), P, 0.5};
 		values[i] = ls;
 	});
+	cout << binFiltered.size() << "\t" << count << endl;
 	cout << "\t" << flush;
 	completed();
 
