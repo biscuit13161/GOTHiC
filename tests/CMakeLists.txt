@@ -18,7 +18,7 @@ include_directories(${TBB_INCLUDE_DIRS})
 # Build unit tests
 add_definitions(-DBOOST_TEST_DYN_LINK)
 
-  message(STATUS "found boost")
+  message(STATUS "found boost ${Boost_INCLUDE_DIRS}")
 
 set(LIBS sysTests hicupTest  overlapTest importHicupTest binInterTest calcFreqTest pBhAdjustTest)
 set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest binomialTest binomTestTest)

@@ -1,4 +1,6 @@
+message(STATUS "Module Path: ${CMAKE_MODULE_PATH}")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/src/modules")
+message(STATUS "Module Path: ${CMAKE_MODULE_PATH}")
 #find_package(Boost 1.71.0 COMPONENTS iostreams)
 #find_package (gzstream 1.5 REQUIRED "${CMAKE_SOURCE_DIR}/../gzstream")
 find_package(TBB REQUIRED)
