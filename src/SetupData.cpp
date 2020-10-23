@@ -32,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace std;
 
@@ -138,6 +139,11 @@ SetupData loadConfig(string & fileName)
 				}
 				else
 				{
+					value = removeSpaces(value);
+					if (value == "")
+						value = "./";
+					else if (! boost::algorithm::ends_with(value, "/"))
+						value += "/";
 					setupValues.setOutDir(value);
 				}
 				break;
@@ -265,3 +271,4 @@ void SetupData::setCisTrans(string input)
 
 	mCisTrans = CToptionValues[input];
 }
+

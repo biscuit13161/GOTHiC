@@ -66,4 +66,7 @@ int binarySearch2(int arr[], int l, int r, int x);
 
 bool file_exists (const std::string& name);
 
+char *removeSpaces(std::string & str)
+char *removeSpaces(char *str);
+
 #endif /* SRC_UTILS_H_ */

@@ -143,6 +143,11 @@ SetupComp loadConfigComp(string & fileName)
 				}
 				else
 				{
+					value = removeSpaces(value);
+					if (value == "")
+						value = "./";
+					else if (! boost::algorithm::ends_with(value, "/"))
+						value += "/";
 					setupValues.setOutDir(value);
 				}
 				break;
