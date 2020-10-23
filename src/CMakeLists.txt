@@ -39,7 +39,7 @@ foreach(lib ${LIBS})
 endforeach(lib)
 
 ## norm libs
-list (APPEND GLIBS Utils SetupData hicupData BinomData )
+list (APPEND GLIBS Utils SetupData hicupData BinomData random )
 
 foreach(lib ${GLIBS})
   ## copy list (zero-based, -1 refers to end) ##
