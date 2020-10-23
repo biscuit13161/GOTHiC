@@ -30,6 +30,7 @@
 #include "binomTest.h"
 #include "padjust.h"
 #include "Baits.h"
+#include "random.h"
 #include <algorithm>
 #include <math.h> //pow
 #include <stdint.h> // uint32_t
@@ -54,6 +55,16 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	removeDiagonals(interactions1, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
 	removeDiagonals(interactions2, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
+
+	if (setupValues.getRandom()){
+		RandomChoose(interactions1, interactions2);
+
+		if (setupValues.getVerbose())
+		{
+			cerr << "\tAfter Random:\n\tControl: " << interactions1.size() << " interactions" <<endl;
+			cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
+		}
+	}
 
 	if (setupValues.getVerbose())
 	{

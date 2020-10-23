@@ -29,7 +29,6 @@
 #include "hicupDataComp.h"
 #include "binTest.h"
 #include "IHW.h"
-#include "random.h"
 #include <iostream>
 #include <stdio.h>
 #include "tbb/concurrent_vector.h"
@@ -107,16 +106,6 @@ void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> &
 	{
 		cerr << "\tControl: " << interactions1.size() << " interactions" <<endl;
 		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
-	}
-
-	if (setupValues.getRandom()){
-		RandomChoose(interactions1, interactions2);
-
-		if (setupValues.getVerbose())
-		{
-			cerr << "\tAfter Random:\n\tControl: " << interactions1.size() << " interactions" <<endl;
-			cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
-		}
 	}
 
 	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);

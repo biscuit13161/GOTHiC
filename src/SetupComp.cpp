@@ -35,7 +35,7 @@
 
 using namespace std;
 
-SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mRemoveDiagonal(true), mVerbose(false)
+SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mRemoveDiagonal(true), mRandom(true), mVerbose(false)
 {
 
 }
@@ -54,6 +54,7 @@ void SetupComp::print()
 	cerr << "# Resolution:        " << mRes << endl;
 	cerr << "# Config File:       " << mCliName << endl;
 	cerr << "# Verbose:           " << mVerbose << endl;
+	cerr << "# Random Subsetting: " << mRandom << endl;
 	if (mQvalue == qv_ihw)
 		cerr << "# Pvalue Correction: Independent Hypothesis Weighting" <<endl;
 	else if (mQvalue == qv_bh)
