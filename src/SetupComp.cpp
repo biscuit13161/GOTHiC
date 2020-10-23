@@ -31,6 +31,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace std;
 
@@ -103,6 +104,7 @@ SetupComp loadConfigComp(string & fileName)
 			optionValues["CisTrans"] = sc_Cistrans;
 			optionValues["RemoveDiagonals"] = sc_RemDiag;
 			optionValues["Verbose"] = sc_Verbose;
+			optionValues["RandomSubset"] = sc_Random;
 			optionValues["Alpha"] = sc_Alpha;
 			optionValues["Algorithm"] = sc_Qvalues;
 
@@ -171,6 +173,12 @@ SetupComp loadConfigComp(string & fileName)
 						[](unsigned char c){ return std::tolower(c); });
 				if (value == "true")
 					setupValues.setVerbose(true);
+				break;
+			case sc_Random:
+				std::transform(value.begin(), value.end(), value.begin(),
+						[](unsigned char c){ return std::tolower(c); });
+				if (value == "false")
+					setupValues.setRandom(false);
 				break;
 			case sc_Alpha:
 				if (value.empty())

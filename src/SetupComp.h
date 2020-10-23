@@ -28,6 +28,7 @@ private:
 	int mRes;
 	bool mRemoveDiagonal;
 	bool mVerbose;
+	bool mRandom;
 	std::string mAlpha;
 	QV_Options mQvalue;
 	double mUpperhalfBinNumber;
@@ -54,6 +55,7 @@ public:
 	inline CisTrans getCisTrans() const {return mCisTrans;}
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
 	inline bool getVerbose() const {return mVerbose;}
+	inline bool getRandom() const {return mRandom;}
 	inline std::string getAlpha() const {return mAlpha;}
 	inline QV_Options getQvalue() const {return mQvalue;}
 	inline double getUpperhalfBinNumber() {return mUpperhalfBinNumber;}
@@ -75,6 +77,7 @@ public:
 	//{mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
 	inline void setVerbose(bool L) {mVerbose = L;}
+	inline void setRandom(bool L) {mRandom = L;}
 	inline void setAlpha(std::string L) {mAlpha = L;}
 	void setQvalue(std::string L);
 	//{mQvalue = L;}
@@ -101,6 +104,7 @@ enum SC_Options {
 	sc_RemDiag,
 	sc_Logfile,
 	sc_Verbose,
+	sc_Random,
 	sc_Alpha,
 	sc_Qvalues
 };

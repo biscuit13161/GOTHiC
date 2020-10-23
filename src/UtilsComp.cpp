@@ -397,3 +397,21 @@ void checkInputFiles(std::string file)
 		throw std::invalid_argument(str);
 		}
 }
+
+char *removeSpaces(string & str)
+{
+	return removeSpaces(&str[0]);
+}
+
+char *removeSpaces(char *str)
+{
+    int i = 0, j = 0;
+    while (str[i])
+    {
+        if (str[i] != ' ')
+           str[j++] = str[i];
+        i++;
+    }
+    str[j] = '\0';
+    return str;
+}

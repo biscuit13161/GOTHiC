@@ -1,12 +1,12 @@
 /*
- * Utils.h
+ * UtilsComp.h
  *
  *  Created on: 11 May 2020
  *  Author: Richard Thompson (ithompson@hbku.edu.qa)
  */
 
-#ifndef SRC_UTILS_H_
-#define SRC_UTILS_H_
+#ifndef SRC_UTILSCOMP_H_
+#define SRC_UTILSCOMP_H_
 
 //#include "Interactions.h"
 //#include "Site.h"
@@ -67,4 +67,7 @@ void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,cons
 
 void checkInputFiles(std::string file);
 
-#endif /* SRC_UTILS_H_ */
+char *removeSpaces(std::string & str)
+char *removeSpaces(char *str);
+
+#endif /* SRC_UTILSCOMP_H_ */

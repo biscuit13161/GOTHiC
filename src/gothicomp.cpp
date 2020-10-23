@@ -109,13 +109,15 @@ void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> &
 		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
 	}
 
-	RandomChoose(interactions1, interactions2);
+	if (setupValues.getRandom()){
+		RandomChoose(interactions1, interactions2);
 
-	if (setupValues.getVerbose())
+		if (setupValues.getVerbose())
 		{
 			cerr << "\tAfter Random:\n\tControl: " << interactions1.size() << " interactions" <<endl;
 			cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
 		}
+	}
 
 	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);
 
