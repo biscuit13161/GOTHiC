@@ -23,7 +23,7 @@ add_definitions(-DBOOST_TEST_DYN_LINK)
 set(LIBS sysTests hicupTest  overlapTest importHicupTest binInterTest calcFreqTest pBhAdjustTest)
 set(LIBS ${LIBS} sortPositionsTest countDupsTest removeDupsTest findCisTest binomialTest binomTestTest)
 set(LIBS ${LIBS} findTransTest fixChromoTest halfInteractionTest hicupCompInterTest)
-set(LIBS ${LIBS} sumSquareTest IHWTest)
+set(LIBS ${LIBS} sumSquareTest IHWTest randomTest)
 
 foreach(lib ${LIBS})
   add_executable(${lib} ${lib}.cpp)

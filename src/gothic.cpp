@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 	{
 		sort(binom.begin(), binom.end(), bincomp);
 
-		string fileName = setupValues.getSname()+".binom.txt";
+		string fileName = setupValues.getOutDir()+setupValues.getSname()+".binom.txt";
 		ofstream binomFile(fileName);
 		binomFile << "chr1" << "\t" << "locus1" \
 				<< "\t" << "chr2" << "\t" << "locus2" \
@@ -203,7 +203,7 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 		break;
 	case ao_comparative:
 		// save binary file of interactions
-		string outBinName = setupValues.getSname()+".inter.bin";
+		string outBinName = setupValues.getOutDir()+setupValues.getSname()+".inter.bin";
 		writeBinary(interactions, outBinName);
 
 		//vector<Interaction> interactions2;

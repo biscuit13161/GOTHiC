@@ -29,6 +29,7 @@
 #include "hicupDataComp.h"
 #include "binTest.h"
 #include "IHW.h"
+#include "random.h"
 #include <iostream>
 #include <stdio.h>
 #include "tbb/concurrent_vector.h"
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 
 
 	if (setupValues.getQvalue() == qv_ihw)
-		ihw(setupValues.getSname()+".binom.txt", setupValues);
+		ihw(setupValues.getOutDir()+setupValues.getSname()+".binom.txt", setupValues);
 
 	return 0;
 }
@@ -108,13 +109,21 @@ void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> &
 		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
 	}
 
+	RandomChoose(interactions1, interactions2);
+
+	if (setupValues.getVerbose())
+		{
+			cerr << "\tAfter Random:\n\tControl: " << interactions1.size() << " interactions" <<endl;
+			cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
+		}
+
 	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);
 
 }
 
 void outputfile(tbb::concurrent_vector<BinomDataComp> & binom, SetupComp & setupValues)
 {
-	string fileName = setupValues.getSname()+".binom.txt";
+	string fileName = setupValues.getOutDir()+setupValues.getSname()+".binom.txt";
 	ofstream binomFile(fileName);
 	if (setupValues.getBaits() == "")
 	{
