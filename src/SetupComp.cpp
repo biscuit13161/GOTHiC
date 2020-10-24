@@ -35,7 +35,7 @@
 
 using namespace std;
 
-SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mRemoveDiagonal(true), mRandom(true), mVerbose(false)
+SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"),mQvalue(qv_ihw), mRemoveDiagonal(true), mRandom(true), mVerbose(false)
 {
 
 }
