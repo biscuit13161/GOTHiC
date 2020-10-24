@@ -45,8 +45,8 @@ void verbose(const char * fmt, ... );
 std::uint32_t fact(std::uint32_t n);
 int fact(int n);
 
-void writeBinary(tbb::concurrent_vector<Site> & sites, std::string binOutFileName);
-void readBinary(tbb::concurrent_vector<Site> & sites, std::string binInFileName);
+//void writeBinary(tbb::concurrent_vector<Site> & sites, std::string binOutFileName);
+//void readBinary(tbb::concurrent_vector<Site> & sites, std::string binInFileName);
 
 //get memory usage
 int getRealValue();

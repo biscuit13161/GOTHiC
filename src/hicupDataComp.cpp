@@ -57,6 +57,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	removeDiagonals(interactions2, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
 
 	if (setupValues.getRandom()){
+		cerr << "Running Random subsampling" << endl;
 		RandomChoose(interactions1, interactions2);
 
 		if (setupValues.getVerbose())
@@ -303,7 +304,8 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		array<double,3> ls = {double(i), P, 0.5};
 		values[i] = ls;
 	});
-	cout << binFiltered.size() << "\t" << count << endl;
+	if (setupValues.getVerbose())
+		cout << binFiltered.size() << "\t" << count << endl;
 	cout << "\t" << flush;
 	completed();
 

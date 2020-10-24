@@ -571,8 +571,8 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
     int numberOfReadPairs = 0;
     int max = 0;
 
-    ofstream outFile("my_file.txt");
-    for (const auto &e : interactions) outFile << e << "\n";
+    //ofstream outFile("my_file.txt");
+    //for (const auto &e : interactions) outFile << e << "\n";
 
     calcFreq(interactions, cov, numberOfReadPairs, tCoverage, max);
 

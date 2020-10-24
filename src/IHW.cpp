@@ -21,6 +21,7 @@ using namespace tbb;
 void ihw(string fileName, SetupComp SetupValues)
 {
 	cout << "\tcalculating Q values using Independent Hypothesis Weighting" << endl;
+	cout << "\t- N.B. if IHW issues a \"Only 1 bin; IHW reduces to Benjamini Hochberg\" warning, you should re-run specifying the BH algorithm!" << endl;
 
 	string cmd = string("Rscript --vanilla -e 'args = commandArgs(trailingOnly=TRUE) \n");
 	cmd += "library(IHW) \n";
