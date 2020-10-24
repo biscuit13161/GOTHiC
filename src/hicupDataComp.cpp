@@ -283,8 +283,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		cout << "\tBinomial Vector Size: " << binFiltered.size() << endl;
 	}
 
-	vector<array<double,3>> values;
-	values.resize(binFiltered.size());
+	//vector<array<double,3>> values;
+	//values.resize(binFiltered.size());
+	setupValues.mValues.resize(binFiltered.size());
 
 	int count = 0;
 	cout << "\tcalculating P values" << endl;
@@ -302,7 +303,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		binFiltered[i].setLogObExp(Fd);
 
 		array<double,3> ls = {double(i), P, 0.5};
-		values[i] = ls;
+		setupValues.mValues[i] = ls;
 	});
 	if (setupValues.getVerbose())
 		cout << binFiltered.size() << "\t" << count << endl;
@@ -328,47 +329,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getQvalue() == qv_bh)
 	{
-		cout << "\tcalculating Q values using Benjamini Hochberg" << endl;
-		BHCorrection(binFiltered, values, setupValues);
-//		switch(setupValues.getCisTrans())
-//		{
-//		case ct_all :
-//			if(setupValues.getRemoveDiagonal())
-//			{
-//				pBhAdjust(values, upperhalfBinNumber);
-//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
-//			}
-//			else
-//			{
-//				pBhAdjust(values, upperhalfBinNumber+covS);
-//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
-//			}
-//			break;
-//		case ct_cis :
-//			if(setupValues.getRemoveDiagonal())
-//			{
-//				pBhAdjust(values, cisBinNumber);
-//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
-//			}
-//			else
-//			{
-//				pBhAdjust(values, cisBinNumber+covS);
-//				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
-//			}
-//			break;
-//		case ct_trans:
-//			pBhAdjust(values, transBinNumber);
-//			//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
-//			break;
-//		}
-//
-//		parallel_for(size_t(0),size_t(binFiltered.size()),
-//				[&] (size_t i) {
-//
-//			binFiltered[i].setQvalue(values[i][2]);
-//		});
-		cout << "\t" << flush;
-		completed();
+		BHCalculation(binFiltered, setupValues);
 	}
 
 	completed();
@@ -392,36 +353,44 @@ Interaction splitPair(string & e)
 	return I;
 }
 
-void BHCorrection(concurrent_vector<BinomDataComp> & binFiltered, vector<array<double,3>> values, SetupComp & setupValues)
+void BHCalculation(concurrent_vector<BinomDataComp> & binFiltered, SetupComp & setupValues)
+{
+	cout << "\tcalculating Q values using Benjamini Hochberg" << endl;
+	BHCorrection(binFiltered, setupValues);
+	cout << "\t" << flush;
+	completed();
+}
+
+void BHCorrection(concurrent_vector<BinomDataComp> & binFiltered, SetupComp & setupValues)
 {
 	switch(setupValues.getCisTrans())
 			{
 			case ct_all :
 				if(setupValues.getRemoveDiagonal())
 				{
-					pBhAdjust(values, setupValues.getUpperhalfBinNumber());
+					pBhAdjust(setupValues.mValues, setupValues.getUpperhalfBinNumber());
 					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber));
 				}
 				else
 				{
-					pBhAdjust(values, setupValues.getUpperhalfBinNumber()+setupValues.getCovS());
+					pBhAdjust(setupValues.mValues, setupValues.getUpperhalfBinNumber()+setupValues.getCovS());
 					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), upperhalfBinNumber+covS));
 				}
 				break;
 			case ct_cis :
 				if(setupValues.getRemoveDiagonal())
 				{
-					pBhAdjust(values, setupValues.getCisBinNumber());
+					pBhAdjust(setupValues.mValues, setupValues.getCisBinNumber());
 					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), cisBinNumber));
 				}
 				else
 				{
-					pBhAdjust(values, setupValues.getCisBinNumber()+setupValues.getCovS());
+					pBhAdjust(setupValues.mValues, setupValues.getCisBinNumber()+setupValues.getCovS());
 					//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(),cisBinNumber+covS));
 				}
 				break;
 			case ct_trans:
-				pBhAdjust(values, setupValues.getTransBinNumber());
+				pBhAdjust(setupValues.mValues, setupValues.getTransBinNumber());
 				//binFiltered[i].setQvalue(pBhAdjust(binFiltered[i].getProbability(), transBinNumber));
 				break;
 			}
@@ -429,6 +398,6 @@ void BHCorrection(concurrent_vector<BinomDataComp> & binFiltered, vector<array<d
 			parallel_for(size_t(0),size_t(binFiltered.size()),
 					[&] (size_t i) {
 
-				binFiltered[i].setQvalue(values[i][2]);
+				binFiltered[i].setQvalue(setupValues.mValues[i][2]);
 			});
 }

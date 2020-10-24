@@ -18,7 +18,7 @@ using namespace tbb;
 
 //We use the (expected+observed)/2 number of reads as the baseMean and alpha at 0.1
 
-void ihw(string fileName, SetupComp SetupValues)
+bool ihw(string fileName, SetupComp SetupValues)
 {
 	cout << "\tcalculating Q values using Independent Hypothesis Weighting" << endl;
 	//printf("\t- \x1B[35mN.B.\033[0m if IHW issues a \"Only 1 bin; IHW reduces to Benjamini Hochberg\" warning, you should re-run specifying the \x1B[36mBH algorithm!\033[0m\n");
@@ -46,7 +46,12 @@ void ihw(string fileName, SetupComp SetupValues)
     cout << "Returned: " << result << endl;
     auto returnCode = pclose(pipe);
     if ( result.find("Only 1 bin") != string::npos)
-    	throw invalid_argument(string("\nIHW internal BH correction inaccurate!\nPlease re-run with BH option!"));
+    {
+    	//throw invalid_argument(string("\nIHW internal BH correction inaccurate!\nPlease re-run with BH option!"));
+    	cout << "\nIHW internal BH correction inaccurate - Switching to GOTHiComp BH calculation!" << endl;
+    	return true;
+    }
 	cerr << "\t" << flush;
 	completed();
+	return false;
 }

@@ -86,9 +86,16 @@ int main(int argc, char *argv[])
 
 	outputfile(binom, setupValues);
 
+	bool failed = false;
 
 	if (setupValues.getQvalue() == qv_ihw)
-		ihw(setupValues.getOutDir()+setupValues.getSname()+".binom.txt", setupValues);
+		failed = ihw(setupValues.getOutDir()+setupValues.getSname()+".binom.txt", setupValues);
+
+	if (failed)
+	{
+		BHCalculation(binom, setupValues);
+		outputfile(binom, setupValues);
+	}
 
 	return 0;
 }

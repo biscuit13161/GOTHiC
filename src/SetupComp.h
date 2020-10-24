@@ -40,6 +40,8 @@ public:
 	SetupComp();
 	SetupComp(std::string outDir, std::string enzyme, std::string input, int threads);
 
+	std::vector<std::array<double,3>> mValues;
+
 	void print();
 
 	inline int getThreads() const {return mThreads;}

@@ -11,6 +11,6 @@
 #include "SetupComp.h"
 #include <string>
 
-void ihw(std::string fileName, SetupComp SetupValues);
+bool ihw(std::string fileName, SetupComp SetupValues);
 
 #endif /* SRC_IHW_H_ */
