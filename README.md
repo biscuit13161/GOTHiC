@@ -63,6 +63,13 @@ Specifying bam/sam files in the config file, will result in gothic automatically
 <path/to>/gothic <path/to/gothic.conf>
 ```
 
+or
+
+```bash
+gothic -i <filename> -s <name> -d <filename> [-t #] [-r #] [-o <dir>] [-c (all|trans|cis)]
+      [-A (single|comparative)] [-l <filename>] [--verbose] [--no_rem_diag]
+```
+
 ### Running Comparative GOTHiC++
 
 In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file (`<SampleName>.inter.bin`). These files are then used as input for gothicomp.
@@ -70,6 +77,14 @@ In order to carry a comparative analysis, Samples must be individually run as de
 ```bash
 <path/to>/gothicomp <path/to/gothicomp.conf>
 ```
+ or 
+ 
+ ```bash
+gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]
+        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]
+ ```
+
+- When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 
 
 ### Notes on config files
 
@@ -105,9 +120,8 @@ Please note, it may be necessary to add the `-DTBB_DIR=<path/to>/oneTBB` option 
  
 GOTHiC++ carries out Pvalue correction using either Benjamini Hochberg (BH) or Independent Hypothesis Weighting (IHW) \[Ignatiadis *et al*, 2016\], which is specified in the config file. Independent hypothesis weighting utilises the BioConductor IHW package, described from [https://bioconductor.org/packages/release/bioc/html/IHW.html](https://bioconductor.org/packages/release/bioc/html/IHW.html).
 
-GOTHiC++ defaults to using ihw, if not specified. However, if the IHW package is not installed, GOTHiC++ will revert to BH correction.
 
-**N.B.** if the "`Only 1 bin; IHW reduces to Benjamini Hochberg (uniform weights)`" error is produced, GOTHiC++ should be re-run with the `Algorithm: bh` option. BH correction relys on the dimensions of the input data, however IHW does not have access to this when it runs the BH calculation and these corrections are therefore inaccurate. 
+**N.B.** By default GOTHiC++ carries out Q value correction via the IHW R Bioconductor package. If IHW identifies only 1 bin, IHW attempts to use BH correction, however IHW does not have access to all the information it needs to accurately calculate BH correction. In this situation GOTHiC++ will revert to it's own BH correction.
 
 ### References
 

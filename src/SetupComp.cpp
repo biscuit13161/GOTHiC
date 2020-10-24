@@ -204,11 +204,13 @@ SetupComp setConfigComp(int argc, char * argv[])
 
 	static int verbose_flag;
 	static int remdiag_flag;
+	static int random_flag;
 
 	static struct option long_options[] =
 	{
 			/* These options set a flag. */
 			{"verbose", no_argument,       &verbose_flag, 1},
+			{"norandom", no_argument,       &random_flag, 1},
 			/* These options don’t set a flag.
 			             We distinguish them by their indices. */
 			{"sample",     required_argument,       0, 's'},
@@ -276,6 +278,8 @@ SetupComp setConfigComp(int argc, char * argv[])
 
 	if (verbose_flag)
 		setupValues.setVerbose(true);
+	if (random_flag)
+		setupValues.setRandom(false);
 
 	return setupValues;
 }

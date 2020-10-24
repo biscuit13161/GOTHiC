@@ -73,7 +73,8 @@ void printUsageComp()
 	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
 	cerr << "    gothicomp <path/to/config/file>" << endl;
 	cerr << "OR" << endl;
-	cerr << "    gothicomp " << endl << endl;
+	cerr << "    gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]" << endl;
+	cerr << "        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]" << endl << endl;
 	cerr << "options:" << endl;
 	cerr <<
 			"    -c <filename>         Control input filename\n"
@@ -92,14 +93,15 @@ void printUsageComp()
 	        "      --res #\n"
 			"    -o <dir>              Output directory, defaults to './'\n"
 			"      --output <dir>\n"
-			"    -c [all|trans|cis]    Filter for Cis or Trans interactions,defaults to 'all'\n"
-			"      --cistrans [all|trans|cis]\n"
-			"    -A <option>           Algorithm for p-value correction, either 'bh' or 'ihw'\n"
-			"      --analysis <option>\n"
+			"    -C (all|trans|cis)    Filter for Cis or Trans interactions,defaults to 'all'\n"
+			"      --cistrans (all|trans|cis)\n"
+			"    -A (bh|ihw)           Algorithm for p-value correction, either 'bh' or 'ihw'\n"
+			"      --analysis (bh|ihw)\n"
 			"    -a #                  Alpha cutoff for p-value correction, defaults to '0.1'\n"
 			"      --alpha #\n"
 			"    -l <filename>         Log file\n"
 			"      --log <filename>\n"
+			"    --norandom            Turn off Random subsampling\n"
 			"    --verbose             Print verbose output during run\n";
 	cerr << endl;
 
