@@ -21,7 +21,8 @@ using namespace tbb;
 void ihw(string fileName, SetupComp SetupValues)
 {
 	cout << "\tcalculating Q values using Independent Hypothesis Weighting" << endl;
-	cout << "\t- N.B. if IHW issues a \"Only 1 bin; IHW reduces to Benjamini Hochberg\" warning, you should re-run specifying the BH algorithm!" << endl;
+	//printf("\t- \x1B[35mN.B.\033[0m if IHW issues a \"Only 1 bin; IHW reduces to Benjamini Hochberg\" warning, you should re-run specifying the \x1B[36mBH algorithm!\033[0m\n");
+	//cout << "\t- N.B. if IHW issues a \"Only 1 bin; IHW reduces to Benjamini Hochberg\" warning, you should re-run specifying the BH algorithm!" << endl;
 
 	string cmd = string("Rscript --vanilla -e 'args = commandArgs(trailingOnly=TRUE) \n");
 	cmd += "library(IHW) \n";
@@ -29,7 +30,7 @@ void ihw(string fileName, SetupComp SetupValues)
 	cmd += "baseMean <- (binom$expected+binom$readCount)/2 \n";
 	cmd += "binom$qvalue <- adj_pvalues(ihw(binom$pvalue ~ baseMean, alpha = as.numeric(args[2]) )) \n";
 	cmd += "write.table(binom,file=args[1], sep=\"\\t\",quote=FALSE,row.names = FALSE) ' ";
-	cmd += fileName + " " + SetupValues.getAlpha();
+	cmd += fileName + " " + SetupValues.getAlpha() + " 2>&1";
 
 	if (SetupValues.getVerbose())
 		cout << "\nRscript call:\n" << cmd << endl << endl;
@@ -42,9 +43,10 @@ void ihw(string fileName, SetupComp SetupValues)
         std::cout << "\t\tReading..." << std::endl;
         result += buffer.data();
     }
+    cout << "Returned: " << result << endl;
     auto returnCode = pclose(pipe);
     if ( result.find("Only 1 bin") != string::npos)
-    	throw std::invalid_argument("\nIHW internal BH correction inaccurate!\nPlease re-run with BH option!");
+    	throw invalid_argument(string("\nIHW internal BH correction inaccurate!\nPlease re-run with BH option!"));
 	cerr << "\t" << flush;
 	completed();
 }
