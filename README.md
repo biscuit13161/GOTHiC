@@ -4,11 +4,13 @@ GOTHiC++ is a C++ implementation of the Bioconductor R package [GOTHiC](https://
 
 This is Hi-C analysis software which uses a cumulative binomial test to detect interactions between distal genomic loci that have significantly more reads than expected by chance in Hi-C experiments \[Mifsud *et al*,2017\]. It takes mapped paired NGS reads as input and gives back the list of significant interactions for a given bin size in the genome.
 
+GOTHiC++ is available as a pre-built Singularity image which can be run locally or on a HPC, available from **TBC**.
+
 **GOTHiC Authors**: Borbala Mifsud and Robert Sugar
 
 **GOTHiC Citation**: Mifsud B, Sugar R (2020). GOTHiC: Binomial test for Hi-C data analysis. R package version 1.24.0.
 
-**GOTHiC++ Authors**: Richard Thompson and Borbala Mifsud
+**GOTHiC++ Authors**: Richard Thompson, Elodie Darbo and Borbala Mifsud
 
 **Contact Email**: ithompson[at]hbku.edu.qa
 
@@ -81,7 +83,7 @@ In order to carry a comparative analysis, Samples must be individually run as de
  
  ```bash
 gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]
-        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]
+        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose|--debug]
  ```
 
 - When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 

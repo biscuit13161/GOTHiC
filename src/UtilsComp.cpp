@@ -74,7 +74,7 @@ void printUsageComp()
 	cout << "    gothicomp <path/to/config/file>" << endl;
 	cout << "OR" << endl;
 	cout << "    gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]" << endl;
-	cout << "        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]" << endl << endl;
+	cout << "        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose|--debug]" << endl << endl;
 	cout << "options:" << endl;
 	cout <<
 			"    -c <filename>         Control input filename\n"
