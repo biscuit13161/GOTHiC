@@ -30,6 +30,12 @@ enum CisTrans
 	ct_trans,
 };
 
+enum Verb_level {
+	vl_none = 0,
+	vl_info,
+	vl_debug
+};
+
 enum QV_Options {
 	qv_ihw = 0,
 	qv_bh
@@ -54,13 +60,13 @@ int getVirtValue();
 int parseLine(char* line);
 
 void removeDuplicates(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
-void removeDiagonals(tbb::concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal);
+void removeDiagonals(tbb::concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal, std::string type);
 
 void findTrans(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
 void findCis(tbb::concurrent_vector<Interaction> & interactions, tbb::concurrent_vector<Interaction> & binned_df_filtered);
 
 void writeBinary(tbb::concurrent_vector<Interaction> & interactions, std::string binOutFileName);
-void readBinary(tbb::concurrent_vector<Interaction> & interactions, std::string binInFileName);
+void readBinary(tbb::concurrent_vector<Interaction> & interactions, std::string binInFileName, std::string type, Verb_level verb_lev);
 
 std::string fixChromosomeNames(std::string chr);
 void getSumSquare(double & sumSquare, const std::set<std::string> & chromos,const tbb::concurrent_vector<Interaction> & interactions);

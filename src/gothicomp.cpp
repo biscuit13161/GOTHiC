@@ -45,13 +45,13 @@ int main(int argc, char *argv[])
 	if ( argc < 2 ) // argc should be 2 for correct execution
 	{
 		// We print argv[0] assuming it is the program name
-		cout<<"usage: "<< argv[0] <<" <filename>\n";
+		cerr<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
 	else if ((strcmp(argv[1], "--help")==0) || (strcmp(argv[1], "-h")==0))
 	{
-		cout<<"usage: "<< argv[0] <<" <filename>\n";
+		cerr<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
@@ -104,16 +104,10 @@ void gothicHicupComp(SetupComp & setupValues, concurrent_vector<BinomDataComp> &
 {
 	/** load data from GOTHiC++ **/
 	concurrent_vector<Interaction> interactions1;
-	readBinary(interactions1, setupValues.getCondition1());
+	readBinary(interactions1, setupValues.getCondition1(), "Control", setupValues.getVerbose());
 
 	concurrent_vector<Interaction> interactions2;
-	readBinary(interactions2, setupValues.getCondition2());
-
-	if (setupValues.getVerbose())
-	{
-		cerr << "\tControl: " << interactions1.size() << " interactions" <<endl;
-		cerr << "\tSample:  " << interactions2.size() << " interactions" <<endl;
-	}
+	readBinary(interactions2, setupValues.getCondition2(), "Sample", setupValues.getVerbose());
 
 	binomialHiChicupComp(interactions1, interactions2, setupValues, binom);
 

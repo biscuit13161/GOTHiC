@@ -51,32 +51,32 @@ void showTime()
 	//char* dt = ctime(&now);
 	tm *ltm = localtime(&now);
 
-	cerr << ltm->tm_hour << ":" << flush;
-	cerr << ltm->tm_min << ":" << flush;
-	cerr << ltm->tm_sec << flush;
+	cout << ltm->tm_hour << ":" << flush;
+	cout << ltm->tm_min << ":" << flush;
+	cout << ltm->tm_sec << flush;
 }
 
 void completed(int n)
 {
-	cerr << "\t... Completed";
+	cout << "\t... Completed";
 	if (n > 0)
-		cerr << " (" << n << ")";
-	cerr <<	"! ";
+		cout << " (" << n << ")";
+	cout <<	"! ";
 	//showTime();
-	cerr << endl;
+	cout << endl;
 }
 
 void printUsageComp()
 {
 
-	cerr << "GOTHiC++ usage:" << endl;
-	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
-	cerr << "    gothicomp <path/to/config/file>" << endl;
-	cerr << "OR" << endl;
-	cerr << "    gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]" << endl;
-	cerr << "        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]" << endl << endl;
-	cerr << "options:" << endl;
-	cerr <<
+	cout << "GOTHiC++ usage:" << endl;
+	cout << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cout << "    gothicomp <path/to/config/file>" << endl;
+	cout << "OR" << endl;
+	cout << "    gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]" << endl;
+	cout << "        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose]" << endl << endl;
+	cout << "options:" << endl;
+	cout <<
 			"    -c <filename>         Control input filename\n"
 			"      --control <filename>\n"
 			"    -s <filename>         Sample input filename\n"
@@ -87,7 +87,7 @@ void printUsageComp()
 			"      --digest <filename>\n"
 			"    -b <filename>         Baits file for analysis, as used by HiCUP\n"
 			"      --baits <filename>\n"
-			"    -t #                  Num of threads to run, deafults to 1\n"
+			"    -t #                  Num of threads to run, defaults to 1\n"
 			"      --threads #\n"
 			"    -r #                  Resolution in bases for bining interactions, defaults to 10000\n"
 	        "      --res #\n"
@@ -102,8 +102,9 @@ void printUsageComp()
 			"    -l <filename>         Log file\n"
 			"      --log <filename>\n"
 			"    --norandom            Turn off Random subsampling\n"
-			"    --verbose             Print verbose output during run\n";
-	cerr << endl;
+			"    --verbose             Print verbose output during run\n"
+			"    --debug               Print very verbose output during run\n";
+	cout << endl;
 
 }
 
@@ -200,7 +201,7 @@ void removeDuplicates(concurrent_vector<Interaction> & interactions, concurrent_
 }
 
 
-void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal)
+void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cistrans, bool removeDiagonal, string type)
 {
 	/** Remove Diagonals and Cis/Trans filter values **/
 
@@ -208,9 +209,9 @@ void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cis
 
 	if (removeDiagonal)
 	{
-		cerr << "\tRemoving Diagonals!" << endl;
+		cout << "\tRemoving " << type << " Diagonals!" << endl;
 		removeDuplicates(interactions, binned_df_filtered);
-		cerr << "\t";
+		cout << "\t";
 		completed();
 		interactions.clear();
 	}
@@ -221,16 +222,16 @@ void removeDiagonals(concurrent_vector<Interaction> & interactions, CisTrans cis
 
 	if (cistrans == ct_cis)
 	{
-		cerr << "\tFinding Cis interactions!";
+		cout << "\tFinding " << type << " Cis interactions!";
 		findCis(interactions, binned_df_filtered);
-		cerr << "\t";
+		cout << "\t";
 		completed();
 	}
 	else if (cistrans == ct_trans)
 	{
-		cerr << "\tFinding Trans interactions!";
+		cout << "\tFinding " << type << "Trans interactions!";
 		findTrans(interactions, binned_df_filtered);
-		cerr << "\t";
+		cout << "\t";
 		completed();
 	}
 	else
@@ -346,9 +347,9 @@ void writeBinary(tbb::concurrent_vector<Interaction> & interactions, string binO
 
 }
 
-void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binInFileName)
+void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binInFileName, std::string type, Verb_level verb_lev)
 {
-	cerr << "Reading Binary input file" << endl;
+	cout << "Reading " << type << " Binary input file" << endl;
 	ifstream binInFile;
 	binInFile.open(binInFileName, ios::binary);
 
@@ -386,6 +387,11 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 	{
 		string str = string("Unable to read binary file: ") + binInFileName;
 		throw std::invalid_argument(str);
+	}
+
+	if (verb_lev >= vl_info)
+	{
+		cout << "\t" << interactions.size() << " interactions loaded" <<endl;
 	}
 
 	completed();

@@ -27,7 +27,7 @@ private:
 	int mThreads;
 	int mRes;
 	bool mRemoveDiagonal;
-	bool mVerbose;
+	Verb_level mVerbose;
 	bool mRandom;
 	std::string mAlpha;
 	QV_Options mQvalue;
@@ -56,7 +56,7 @@ public:
 	inline std::string getLogFile() const {return mLogFile;}
 	inline CisTrans getCisTrans() const {return mCisTrans;}
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
-	inline bool getVerbose() const {return mVerbose;}
+	inline Verb_level getVerbose() const {return mVerbose;}
 	inline bool getRandom() const {return mRandom;}
 	inline std::string getAlpha() const {return mAlpha;}
 	inline QV_Options getQvalue() const {return mQvalue;}
@@ -78,7 +78,7 @@ public:
 	void setCisTrans(std::string input);
 	//{mCisTrans = input;}
 	inline void setRemoveDiagonal(bool L) {mRemoveDiagonal = L;}
-	inline void setVerbose(bool L) {mVerbose = L;}
+	inline void setVerbose(Verb_level L) {mVerbose = L;}
 	inline void setRandom(bool L) {mRandom = L;}
 	inline void setAlpha(std::string L) {mAlpha = L;}
 	void setQvalue(std::string L);
@@ -110,5 +110,7 @@ enum SC_Options {
 	sc_Alpha,
 	sc_Qvalues
 };
+
+
 
 #endif /* SRC_SETUPCOMP_H_ */

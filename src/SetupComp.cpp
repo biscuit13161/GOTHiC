@@ -35,34 +35,47 @@
 
 using namespace std;
 
-SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mQvalue(qv_ihw), mRemoveDiagonal(true), mRandom(true), mVerbose(false)
+SetupComp::SetupComp(): mOutDir(""), mEnzyme(""), mCondition1(""), mCondition2(""), mThreads(0), mRes(10000), mAlpha("0.1"), mQvalue(qv_ihw), mRemoveDiagonal(true), mRandom(true), mVerbose(vl_none)
 {
 
 }
 
 void SetupComp::print()
 {
-	cerr << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
-	cerr << "#" << endl;
-	cerr << "# Output Directory:  " << mOutDir << endl;
-	cerr << "# Restriction File:  " << mEnzyme << endl;
-	cerr << "# Baits File:        " << mBaits << endl;
-	cerr << "# Sample Name:       " << mSname << endl;
-	cerr << "# Control File:      " << mCondition1 << endl;
-	cerr << "# Sample File:       " << mCondition2 << endl;
-	cerr << "# Threads:           " << mThreads << endl;
-	cerr << "# Resolution:        " << mRes << endl;
-	cerr << "# Config File:       " << mCliName << endl;
-	cerr << "# Verbose:           " << mVerbose << endl;
-	cerr << "# Random Subsetting: " << mRandom << endl;
-	if (mQvalue == qv_ihw)
-		cerr << "# Pvalue Correction: Independent Hypothesis Weighting" <<endl;
-	else if (mQvalue == qv_bh)
-		cerr << "# Pvalue Correction: Benjamini Hochberg" <<endl;
+	cout << endl << string("GOTHiC++ v") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cout << "#" << endl;
+	cout << "# Output Directory:  " << mOutDir << endl;
+	cout << "# Restriction File:  " << mEnzyme << endl;
+	cout << "# Baits File:        " << mBaits << endl;
+	cout << "# Sample Name:       " << mSname << endl;
+	cout << "# Control File:      " << mCondition1 << endl;
+	cout << "# Sample File:       " << mCondition2 << endl;
+	cout << "# Threads:           " << mThreads << endl;
+	cout << "# Resolution:        " << mRes << endl;
+	cout << "# Config File:       " << mCliName << endl;
+	switch(mVerbose)
+	{
+		case vl_info:
+			cout << "# Verbose Output:    Verbose"<< endl;
+			break;
+		case vl_debug:
+			cout << "# Verbose Output:    Debug"<< endl;
+			break;
+		default:
+			cout << "# Verbose Output:    None"<< endl;
+	}
+	if (mRandom)
+		cout << "# Random Subsetting: True" << endl;
 	else
-		cerr << "# Pvalue Correction: Not Specfied!" <<endl;
-	cerr << "# Alpha:             " << mAlpha << endl;
-	cerr << "#" << endl << endl;
+		cout << "# Random Subsetting: False"  << endl;
+	if (mQvalue == qv_ihw)
+		cout << "# Pvalue Correction: Independent Hypothesis Weighting" <<endl;
+	else if (mQvalue == qv_bh)
+		cout << "# Pvalue Correction: Benjamini Hochberg" <<endl;
+	else
+		cout << "# Pvalue Correction: Not Specfied!" <<endl;
+	cout << "# Alpha:             " << mAlpha << endl;
+	cout << "#" << endl << endl;
 }
 
 SetupComp loadConfigComp(string & fileName)
@@ -173,7 +186,11 @@ SetupComp loadConfigComp(string & fileName)
 				std::transform(value.begin(), value.end(), value.begin(),
 						[](unsigned char c){ return std::tolower(c); });
 				if (value == "true")
-					setupValues.setVerbose(true);
+					setupValues.setVerbose(vl_info);
+				else if (value == "debug")
+				{
+					setupValues.setVerbose(vl_debug);
+				}
 				break;
 			case sc_Random:
 				std::transform(value.begin(), value.end(), value.begin(),
@@ -203,6 +220,7 @@ SetupComp setConfigComp(int argc, char * argv[])
 	SetupComp setupValues;
 
 	static int verbose_flag;
+	static int debug_flag;
 	static int remdiag_flag;
 	static int random_flag;
 
@@ -210,6 +228,7 @@ SetupComp setConfigComp(int argc, char * argv[])
 	{
 			/* These options set a flag. */
 			{"verbose", no_argument,       &verbose_flag, 1},
+			{"debug", no_argument,       &debug_flag, 1},
 			{"norandom", no_argument,       &random_flag, 1},
 			/* These options don’t set a flag.
 			             We distinguish them by their indices. */
@@ -276,8 +295,12 @@ SetupComp setConfigComp(int argc, char * argv[])
 		}//*/
 	}
 
-	if (verbose_flag)
-		setupValues.setVerbose(true);
+
+
+	if (verbose_flag && !debug_flag)
+		setupValues.setVerbose(vl_info);
+	if (debug_flag)
+		setupValues.setVerbose(vl_debug);
 	if (random_flag)
 		setupValues.setRandom(false);
 

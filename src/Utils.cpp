@@ -80,7 +80,7 @@ void printUsage()
 			"      --sample <name>\n"
 			"    -d <filename>         Digest of Restriction Enzyme, as used by HiCUP\n"
 			"      --digest <filename>\n"
-			"    -t #                  Num of threads to run, deafults to 1\n"
+			"    -t #                  Num of threads to run, defaults to 1\n"
 			"      --threads #\n"
 			"    -r #                  Resolution in bases for bining interactions, defaults to 10000\n"
 	        "      --res #\n"
