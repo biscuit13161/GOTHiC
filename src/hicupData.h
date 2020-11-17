@@ -37,8 +37,8 @@ void binInteractions(tbb::concurrent_vector<Interaction> & interactions, SetupDa
 void binomialHiChicup(tbb::concurrent_vector<Interaction> & interactions, SetupData & setupValues, std::vector<BinomData> & binFiltered);
 
 std::string fixChromosomeNames(std::string chrnames);
-void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName);
-void getHindIIIsitesFromHicup(std::multimap<std::string,std::array<int,2>> & sites, std::string fileName);
+void getHindIIIsitesFromHicup(std::vector<Site> & sites, std::string fileName, SetupData & setupValues);
+void getHindIIIsitesFromHicup(std::multimap<std::string,std::array<int,2>> & sites, std::string fileName, SetupData & setupValues);
 
 void findOverlaps(std::vector<halfInteraction>& query, std::vector<Site> & subject, std::string name);
 void findOverlaps(std::vector<halfInteraction>& query, std::multimap<std::string,std::array<int,2>> & subject, std::string name);

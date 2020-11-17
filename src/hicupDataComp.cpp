@@ -58,8 +58,8 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_info && setupValues.getRemoveDiagonal())
 	{
-		cout << "\tDiagonals Removed:\n\t    Control: " << interactions1.size() << " interactions" <<endl;
-		cout << "\t    Sample:  " << interactions2.size() << " interactions" << endl << endl;
+		fprintf(stderr, "\tDiagonals Removed:\n\t    Control: %'d interactions\n", interactions1.size() );
+		fprintf(stderr, "\t    Sample:  %'d interactions \n\n",interactions2.size() );
 	}
 
 	if (setupValues.getRandom()){
@@ -68,13 +68,13 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 		if (setupValues.getVerbose() >= vl_info)
 		{
-			cout << "\tAfter subsetting:\n\t    Control: " << interactions1.size() << " interactions" <<endl;
-			cout << "\t    Sample:  " << interactions2.size() << " interactions" << endl << endl;
+			fprintf(stderr, "\tAfter subsetting:\n\t    Control: %'d interactions\n", interactions1.size() );
+			fprintf(stderr, "\t    Sample:  %'d interactions \n\n",interactions2.size() );
 		}
 	}
 
 
-	cout << "\tGetting Pairs" << endl;
+	printf("\tGetting Pairs\n");
 	concurrent_unordered_set<string> Int1; // Ints from Control
 	concurrent_unordered_set<string> Int2; // Ints from Sample
 	concurrent_unordered_set<string> AllInt; // all_bin
@@ -113,9 +113,9 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_debug)
 	{
-		cout << "\tControl Interactions: " << Int1.size() << " unique positions containing " << pairs1.size() << " pairs" << endl;
-		cout << "\tSample Interactions:  " << Int2.size() << " unique positions containing " << pairs2.size() << " pairs" << endl;
-		cout << "\tAll Interactions:     " << AllInt.size() << " unique positions"  << endl << endl;
+		fprintf(stderr, "\tControl Interactions: %'d unique positions containing %'d pairs\n", Int1.size(),pairs1.size());
+		fprintf(stderr, "\tSample Interactions:  %'d unique positions containing %'d pairs\n", Int2.size(),pairs2.size());
+		fprintf(stderr, "\tAll Interactions:     %'d unique positions\n\n", AllInt.size());
 	}
 
 	concurrent_unordered_set<string> only1;
@@ -175,12 +175,12 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_debug)
 	{
-		cout << "\t    " << numberOfReadPairs1 << " Read Pairs in Control"   << endl;
-		cout << "\t    " << only1.size() << " interactions unique to Control" << endl;
+		fprintf(stderr, "\t    %'d Read Pairs in Control\n", numberOfReadPairs1 );
+		fprintf(stderr, "\t    %'d interactions unique to Control\n", only1.size() );
 		//cout << "\tmax: " << max1 << "\tmin: " << min1 << endl;
-		cout << "\t    " << numberOfReadPairs2 << " Read Pairs in Sample"  << endl;
+		fprintf(stderr, "\t    %'d Read Pairs in Sample\n", numberOfReadPairs2 );
 		//cout << "\tmax: " << max2 << "\tmin: " << min2 << endl;
-		cout << "\t    " << only2.size() << " interactions unique to Sample" << endl << endl;
+		fprintf(stderr, "\t    %'d interactions unique to Sample\n\n", only2.size() );
 	}
 
 	if (interactions1.size() != interactions2.size())
@@ -191,9 +191,8 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_info)
 	{
-		cout << "\tJoined data:" << endl;
-		cout << "\t    Control: " << interactions1.size() << " interactions" << endl;
-		cout << "\t    Sample:  " << interactions2.size() << " interactions" << endl;
+		fprintf(stderr, "\tJoined data:\n\t    Control: %'d interactions\n", interactions1.size() );
+		fprintf(stderr, "\t    Sample:  %'d interactions\n", interactions2.size() );
 	}
 
 	setupValues.setCovS(AllInt.size()); // === length(all.bins)
@@ -202,10 +201,10 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_debug)
 	{
-		cout.precision(15);
-		cout << endl << "\t    Number of All Interactions:  " << setupValues.getCovS() << endl;
-		cout << "\t    Total Interactions: " << numberOfAllInteractions  << endl;
-		cout << "\t    UpperHalfBinNumber: " << setupValues.getUpperhalfBinNumber() << endl;
+		//cout.precision(15);
+		fprintf(stderr, "\n\t    Number of All Interactions:  %'.1f \n", setupValues.getCovS() );
+		fprintf(stderr, "\t    Total Interactions:          %'.f \n", numberOfAllInteractions  );
+		fprintf(stderr, "\t    UpperHalfBinNumber:          %'.1f \n", setupValues.getUpperhalfBinNumber() );
 	}
 
 	set<string> chromos;
@@ -222,10 +221,10 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_debug)
 	{
-		cout.precision(15);
-		cout << "\t    Sample Sum of Squares:  " << sumSquare << endl;
-		cout << "\t    Number of Cis:   " << setupValues.getCisBinNumber() << endl;
-		cout << "\t    Number of Trans: " << setupValues.getTransBinNumber() << endl;
+		//cout.precision(15);
+		fprintf(stderr, "\t    Sample Sum of Squares:       %'.1f \n", sumSquare );
+		fprintf(stderr, "\t    Number of Cis:               %'.1f \n", setupValues.getCisBinNumber() );
+		fprintf(stderr, "\t    Number of Trans:             %'.1f \n", setupValues.getTransBinNumber() );
 	}
 
 	/** all read pairs used in binomial **/
@@ -236,7 +235,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 	{
 		readBaits(Baits, setupValues.getBaits());
 		if (setupValues.getVerbose() == vl_info)
-			cout << "\tLoaded " << Baits.size() << " baits" << endl;;
+			fprintf(stderr, "\tLoaded %'d baits\n", Baits.size() );
 	}//*/
 
 	parallel_for(size_t(0),size_t(interactions2.size()),
@@ -245,7 +244,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 		Interaction s = interactions2[i];
 		if ( f != s )
 		{
-			cout << "Mismatched Interactions:" << endl << f << s;
+			fprintf(stderr, "Mismatched Interactions:\n\t%'d \n\t%'d \n", f , s );
 		}
 		else if (f.getFreq() > 1 && s.getFreq() > 1)
 		{
@@ -282,7 +281,7 @@ void binomialHiChicupComp(concurrent_vector<Interaction> & interactions1, concur
 
 	if (setupValues.getVerbose() >= vl_info)
 	{
-		cout << "\t    Binomial Vector Size: " << binFiltered.size() << endl << endl;
+		fprintf(stderr, "\t    Binomial Vector Size: %'d \n\n", binFiltered.size() );
 	}
 
 	setupValues.mValues.resize(binFiltered.size());

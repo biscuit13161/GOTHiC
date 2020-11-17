@@ -30,6 +30,7 @@
 #include "BinomData.h"
 #include <iostream>
 #include <stdio.h>
+#include <locale.h>
 //#include <omp.h>
 #include <string>
 #include "tbb/concurrent_vector.h"
@@ -38,9 +39,9 @@
 using namespace std;
 using namespace tbb;
 
-
 int main(int argc, char *argv[])
 {
+	setlocale(LC_ALL, ""); /* use user selected locale */
 	SetupData setupValues;
 
 	if ( argc < 2 ) // argc should be 2 for correct execution
@@ -184,16 +185,12 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
     //multimap<string,array<int,2>> fragments; //** map based run **//
 
     fragType fragments;
-    getHindIIIsitesFromHicup(fragments, setupValues.getEnzyme());
+    getHindIIIsitesFromHicup(fragments, setupValues.getEnzyme(), setupValues);
     //throw std::invalid_argument("");
 
     mapHicupToRestrictionFragment(interactions, fragments);
 
 	binInteractions(interactions, setupValues);
-
-	if (setupValues.getVerbose())
-	cout << "Interactions size: " << interactions.size() << " (5530314)" << endl;
-
 
 	switch (setupValues.getAnalysisType())
 	{
@@ -211,5 +208,8 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
 		break;
 	}
+
+	if (setupValues.getVerbose())
+		fprintf(stderr, "\tFinal Interactions size: %'d" , interactions.size() );
 
 }

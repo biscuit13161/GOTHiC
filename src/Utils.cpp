@@ -71,7 +71,7 @@ void printUsage()
 	cerr << "    gothic <path/to/config/file>" << endl;
 	cerr << "OR" << endl;
 	cerr << "    gothic -i <filename> -s <name> -d <filename> [-t #] [-r #] [-o <dir>] [-c (all|trans|cis)]" << endl;
-	cerr << "      [-A (single|comparative)] [-l <filename>] [--verbose] [--no_rem_diag]" << endl << endl;
+	cerr << "      [-A (single|comparative)] [--verbose] [--no_rem_diag]" << endl << endl;
 	cerr << "options:" << endl;
 	cerr <<
 			"    -i <filename>         Input filename\n"
@@ -90,8 +90,8 @@ void printUsage()
 			"      --cistrans (all|trans|cis)\n"
 			"    -A <option>           Analysis type, either 'single' or 'comparative'\n"
 			"      --analysis <option>\n"
-			"    -l <filename>         Log file\n"
-			"      --log <filename>\n"
+//			"    -l <filename>         Log file\n"
+//			"      --log <filename>\n"
 			"    --verbose             Print verbose output during run\n"
 			"    --no_rem_diag         Flag to stop removal of diagonals during analysis\n";
 	cerr << endl;

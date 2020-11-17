@@ -26,11 +26,13 @@
 
 #include "UtilsComp.h"
 #include "Site.h"
+#include "SetupComp.h"
 #include "Interactions.h"
 #include "version.h"
 #include <cmath>
 #include <ctime>
 #include <cstdarg>
+#include <cstdio>
 #include <stdint.h>
 #include <iostream>
 #include <fstream>
@@ -89,8 +91,8 @@ void printUsageComp()
 			"      --baits <filename>\n"
 			"    -t #                  Num of threads to run, defaults to 1\n"
 			"      --threads #\n"
-			"    -r #                  Resolution in bases for bining interactions, defaults to 10000\n"
-	        "      --res #\n"
+			"    -r #                  Resolution in bases for binning interactions, defaults to 10000\n"
+	        "      --res #               - Only effective for binning the baits file, Sample data is binned using gothic.\n"
 			"    -o <dir>              Output directory, defaults to './'\n"
 			"      --output <dir>\n"
 			"    -C (all|trans|cis)    Filter for Cis or Trans interactions,defaults to 'all'\n"
@@ -99,8 +101,8 @@ void printUsageComp()
 			"      --analysis (bh|ihw)\n"
 			"    -a #                  Alpha cutoff for p-value correction, defaults to '0.1'\n"
 			"      --alpha #\n"
-			"    -l <filename>         Log file\n"
-			"      --log <filename>\n"
+//			"    -l <filename>         Log file\n"
+//			"      --log <filename>\n"
 			"    --norandom            Turn off Random subsampling\n"
 			"    --verbose             Print verbose output during run\n"
 			"    --debug               Print very verbose output during run\n";
@@ -113,6 +115,7 @@ void verbosePrint(string & str, bool verbose)
 	if (verbose)
 	cout << str << endl;
 }
+
 
 void verbose(const char * fmt, ... )
 {
@@ -391,7 +394,7 @@ void readBinary(tbb::concurrent_vector<Interaction> & interactions, string binIn
 
 	if (verb_lev >= vl_info)
 	{
-		cout << "\t" << interactions.size() << " interactions loaded" <<endl;
+		fprintf(stderr, "\t%'d interactions loaded\n", interactions.size() );
 	}
 
 	completed();

@@ -4,7 +4,6 @@ GOTHiC++ is a C++ implementation of the Bioconductor R package [GOTHiC](https://
 
 This is Hi-C analysis software which uses a cumulative binomial test to detect interactions between distal genomic loci that have significantly more reads than expected by chance in Hi-C experiments \[Mifsud *et al*,2017\]. It takes mapped paired NGS reads as input and gives back the list of significant interactions for a given bin size in the genome.
 
-GOTHiC++ is available as a pre-built Singularity image which can be run locally or on a HPC, available from **TBC**.
 
 **GOTHiC Authors**: Borbala Mifsud and Robert Sugar
 
@@ -13,6 +12,25 @@ GOTHiC++ is available as a pre-built Singularity image which can be run locally 
 **GOTHiC++ Authors**: Richard Thompson, Elodie Darbo and Borbala Mifsud
 
 **Contact Email**: ithompson[at]hbku.edu.qa
+
+### Singularity Image
+
+Users who don't have the access or experience to compile on the commandline,GOTHiC++ is available as a pre-built Singularity image which can be run locally or on a HPC
+
+```bash
+singularity pull library://biscuit13161/default/gothic
+singularity verify <filename.sif>
+```
+
+#### Using Singularity to run GOTHiC++
+
+GOTHiC++ runs using the same options described below when being run from the Singularity image. 
+
+```bash
+singularity exec <filename.sif> gothic <options>
+singularity exec <filename.sif> gothicomp <optons>
+```
+Running the above commands without any issues will print the usage, detailing the commandline options. 
 
 ### Requirements
 + Cmake 3.4
@@ -69,7 +87,7 @@ or
 
 ```bash
 gothic -i <filename> -s <name> -d <filename> [-t #] [-r #] [-o <dir>] [-c (all|trans|cis)]
-      [-A (single|comparative)] [-l <filename>] [--verbose] [--no_rem_diag]
+      [-A (single|comparative)] [--verbose] [--no_rem_diag]
 ```
 
 ### Running Comparative GOTHiC++
@@ -87,6 +105,7 @@ gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-
  ```
 
 - When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 
+- The resolution option of gothicomp only affects the bin size of the baits file, changes to the sample bin size reuqire re-running gothic.
 
 ### Notes on config files
 

@@ -22,6 +22,7 @@
 
 class Interaction;
 class Site;
+class SetupComp;
 
 enum CisTrans
 {

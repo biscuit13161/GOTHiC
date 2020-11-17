@@ -31,6 +31,7 @@
 #include "IHW.h"
 #include <iostream>
 #include <stdio.h>
+#include <locale.h>
 #include "tbb/concurrent_vector.h"
 #include "tbb/task_scheduler_init.h"
 
@@ -40,6 +41,7 @@ using namespace tbb;
 
 int main(int argc, char *argv[])
 {
+	setlocale(LC_ALL, ""); /* use user selected locale */
 	SetupComp setupValues;
 
 	if ( argc < 2 ) // argc should be 2 for correct execution

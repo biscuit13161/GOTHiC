@@ -106,6 +106,7 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 
 	sort(interactions.begin(),interactions.end(), intcomp);
 	completed();
+	fprintf(stderr, "\tLoaded %'d positions\n\n", interactions.size());
 }
 
 void importHicupGz(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
@@ -318,7 +319,8 @@ void importHicupTxt(string fileName, concurrent_vector<Interaction> & interactio
 void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions, vector<Site> & fragments)
 {
 	int iSize = interactions.size();
-	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
+	fprintf(stderr,"Mapping HiCUP data to enzyme fragments\n");
+	//cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
 	//string binOutFileName = "Digest.bin";
 	//writeBinary(fragments, binOutFileName);
@@ -338,7 +340,7 @@ void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions
 	findOverlaps(sources, fragments, "Sources");
 	findOverlaps(targets, fragments, "Targets");
 
-	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
+	fprintf(stderr, "\tIdentified %'d overlaps\n",2*sources.size() );
 
 	vector<Site> ().swap(fragments);
 	//sort positions into order
@@ -351,7 +353,8 @@ void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions
 void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions, multimap<string,array<int,2>> & fragments)
 {
 	int iSize = interactions.size();
-	cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
+	fprintf(stderr,"Mapping HiCUP data to enzyme fragments\n");
+	//cerr << endl << "Mapping HiCUP data (" << iSize << " positions) to enzyme fragments" << endl;
 
 	vector<halfInteraction> sources;
 	vector<halfInteraction> targets;
@@ -368,7 +371,7 @@ void mapHicupToRestrictionFragment(concurrent_vector<Interaction> & interactions
 	findOverlaps(sources, fragments, "Sources");
 	findOverlaps(targets, fragments, "Targets");
 
-	cerr << "Identified " << 2*sources.size() << " overlaps" << endl;
+	fprintf(stderr, "Identified %'d overlaps\n",2*sources.size() );
 
 	fragments.clear();
 
@@ -415,8 +418,7 @@ void sortPositions(concurrent_vector<Interaction> & interactions, int iSize, vec
 
 void binInteractions(concurrent_vector<Interaction> & interactions, SetupData & setupValues)
 {
-	cerr << "Calculating Interaction Bins ("  <<interactions.size() << ")" << endl;
-
+	fprintf(stderr,"Calculating Interaction Bins (%'d)\n",interactions.size());
 	vector<Interaction> interactions2;
 
 	//#pragma omp parallel for
@@ -442,19 +444,19 @@ void binInteractions(concurrent_vector<Interaction> & interactions, SetupData & 
 
 	// --------- count the number of interactions between bins -------
 	if (setupValues.getVerbose())
-		cout << "Singles: " << interactions.size() << " (8058150)"  << endl;
+		fprintf(stderr,"\tSingles: %'d (must match above count)\n", interactions.size());
 
 	countDuplicates(interactions);
 
 	completed();
 }
 
-void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
+void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName, SetupData & setupValues)
 {
 	// ** getHindIIIsitesFromHicup using vector of Sites **
 
 	// load sites for HindIII restriction enzyme from HiCUP_digester
-	cerr << endl << "Loading Enzyme Restriction Sites" << endl;
+	fprintf(stderr,"Loading Enzyme Restriction Sites\n");
 
 	ifstream inFile;
 	inFile.open(fileName);
@@ -493,20 +495,22 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName)
 		rows++;
 	}
 	inFile.close();
-	cout << "  -- Vector Variant --" << endl;
+	if (setupValues.getVerbose())
+		cerr << "  -- Vector Variant --" << endl;
 
 	sort(sites.begin(), sites.end(), sitecomp);
 
 	completed();
-	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
+	fprintf(stderr,"\tLoaded %'d enzyme fragments\n\n", sites.size());
+
 }//*/
 
-void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string fileName)
+void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string fileName, SetupData & setupValues)
 {
 	// ** getHindIIIsitesFromHicup using multimap structure **
 
 	// load sites for HindIII restriction enzyme from HiCUP_digester
-	cerr << endl << "Loading Enzyme Restriction Sites" << endl;
+	fprintf(stderr,"Loading Enzyme Restriction Sites\n");
 
 	ifstream inFile;
 	inFile.open(fileName);
@@ -545,10 +549,11 @@ void getHindIIIsitesFromHicup(multimap<string,array<int,2>> & sites, string file
 	}
 
 	inFile.close();
-	cout << "  -- Map Variant --" << endl;
+	if (setupValues.getVerbose())
+		cerr << "  -- Map Variant --" << endl;
 
 	completed();
-	cerr << "Loaded " << sites.size() << " enzyme fragments" << endl;;
+	fprintf(stderr, "\tLoaded %'d enzyme fragments\n\n", sites.size() );
 }//*/
 
 
@@ -558,12 +563,13 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 	cerr << "Binomial HiC Hicup Analysis" << endl;
 
 	if (setupValues.getVerbose())
-		cout << "Interactions size: " << interactions.size() << " (5530314)" << endl;
+		fprintf(stderr, "\tInteractions size: %'d\n", interactions.size());
 
 	removeDiagonals(interactions, setupValues.getCisTrans(), setupValues.getRemoveDiagonal());
 
 	if (setupValues.getVerbose())
-		cout << "Removed size: " << interactions.size() << " (5526538)" << endl;
+		fprintf(stderr, "\tRemoved size: %'d\n", interactions.size());
+
 
 	// calculate coverage
     map<string,int> cov;
@@ -576,12 +582,13 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 
     calcFreq(interactions, cov, numberOfReadPairs, tCoverage, max);
 
-    cout << "Read Pairs " << numberOfReadPairs << " (7972645)" << endl;
+
 
     if (setupValues.getVerbose())
     {
-    	cerr << "Total Coverage: " << tCoverage  << " ()"<< endl;
-    	cerr << "Max Individual Coverage: " << max << endl;
+    	fprintf(stderr, "\t%'d Read Pairs \n", numberOfReadPairs);
+    	fprintf(stderr, "\tTotal Coverage: %'.f\n", tCoverage );
+    	fprintf(stderr, "\tMax Individual Coverage: %'d\n", max );
     }
 
     if (tCoverage == 0)
@@ -626,10 +633,10 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 
     if (setupValues.getVerbose())
     {
-    	cout << "Chromosomes Size: " << chromos.size() << endl;
-    	printf("numberOfAllInteractions: %.0f (%.0f, 64858846276)\n", numberOfAllInteractions, covS);
-    	printf("upperhalfBinNumber: %.0f (32429295801)\n", upperhalfBinNumber);
-    	printf("diagonalProb: %.10f (0.0003485705)\n", diagonalProb);
+    	fprintf(stderr, "\tChromosomes Size:         %'d\n", chromos.size() );
+    	fprintf(stderr, "\tnumberOfAllInteractions:  %'.f\n", numberOfAllInteractions);
+    	fprintf(stderr, "\tupperhalfBinNumber:       %'.1f\n", upperhalfBinNumber);
+    	fprintf(stderr, "\tdiagonalProb:             %e\n", diagonalProb);
     }
 
 
@@ -647,8 +654,8 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 
     if (setupValues.getVerbose())
     {
-    	printf("cisBinNumber: %.0f (835950970)\n", cisBinNumber);
-    	printf("transBinNumber: %.0f (31593344831)\n", transBinNumber);
+    	fprintf(stderr, "\tcisBinNumber:             %'.1f\n", cisBinNumber);
+    	fprintf(stderr, "\ttransBinNumber:           %'.1f\n", transBinNumber);
     }
 
     double probabilityCorrection = 0;
@@ -666,7 +673,7 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
     }
 
     if (setupValues.getVerbose())
-    	printf("Probability Correction: %.10f (1.000349) \n", probabilityCorrection);
+    	fprintf(stderr, "\tProbability Correction:   %e \n\n", probabilityCorrection);
 
 
     vector<array<double,3>> values;
@@ -740,7 +747,7 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 	});//*/
 
 //#ifdef DEBUG_FLAG
-    cout << "BinomialData Size: " << binFiltered.size() << endl;
+    fprintf(stderr, "\tBinomialData Size: %'d\n", binFiltered.size() );
 //#endif
 
     completed();
@@ -751,7 +758,7 @@ void binomialHiChicup(concurrent_vector<Interaction> & interactions, SetupData &
 void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, string name)
 {
 	// ** findOverlaps using vector and equal_range **
-	cerr << "Finding Overlaps in " << name << endl;
+	cout << "\tFinding Overlaps in " << name << endl;
 	int i;
 
 	//#pragma omp parallel for
@@ -774,6 +781,7 @@ void findOverlaps(vector<halfInteraction>& query, vector<Site> & fragments, stri
 		}
 	});//*/
 
+	cerr << "\t";
 	completed();
 }//*/
 
@@ -800,7 +808,7 @@ else
 void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> & fragments, string name)
 {
 	// ** findOverlaps for map **
-	cerr << "Finding Overlaps in " << name << endl;
+	cout << "\nFinding Overlaps in " << name << endl;
 
 	int i;
 
@@ -821,6 +829,7 @@ void findOverlaps(vector<halfInteraction>& query, multimap<string,array<int,2>> 
 				}
 		}
 	});
+	cerr << "\t";
 	completed();
 }//*/
 

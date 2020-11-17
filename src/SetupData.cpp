@@ -55,7 +55,7 @@ void SetupData::print()
 	cerr << "# Sample Name:      " << mSname << endl;
 	cerr << "# Input Data File:  " << mInput << endl;
 	cerr << "# Threads:          " << mThreads << endl;
-	cerr << "# Resolution:       " << mRes << endl;
+	fprintf(stderr, "# Resolution:       %d\n", mRes );
 	cerr << "# Config File:      " << mCliName << endl;
 	cerr << "# Verbose:          " << mVerbose << endl;
 	cerr << "# Analysis type:    ";
@@ -255,11 +255,20 @@ SetupData setConfig(int argc, char * argv[])
 
 void SetupData::setAnalysisType(string L)
 {
-	std::map<std::string,AnalysisOptions> AOoptionValues;
-	AOoptionValues["single"] = ao_single;
-	AOoptionValues["comparative"] = ao_comparative;
 
-	mAnalysisType = AOoptionValues[L];
+	if (string("single").find(L) != string::npos)
+	{
+		mAnalysisType = ao_single;
+	}
+	else if (string("comparative").find(L) != string::npos)
+	{
+		mAnalysisType = ao_comparative;
+	}
+	else
+	{
+		throw std::invalid_argument("Unknown Analysis type requested\n\tPlease select 'single' or 'comparative'");
+	}
+
 }
 
 void SetupData::setCisTrans(string input)

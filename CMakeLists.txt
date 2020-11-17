@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.4)
 cmake_policy(SET CMP0074 NEW)
 
-project (GOTHiC VERSION 0.1.5 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
+project (GOTHiC VERSION 0.1.6 HOMEPAGE_URL https://github.com/biscuit13161/GOTHiC LANGUAGES C CXX)
 
 include(CTest) # note: this adds a BUILD_TESTING which defaults to ON
 
