@@ -19,7 +19,12 @@ Users who don't have the access or experience to compile on the commandline,GOTH
 
 ```bash
 singularity pull library://biscuit13161/default/gothic
-singularity verify <filename.sif>
+```
+
+Downloaded files can be verified with the following sha256 checksums:
+
+```
+6270a7a4fe0fa431ea36549c01d1eb4b4b03c34c51cfab75e8dab8e9e8c46e2d  gothic.0.1.6.sif
 ```
 
 #### Using Singularity to run GOTHiC++

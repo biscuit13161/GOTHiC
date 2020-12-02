@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <istream>
 #include <fstream>
+#include <filesystem>
 #include <map>
 #include <cmath>
 #include <regex>
@@ -73,14 +74,14 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 	if (fileName.find("bam",fileName.length()-3)!=string::npos)
 	{
 		string f2 = fileName + ".txt";
-		if (file_exists (f2))
+		if ( filesystem::exists(f2) )
 		{
 			cerr << "\tbam.txt file already exists" << endl;
 		}
 		else
 		{
 			cerr << "\tconverting Bam file" << endl;
-			string str = string("samtools view -h --no-PG ") + fileName + " | grep -v \"^@\" | cut -f -4 > " + f2;
+     		string str = string("samtools view -h --no-PG ") + fileName + " | grep -v \"^@\" | cut -f -4 > " + f2;
 			const char *cmd = str.c_str();
 			system(cmd);
 			//throw std::invalid_argument("importHicup: doesn't function with bam files, input can be converted to appropriate text file using hicupToTable script");
@@ -89,6 +90,7 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 		}
 		fileName = f2;
 	}
+
 	if (fileName.find("sam",fileName.length()-3)!=string::npos)
 	{
 		importHicupSam(fileName, interactions, checkConsistency);
@@ -101,7 +103,7 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 	}
 	else
 	{
-		importHicupTxt(fileName, interactions, checkConsistency);
+//		importHicupTxt(fileName, interactions, checkConsistency);
 	}
 
 	sort(interactions.begin(),interactions.end(), intcomp);

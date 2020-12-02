@@ -67,7 +67,7 @@ void completed(int n)
 void printUsage()
 {
 	cerr << "GOTHiC++ usage:" << endl;
-	cerr << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cerr << string("version: ") << GOTH_VERSION_STRING << endl << endl;
 	cerr << "    gothic <path/to/config/file>" << endl;
 	cerr << "OR" << endl;
 	cerr << "    gothic -i <filename> -s <name> -d <filename> [-t #] [-r #] [-o <dir>] [-c (all|trans|cis)]" << endl;

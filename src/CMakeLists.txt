@@ -16,6 +16,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 set(GOTH_MAJOR_VERSION ${CMAKE_PROJECT_VERSION_MAJOR})
 set(GOTH_MINOR_VERSION ${CMAKE_PROJECT_VERSION_MINOR})
 set(GOTH_PATCH_VERSION ${CMAKE_PROJECT_VERSION_PATCH}) 
+set(GOTH_TWEAK_VERSION ${CMAKE_PROJECT_VERSION_TWEAK}) 
 configure_file("version.h.in" "version.h" @ONLY)
 
 list (APPEND CLIBS dbinom pbinom toms708 bd0 lgamma stirlerr gamma)

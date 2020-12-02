@@ -72,7 +72,7 @@ void printUsageComp()
 {
 
 	cout << "GOTHiC++ usage:" << endl;
-	cout << string("version: ") << GOTH_MAJOR_VERSION << "." << GOTH_MINOR_VERSION << "." << GOTH_PATCH_VERSION << endl << endl;
+	cout << string("version: ") << GOTH_VERSION_STRING << endl << endl;
 	cout << "    gothicomp <path/to/config/file>" << endl;
 	cout << "OR" << endl;
 	cout << "    gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]" << endl;

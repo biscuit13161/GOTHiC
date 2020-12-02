@@ -46,14 +46,11 @@ int main(int argc, char *argv[])
 
 	if ( argc < 2 ) // argc should be 2 for correct execution
 	{
-		// We print argv[0] assuming it is the program name
-		cerr<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
 	else if ((strcmp(argv[1], "--help")==0) || (strcmp(argv[1], "-h")==0))
 	{
-		cerr<<"usage: "<< argv[0] <<" <filename>\n";
 		printUsageComp();
 		return 0;
 	}
