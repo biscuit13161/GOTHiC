@@ -26,7 +26,7 @@ public:
     }
 };
 
-void importHicup(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
+void importHicup(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, SetupData & setupValues, bool checkConsistency=true);
 void importHicupTxt(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupSam(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency=true);
 void importHicupGz(std::string fileName, tbb::concurrent_vector<Interaction> & interactions, bool checkConsistency);

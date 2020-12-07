@@ -171,7 +171,7 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 	// Get Hicup data
 	concurrent_vector<Interaction> interactions;
 
-    importHicup(setupValues.getInput(), interactions);
+    importHicup(setupValues.getInput(), interactions, setupValues);
 
     const bool fast = false; // set true to use map version and false to use Vector version
 
