@@ -63,7 +63,7 @@ struct RetrieveKey
 };
 
 
-void importHicup(string fileName, concurrent_vector<Interaction> & interactions, bool checkConsistency)
+void importHicup(string fileName, concurrent_vector<Interaction> & interactions, SetupData & setupValues, bool checkConsistency)
 {
 	cerr << "Importing HiCUP file: " << fileName << endl;
 
@@ -89,6 +89,11 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 			completed();
 		}
 		fileName = f2;
+		if (setupValues.getVerbose())
+		{
+			cerr << "\tinput file renamed to " << fileName <<endl;
+		}
+
 	}
 
 	if (fileName.find("sam",fileName.length()-3)!=string::npos)
@@ -103,11 +108,15 @@ void importHicup(string fileName, concurrent_vector<Interaction> & interactions,
 	}
 	else
 	{
-//		importHicupTxt(fileName, interactions, checkConsistency);
+		importHicupTxt(fileName, interactions, checkConsistency);
 	}
 
 	sort(interactions.begin(),interactions.end(), intcomp);
 	completed();
+	if ( interactions.size() == 0 )
+	{
+		throw std::invalid_argument("Input Data not loaded!");
+	}
 	fprintf(stderr, "\tLoaded %'d positions\n\n", interactions.size());
 }
 
