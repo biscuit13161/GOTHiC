@@ -115,6 +115,7 @@ printf(fmt, &args);
 #endif
 /*This isn't tested, the point is to be able to pass args to
 printf*/
+va_end(args);
 }
 
 uint32_t fact(uint32_t n)
