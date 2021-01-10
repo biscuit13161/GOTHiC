@@ -21,12 +21,6 @@ Users who don't have the access or experience to compile on the commandline,GOTH
 singularity pull library://biscuit13161/default/gothic
 ```
 
-Downloaded files can be verified with the following sha256 checksums:
-
-```
-6270a7a4fe0fa431ea36549c01d1eb4b4b03c34c51cfab75e8dab8e9e8c46e2d  gothic.0.1.6.sif
-```
-
 #### Using Singularity to run GOTHiC++
 
 GOTHiC++ runs using the same options described below when being run from the Singularity image. 
@@ -35,9 +29,110 @@ GOTHiC++ runs using the same options described below when being run from the Sin
 singularity exec <filename.sif> gothic <options>
 singularity exec <filename.sif> gothicomp <optons>
 ```
-Running the above commands without any issues will print the usage, detailing the commandline options. 
+Running the above commands without any arguments issues will print the usage, detailing the commandline options. 
 
-### Requirements
+### Running Single Sample GOTHiC++
+
+GOTHiC++ does not, currently, readin HiCUP bam/sam files directly. Bam/sam files from HiCUP can be converted to txt files using the hicupToTable.sh script found in the src subdirectory where gothic is built.
+
+```bash
+src/hicupToTable.sh <input.bam>
+```
+Specifying bam/sam files in the config file, will result in gothic automatically converting `<input.bam>` to `<input.bam.txt>` if it does not exist. This file is then loaded by gothic.
+
+```bash
+<path/to>/gothic <path/to/gothic.conf>
+```
+
+or
+
+```bash
+gothic -i <filename> -s <name> -d <filename> [-t \#] [-r \#] [-o <dir>] [-c (all|trans|cis)]
+      [-A (single|comparative)] [--verbose] [--no_rem_diag]
+
+options:
+    -i <filename>         Input filename
+      --input <filename>
+    -s <name>             Sample name
+      --sample <name>
+    -d <filename>         Digest of Restriction Enzyme, as used by HiCUP
+      --digest <filename>
+    -t #                  Num of threads to run, defaults to 1
+      --threads #
+    -r #                  Resolution in bases for bining interactions, defaults to 10000
+      --res #
+    -o <dir>              Output directory, defaults to './'
+      --output <dir>
+    -c (all|trans|cis)    Filter for Cis or Trans interactions,defaults to 'all'
+      --cistrans (all|trans|cis)
+    -A <option>           Analysis type, either 'single' or 'comparative'
+      --analysis <option>
+    --verbose             Print verbose output during run
+    --no_rem_diag         Flag to stop removal of diagonals during analysis
+```
+
+
+
+### Running Comparative GOTHiC++
+
+In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file (`<SampleName>.inter.bin`). These files are then used as input for gothicomp.
+
+```bash
+<path/to>/gothicomp <path/to/gothicomp.conf>
+```
+ or 
+ 
+ ```bash
+gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t \#] [-r \#]
+        [-o <dir>] [-a \#] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose|--debug]
+        
+options:
+    -c <filename>         Control input filename
+      --control <filename>
+    -s <filename>         Sample input filename
+      --sample <filename>
+    -n <name>             Sample name
+      --sample <name>
+    -d <filename>         Digest of Restriction Enzyme, as used by HiCUP
+      --digest <filename>
+    -b <filename>         Baits file for analysis, as used by HiCUP
+      --baits <filename>
+    -t #                  Num of threads to run, defaults to 1
+      --threads #
+    -r #                  Resolution in bases for binning interactions, defaults to 10000
+      --res #               - Only effective for binning the baits file, Sample data is binned using gothic.
+    -o <dir>              Output directory, defaults to './'
+      --output <dir>
+    -C (all|trans|cis)    Filter for Cis or Trans interactions,defaults to 'all'
+      --cistrans (all|trans|cis)
+    -A (bh|ihw)           Algorithm for p-value correction, either 'bh' or 'ihw'
+      --analysis (bh|ihw)
+    -a #                  Alpha cutoff for p-value correction, defaults to '0.1'
+      --alpha #
+    --norandom            Turn off Random subsampling
+    --verbose             Print verbose output during run
+    --debug               Print very verbose output during run
+ ```
+
+- When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 
+- The resolution option of gothicomp only affects the bin size of the baits file, changes to the sample bin size reuqire re-running gothic.
+
+### Notes on config files
+
+<ul>
+<li>GOTHiC and GOTHiCOMP can carry out analysis using only 
+	<ul>
+	<li> cis (defined as both on the same chromosome)</li> 
+  <li>trans (defined as between chromosomes)</li>
+  <li>all</li>
+  </ul> 
+The config default is to analyse all interactions, but can be changed by altering the "CisTrans" option
+</li>
+
+<li>By default, GOTHiC and GOTHiComp will remove diagnals; if this is not required, please uncomment the "#RemoveDiagonals: false" line</li>
+</ul>
+
+### Requirements for building from Source
 + Cmake 3.4
 + C99 and C++17-compatible compiler
 + Boost C++ libraries (for unit testing)
@@ -67,7 +162,7 @@ it is possible that cmake will not use the correct compilers if you have multipl
 cmake -DCMAKE_C_COMPILER=/usr/local/bin/gcc -DCMAKE_CXX_COMPILER=/usr/local/bin/g++ ..
 ```
 
-### Testing
+### Testing compiled code
 
 Once compiled, the compilation can be tested using:
 
@@ -75,57 +170,6 @@ Once compiled, the compilation can be tested using:
 make test
 ```
 
-### Running Single Sample GOTHiC++
-
-GOTHiC++ does not, currently, readin HiCUP bam/sam files directly. Bam/sam files from HiCUP can be converted to txt files using the hicupToTable.sh script found in the src subdirectory where gothic is built.
-
-```bash
-src/hicupToTable.sh <input.bam>
-```
-Specifying bam/sam files in the config file, will result in gothic automatically converting `<input.bam>` to `<input.bam.txt>` if it does not exist. This file is then loaded by gothic.
-
-```bash
-<path/to>/gothic <path/to/gothic.conf>
-```
-
-or
-
-```bash
-gothic -i <filename> -s <name> -d <filename> [-t #] [-r #] [-o <dir>] [-c (all|trans|cis)]
-      [-A (single|comparative)] [--verbose] [--no_rem_diag]
-```
-
-### Running Comparative GOTHiC++
-
-In order to carry a comparative analysis, Samples must be individually run as described above for single samples, but with the "**Analysis: comparative**" option. This mode causes gothic to carry out the fragment identification, binning and frequency counting before outputing the interactions into a binary file (`<SampleName>.inter.bin`). These files are then used as input for gothicomp.
-
-```bash
-<path/to>/gothicomp <path/to/gothicomp.conf>
-```
- or 
- 
- ```bash
-gothicomp -c <filename> -s <filename> -n <name> -d <filename> [-b <filename>] [-t #] [-r #]
-        [-o <dir>] [-a #] [-A (bh|ihw)] [-C (all|trans|cis)] [--norandom] [--verbose|--debug]
- ```
-
-- When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 
-- The resolution option of gothicomp only affects the bin size of the baits file, changes to the sample bin size reuqire re-running gothic.
-
-### Notes on config files
-
-<ul>
-<li>GOTHiC and GOTHiCOMP can carry out analysis using only 
-	<ul>
-	<li> cis (defined as both on the same chromosome)</li> 
-  <li>trans (defined as between chromosomes)</li>
-  <li>all</li>
-  </ul> 
-The config default is to analyse all interactions, but can be changed by altering the "CisTrans" option
-</li>
-
-<li>By default, GOTHiC and GOTHiComp will remove diagnals; if this is not required, please uncomment the "#RemoveDiagonals: false" line</li>
-</ul>
 
 ### Installing Boost
 
