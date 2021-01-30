@@ -29,6 +29,7 @@ private:
 	bool mRemoveDiagonal;
 	Verb_level mVerbose;
 	bool mRandom;
+	bool mTime;
 	std::string mAlpha;
 	QV_Options mQvalue;
 	double mUpperhalfBinNumber;
@@ -64,6 +65,7 @@ public:
 	inline double getCovS() {return mCovS;}
 	inline double getCisBinNumber() {return mCisBinNumber;}
 	inline double getTransBinNumber() {return mTransBinNumber;}
+	inline bool getTime() const {return mTime;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -87,6 +89,7 @@ public:
 	inline void setCovS(double L) {mCovS = L;}
 	inline void setCisBinNumber(double L) {mCisBinNumber = L;}
 	inline void setTransBinNumber(double L) {mTransBinNumber = L;}
+	inline void setTime(bool L) {mTime = L;}
 
 };
 
@@ -108,7 +111,8 @@ enum SC_Options {
 	sc_Verbose,
 	sc_Random,
 	sc_Alpha,
-	sc_Qvalues
+	sc_Qvalues,
+	sc_Time
 };
 
 

@@ -33,6 +33,8 @@ private:
 	bool mRemoveDiagonal;
 	AnalysisOptions mAnalysisType;
 	bool mVerbose;
+	bool mTime;
+
 public:
 	SetupData();
 	SetupData(std::string outDir, std::string enzyme, std::string input, int threads);
@@ -51,6 +53,7 @@ public:
 	inline bool getRemoveDiagonal() const {return mRemoveDiagonal;}
 	inline AnalysisOptions getAnalysisType() const {return mAnalysisType;}
 	inline bool getVerbose() const {return mVerbose;}
+	inline bool getTime() const {return mTime;}
 
 	inline void setThreads(int threads) {mThreads = threads;}
 	inline void setRes(int res) {mRes = res;}
@@ -66,6 +69,7 @@ public:
 	void setAnalysisType(std::string L);
 	//{mAnalysisType = L;}
 	inline void setVerbose(bool L) {mVerbose = L;}
+	inline void setTime(bool L) {mTime = L;}
 
 };
 
@@ -84,6 +88,7 @@ enum Options {
 	RemDiag,
 	Logfile,
 	Verbose,
+	Time
 };
 
 

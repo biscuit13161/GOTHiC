@@ -115,7 +115,7 @@ options:
  ```
 
 - When there is a greater than 10% difference in read count between the samples, GOTHiComp will randomly subset the larger sample to match the size of the smaller sample before calculating the P values. This behaviour can be turned off with `--norandom` on the CLI, or setting `RandomSubset: false` if using a config file. 
-- The resolution option of gothicomp only affects the bin size of the baits file, changes to the sample bin size reuqire re-running gothic.
+- The resolution option of gothicomp only affects the bin size of the baits file, changes to the sample bin size require re-running gothic.
 
 ### Notes on config files
 

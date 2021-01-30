@@ -28,7 +28,9 @@
 #include "Interactions.h"
 #include "hicupDataComp.h"
 #include "binTest.h"
+#include "resources.h"
 #include "IHW.h"
+#include <chrono>
 #include <iostream>
 #include <stdio.h>
 #include <locale.h>
@@ -37,10 +39,13 @@
 
 using namespace std;
 using namespace tbb;
+using namespace std::chrono;
 
 
 int main(int argc, char *argv[])
 {
+	auto start = steady_clock::now();
+
 	setlocale(LC_ALL, ""); /* use user selected locale */
 	SetupComp setupValues;
 
@@ -96,6 +101,31 @@ int main(int argc, char *argv[])
 		outputfile(binom, setupValues);
 	}
 
+	auto stop = steady_clock::now();
+	auto duration = duration_cast<seconds>(stop - start);
+	int hour = 0;
+	int min = 0;
+	int sec = 0;
+
+	if (setupValues.getTime()) {
+		size_t peakSize    = getPeakRSS( );
+		cerr << endl << "Peak Memory Usage (kBytes): " << peakSize/1024 << endl;
+		int time = duration.count();
+		if (time >= 3600)
+		{
+			hour = time/3600;
+			time = time%3600;
+		}
+		min = time/60;
+		time = time%60;
+		sec = time;
+		if (hour > 0)
+			fprintf(stderr, "Run time (mm:ss): %02d:%02d:%02d", hour, min, sec );
+		else
+			fprintf(stderr, "Run time (mm:ss): %02d:%02d", min, sec );
+	}
+
+	cerr << endl;
 	return 0;
 }
 
