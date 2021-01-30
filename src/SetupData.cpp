@@ -36,12 +36,12 @@
 
 using namespace std;
 
-SetupData::SetupData(): mOutDir("./"), mEnzyme(""), mInput(""), mThreads(1), mRes(10000), mRemoveDiagonal(true)
+SetupData::SetupData(): mOutDir("./"), mEnzyme(""), mInput(""), mThreads(1), mRes(10000), mRemoveDiagonal(true), mTime(false)
 {
 
 }
 
-SetupData::SetupData(string outDir, string enzyme, string input, int threads): mOutDir(outDir), mEnzyme(enzyme), mInput(input), mThreads(threads)
+SetupData::SetupData(string outDir, string enzyme, string input, int threads): mOutDir(outDir), mEnzyme(enzyme), mInput(input), mThreads(threads), mTime(false)
 {
 
 }
@@ -63,6 +63,8 @@ void SetupData::print()
 		cerr << "Comparative" << endl;
 	else
 		cerr << "Single" << endl;
+	if (mTime)
+		cerr << "# Output Time and Memory Resources" << endl;
 	cerr << "#" << endl << endl;
 }
 
@@ -184,12 +186,14 @@ SetupData setConfig(int argc, char * argv[])
 
 	static int verbose_flag;
 	static int remdiag_flag;
+	static int time_flag;
 
 	static struct option long_options[] =
 	{
 			/* These options set a flag. */
 			{"verbose", no_argument,       &verbose_flag, 1},
 			{"no_rem_diag",   no_argument,       &remdiag_flag, 1},
+			{"time",   no_argument,       &time_flag, 1},
 			/* These options don’t set a flag.
 			             We distinguish them by their indices. */
 			{"input",     required_argument,       0, 'i'},
@@ -249,6 +253,9 @@ SetupData setConfig(int argc, char * argv[])
 		setupValues.setRemoveDiagonal(true);
 	else
 		setupValues.setRemoveDiagonal(false);
+
+	if (time_flag)
+		setupValues.setTime(true);
 
 	return setupValues;
 }

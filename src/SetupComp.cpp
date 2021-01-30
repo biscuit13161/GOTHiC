@@ -75,6 +75,8 @@ void SetupComp::print()
 	else
 		cout << "# Pvalue Correction: Not Specfied!" <<endl;
 	cout << "# Alpha:             " << mAlpha << endl;
+	if (mTime)
+		cerr << "# Output Time and Memory Resources" << endl;
 	cout << "#" << endl << endl;
 }
 
@@ -221,6 +223,7 @@ SetupComp setConfigComp(int argc, char * argv[])
 
 	static int verbose_flag;
 	static int debug_flag;
+	static int time_flag;
 	static int remdiag_flag;
 	static int random_flag;
 
@@ -229,6 +232,7 @@ SetupComp setConfigComp(int argc, char * argv[])
 			/* These options set a flag. */
 			{"verbose", no_argument,       &verbose_flag, 1},
 			{"debug", no_argument,       &debug_flag, 1},
+			{"time", no_argument,       &time_flag, 1},
 			{"norandom", no_argument,       &random_flag, 1},
 			/* These options don’t set a flag.
 			             We distinguish them by their indices. */
@@ -303,6 +307,8 @@ SetupComp setConfigComp(int argc, char * argv[])
 		setupValues.setVerbose(vl_debug);
 	if (random_flag)
 		setupValues.setRandom(false);
+	if (time_flag)
+			setupValues.setTime(true);
 
 	return setupValues;
 }
