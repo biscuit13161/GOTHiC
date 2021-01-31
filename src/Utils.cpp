@@ -34,6 +34,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 #include <boost/filesystem.hpp>
 #include "tbb/parallel_for.h"
 
@@ -518,6 +519,14 @@ bool file_exists (const std::string& name)
     } else {
         return false;
     }
+}
+
+void checkFileExists(std::string file)
+{
+	namespace fs = std::filesystem;
+	fs::path f{ file };
+	if (! fs::exists(f))
+		throw std::invalid_argument("importHicup: Input file not found");
 }
 
 char *removeSpaces(string & str)

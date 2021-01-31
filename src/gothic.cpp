@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <locale.h>
 #include <chrono>
+#include <filesystem>
 //#include <omp.h>
 #include <string>
 #include "tbb/concurrent_vector.h"
@@ -201,6 +202,9 @@ void gothicHicup(SetupData & setupValues, vector<BinomData> & binom)
 
 	// Get Hicup data
 	concurrent_vector<Interaction> interactions;
+
+	checkFileExists( setupValues.getInput() , "Input");
+	checkFileExists( setupValues.getEnzyme() , "Digest");
 
     importHicup(setupValues.getInput(), interactions, setupValues);
 
