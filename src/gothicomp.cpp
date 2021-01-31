@@ -30,6 +30,7 @@
 #include "binTest.h"
 #include "resources.h"
 #include "IHW.h"
+#include "JointUtils.h"
 #include <chrono>
 #include <iostream>
 #include <stdio.h>
