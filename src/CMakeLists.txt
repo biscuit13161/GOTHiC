@@ -29,7 +29,7 @@ foreach(lib ${CLIBS})
 endforeach(lib)
 
 ## norm libs
-list (APPEND LIBS Site padjust binomTest Interactions binTest)
+list (APPEND LIBS Site padjust binomTest Interactions binTest JointUtils)
 
 foreach(lib ${LIBS})
   ## copy list (zero-based, -1 refers to end) ##

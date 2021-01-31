@@ -29,6 +29,7 @@
 #include "Utils.h"
 #include "BinomData.h"
 #include "resources.h"
+#include "JointUtils.h"
 #include <iostream>
 #include <stdio.h>
 #include <locale.h>
