@@ -65,6 +65,7 @@ int binarySearch(int arr[], int l, int r, int x);
 int binarySearch2(int arr[], int l, int r, int x);
 
 bool file_exists (const std::string& name);
+void checkFileExists(std::string file);
 
 char *removeSpaces(std::string & str);
 char *removeSpaces(char *str);

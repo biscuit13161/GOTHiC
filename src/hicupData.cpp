@@ -469,6 +469,8 @@ void getHindIIIsitesFromHicup(vector<Site> & sites, string fileName, SetupData &
 	// load sites for HindIII restriction enzyme from HiCUP_digester
 	fprintf(stderr,"Loading Enzyme Restriction Sites\n");
 
+	checkFileExists(fileName);
+
 	ifstream inFile;
 	inFile.open(fileName);
 
