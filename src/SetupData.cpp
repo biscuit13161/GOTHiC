@@ -210,6 +210,7 @@ SetupData setConfig(int argc, char * argv[])
 
 	int option_index = 0;
 	int opt;
+	string value;
 
 	while ((opt = getopt_long(argc, argv, "i:s:d:t:r:o:c:A:l:", long_options, &option_index)) != -1)
 	{
@@ -232,7 +233,10 @@ SetupData setConfig(int argc, char * argv[])
 			setupValues.setRes(atoi(optarg));
 			break;
 		case 'o':
-			setupValues.setOutDir(optarg);
+			value = removeSpaces(optarg);
+			if (! boost::algorithm::ends_with(value, "/"))
+				value += "/";
+			setupValues.setOutDir(value);
 			break;
 		case 'c':
 			setupValues.setCisTrans(optarg);
