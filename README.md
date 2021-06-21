@@ -18,7 +18,7 @@ This is Hi-C analysis software which uses a cumulative binomial test to detect i
 Users who don't have the access or experience to compile on the commandline,GOTHiC++ is available as a pre-built Singularity image which can be run locally or on a HPC
 
 ```bash
-singularity pull library://biscuit13161/default/gothic
+singularity pull library://gothic2020/default/gothic
 ```
 
 #### Using Singularity to run GOTHiC++
