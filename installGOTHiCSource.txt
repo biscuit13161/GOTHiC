@@ -1,0 +1,48 @@
+## create environment to install dependencies needed (can't be done in base env.)
+conda create -n omnicEnv
+## activate environment
+conda activate omnicEnv
+
+## install cmake (>= v3.12) Ref: https://cmake.org/download/
+conda install -n omnicEnv anaconda::cmake
+
+## install GCC and G++ >= v.10 
+conda install gcc_linux-64==11.2.0 gxx_linux-64==11.2.0
+
+## install IHW R package  
+conda install -c conda-forge bioconda::bioconductor-ihw==1.28.0
+
+## install tbb (within the env)
+conda install tbb-devel==2020.0 ## newer versions of tbb don't have tbb_stddef.h header in their include dir, which will be an issue
+
+## install boost (within the env)
+conda install boost==1.71.0
+
+
+## download gothic 
+## get env location from conda env list
+includeDir=$CONDA_PREFIX/include
+gothicDir=$HOME/software/GOTHiC
+
+cd $HOME/software 
+git clone https://github.com/biscuit13161/GOTHiC.git
+## make an empty directory to build the package
+mkdir GOTHiC/build
+cd GOTHiC/build
+
+#module switch PrgEnv-cray/6.0.9 PrgEnv-intel
+
+## it's important to specify the install directory with -DCMAKE_INSTALL_PREFIX
+## otherwise, it will try to install GOTHiC to /usr/bin which we don't have permission to access
+cmake -DCMAKE_C_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc \
+    -DCMAKE_CXX_COMPILER=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++ \
+    -DBoost_INCLUDE_DIRS=$includeDir -DTBB_INCLUDE_DIR=$includeDir \
+    -DCMAKE_INSTALL_PREFIX=$gothicDir $gothicDir
+
+make clean
+make
+ctest
+make install
+
+
+
